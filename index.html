@@ -76,12 +76,12 @@
     
     <section class="about-section" data-aos="fade-up">
         <h2>About Me ❄️</h2>
-        <p>I am a 12-year-old Grade 7 student. I'm saving up <strong>$1,000 for ski lessons</strong> this winter. Supporting me means getting clear paths while helping a local student reach a big goal!</p>
+        <p>I am a 12-year-old Grade 7 student saving up <strong>$1,000 for ski lessons</strong>. Supporting me means getting a clear sidewalk while helping a local student reach a goal!</p>
         <div class="goal-container">
             <div class="goal-bar">
                 <div id="dynamicBar" class="progress-fill" style="width: 7.5%;">$75</div>
             </div>
-            <p><strong>Current Progress: $75 / $1,000</strong></p>
+            <p><strong>Goal: $75 / $1,000</strong></p>
         </div>
     </section>
 
@@ -121,7 +121,7 @@
         <div class="card bundle-card" onclick="sel('Walkway & Sidewalk', 15)">
             <div class="badge">VALUE</div>
             <h3>Walkway & Sidewalk</h3>
-            <p>Saves $5 vs individual price.</p>
+            <p>Front path and city sidewalk cleared.</p>
             <span class="price">$15</span>
         </div>
         <div class="card bundle-card" onclick="sel('Driveway & Walkway', 20)">
@@ -133,7 +133,7 @@
         <div class="card bundle-card" onclick="sel('Sidewalk & Driveway', 20)">
             <div class="badge">VALUE</div>
             <h3>Sidewalk & Driveway</h3>
-            <p>Main public sidewalk and the driveway.</p>
+            <p>Main sidewalk and the full driveway.</p>
             <span class="price">$20</span>
         </div>
         <div class="card bundle-card" onclick="sel('Full Package', 30)">
@@ -153,8 +153,13 @@
         <form id="orderForm" action="https://formspree.io/f/xjgydwzk" method="POST">
             <input type="hidden" name="_next" value="thanks.html">
             <h2 id="form-head" style="text-align:center; margin-top: 0;">Book a Shoveling</h2>
+            
+            <label>Selected Service</label>
             <input type="text" name="Service" id="planInput" readonly required placeholder="Click a service above">
-            <input type="datetime-local" name="Requested_Time" required>
+
+            <label>Requested Date</label>
+            <input type="date" name="Requested_Date" required>
+
             <input type="text" name="Name" placeholder="Full Name" required>
             <input type="text" name="Address" placeholder="House Address" required>
             <input type="tel" name="Phone" placeholder="Phone Number" required>
@@ -197,7 +202,6 @@
     window.addEventListener('resize', init);
     init(); setInterval(draw, 30);
 
-    // DYNAMIC COLOR SCRIPT
     function updateGoalColor() {
         const bar = document.getElementById('dynamicBar');
         const widthVal = parseFloat(bar.style.width);
