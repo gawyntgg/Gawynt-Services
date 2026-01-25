@@ -31,23 +31,18 @@
 
         .section-title { text-align: center; color: var(--dark-blue); font-size: 2.2rem; margin-top: 50px; margin-bottom: 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px; }
-        .card { background: white; padding: 25px; border-radius: 20px; text-align: center; border: 1px solid #ddd; cursor: pointer; transition: 0.3s; position: relative; }
+        .card { background: white; padding: 25px; border-radius: 20px; text-align: center; border: 1px solid #ddd; cursor: pointer; transition: 0.3s; position: relative; display: flex; flex-direction: column; justify-content: space-between; }
         .card:hover { transform: translateY(-5px); border-color: var(--winter-blue); }
+        .card p { font-size: 0.95rem; color: #666; margin: 10px 0; }
         
         .badge { background: var(--gold); color: #333; padding: 5px 15px; font-size: 0.8rem; font-weight: bold; border-radius: 10px; position: absolute; top: 10px; right: 10px; }
         
-        /* CORNER PULSE ANIMATION */
         @keyframes corner-pulse {
             0% { transform: scale(1); box-shadow: 0 0 0 rgba(0, 119, 190, 0); }
             50% { transform: scale(1.1); box-shadow: 0 0 15px rgba(0, 119, 190, 0.6); }
             100% { transform: scale(1); box-shadow: 0 0 0 rgba(0, 119, 190, 0); }
         }
-        .badge-corner { 
-            background: var(--winter-blue) !important; 
-            color: white !important; 
-            animation: corner-pulse 2s infinite ease-in-out;
-        }
-
+        .badge-corner { background: var(--winter-blue) !important; color: white !important; animation: corner-pulse 2s infinite ease-in-out; }
         .badge-total { background: #2ecc71 !important; color: white !important; }
         .price { font-size: 1.8rem; font-weight: bold; color: var(--winter-blue); display: block; margin-top: 10px; }
 
@@ -78,8 +73,6 @@
     <section class="about-section" data-aos="fade-up">
         <h2>About Me & My Mission ❄️</h2>
         <p>I am a 12-year-old Grade 7 student in Calgary. I am hardworking, reliable, and I am saving up <strong>$1,000 for my ski lessons!</strong></p>
-        <p>When you hire me, you aren't just getting a clear sidewalk; you're helping a local student reach a big goal. Thank you for the support!</p>
-        
         <div class="goal-bar">
             <div class="progress-fill" style="width: 7.5%;">$75</div>
         </div>
@@ -92,19 +85,23 @@
     <div class="grid">
         <div class="card" onclick="sel('Walkway Only', 10)">
             <h3>Walkway Only</h3>
+            <p>The main path from the sidewalk to your front door.</p>
             <span class="price">$10</span>
         </div>
         <div class="card" onclick="sel('Sidewalk Only', 10)">
             <h3>Sidewalk Only</h3>
+            <p>The city sidewalk in front of a standard single lot.</p>
             <span class="price">$10</span>
         </div>
         <div class="card" onclick="sel('Corner Lot Sidewalks', 20)">
             <div class="badge badge-corner">CORNER</div>
             <h3>Corner Lot Sidewalks</h3>
+            <p>Clearing both city sidewalks on a corner property.</p>
             <span class="price">$20</span>
         </div>
         <div class="card" onclick="sel('Driveway Only', 15)">
             <h3>Driveway Only</h3>
+            <p>Shoveling a standard 2-car driveway.</p>
             <span class="price">$15</span>
         </div>
     </div>
@@ -114,33 +111,37 @@
         <div class="card" onclick="sel('Sidewalk & Walkway', 15)">
             <div class="badge">VALUE</div>
             <h3>Sidewalk & Walkway</h3>
+            <p>Front path plus standard city sidewalk.</p>
             <span class="price">$15</span>
         </div>
         <div class="card" onclick="sel('Walkway & Corner Sidewalk', 25)">
             <div class="badge badge-corner">CORNER</div>
             <h3>Walkway & Corner Sidewalk</h3>
+            <p>Front path plus both corner city sidewalks.</p>
             <span class="price">$25</span>
         </div>
         <div class="card" onclick="sel('Driveway & Walkway', 20)">
             <div class="badge">VALUE</div>
             <h3>Driveway & Walkway</h3>
+            <p>Shoveling your driveway and the path to the door.</p>
             <span class="price">$20</span>
         </div>
         <div class="card" onclick="sel('Driveway & Corner Sidewalk', 30)">
             <div class="badge badge-corner">CORNER</div>
             <h3>Driveway & Corner Sidewalk</h3>
+            <p>Driveway plus both corner city sidewalks.</p>
             <span class="price">$30</span>
         </div>
         <div class="card" onclick="sel('Full Regular Package', 30)">
             <div class="badge badge-total">TOTAL CLEAR</div>
             <h3>Full Regular Package</h3>
-            <p>Walkway, Sidewalk & Driveway (Single Lot).</p>
+            <p>Everything: Walkway, Sidewalk, and Driveway.</p>
             <span class="price">$30</span>
         </div>
         <div class="card" onclick="sel('Full Corner Package', 40)">
             <div class="badge badge-corner">CORNER TOTAL</div>
             <h3>Full Corner Package</h3>
-            <p>Every surface cleared (Corner Lot).</p>
+            <p>The total works: Driveway, Walkway, and both Sidewalks.</p>
             <span class="price">$40</span>
         </div>
     </div>
