@@ -20,7 +20,7 @@
             margin-bottom: 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); 
         }
 
-        .about-section { border-top: 10px solid var(--winter-blue); text-align: center; }
+        .about-section { border-top: 10px solid var(--winter-blue); text-align: center; line-height: 1.6; }
         .goal-bar { background: #eee; border-radius: 20px; height: 45px; width: 100%; max-width: 600px; margin: 15px auto; overflow: hidden; border: 2px solid #ddd; display: block !important; }
         .progress-fill { height: 100%; width: 7.5%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; background-color: #d9534f; min-width: 50px; }
 
@@ -31,7 +31,7 @@
 
         .section-title { text-align: center; color: var(--dark-blue); font-size: 2.2rem; margin-top: 50px; margin-bottom: 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px; }
-        .card { background: white; padding: 25px; border-radius: 20px; text-align: center; border: 1px solid #ddd; cursor: pointer; transition: 0.3s; position: relative; display: flex; flex-direction: column; justify-content: space-between; }
+        .card { background: white; padding: 25px; border-radius: 20px; text-align: center; border: 1px solid #ddd; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
         .card:hover { transform: translateY(-5px); border-color: var(--winter-blue); }
         .card p { font-size: 0.95rem; color: #666; margin: 10px 0; }
         
@@ -71,12 +71,15 @@
 <div class="container">
     
     <section class="about-section" data-aos="fade-up">
-        <h2>About Me & My Mission ❄️</h2>
-        <p>I am a 12-year-old Grade 7 student in Calgary. I am hardworking, reliable, and I am saving up <strong>$1,000 for my ski lessons!</strong></p>
+        <h2>About Me & My Goal ❄️</h2>
+        <p>Hi, I’m Gawynt! I’m a 12-year-old Grade 7 student living right here in Calgary. I started this shoveling business because I love being active outdoors and I want to learn the value of hard work.</p>
+        <p><strong>My Big Mission:</strong> I am saving up <strong>$1,000</strong> to pay for my own <strong>ski lessons, gear, and hill passes</strong> this winter! Every driveway I shovel and every sidewalk I clear gets me one step closer to the mountains.</p>
+        <p>I pride myself on being reliable, showing up on time, and doing a thorough job so you don't have to worry about the ice or snow. Thank you for supporting a local student!</p>
+        
         <div class="goal-bar">
             <div class="progress-fill" style="width: 7.5%;">$75</div>
         </div>
-        <p><strong>Progress: $75 / $1,000</strong></p>
+        <p><strong>Current Goal Progress: $75 / $1,000</strong></p>
     </section>
 
     <div class="alert-box">⚠️ NO SALT SERVICE — Shoveling only! ⚠️</div>
