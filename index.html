@@ -9,210 +9,246 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <script src="https://elfsightcdn.com/platform.js" async></script>
     <style>
+        /* --- ULTRA MODERN WINTER GLASSMORPHISM THEME --- */
         :root { 
-            --winter-blue: #00f2fe; 
+            --winter-blue: #0ea5e9; /* Neon icy blue */
+            --light-blue: #e0f2fe; 
             --snow-white: #ffffff; 
-            --dark-blue: #141e30; 
-            --orange: #ff8c00; 
-            --danger: #ff2a5f; 
-            --gold: #f6d365; 
-            --bg-dark: #0b0c10;
-            --success-green: #2ecc71;
+            --text-main: #f8fafc; /* Crisp white for dark mode */
+            --text-muted: #cbd5e1;
+            --orange: #f59e0b; 
+            --danger: #ef4444; 
+            --gold: #fbbf24; 
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f2027 100%);
+            --success-green: #10b981;
+            /* Glassmorphism Variables */
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: var(--winter-blue); border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+
+        /* Scroll Progress Bar at the very top */
+        #scroll-progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 5px; background: rgba(255,255,255,0.1); z-index: 9999; }
+        #scroll-progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--winter-blue), #38bdf8); box-shadow: 0 0 10px var(--winter-blue); }
 
         /* Loading Screen */
         #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-dark);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0f172a; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 10000;
+            transition: opacity 0.8s ease;
         }
         #loading-screen h1 {
-            color: var(--snow-white) !important;
-            margin-bottom: 20px;
-            font-size: 2.2rem;
-            font-family: 'Fredoka', sans-serif;
-            font-weight: 700;
+            color: var(--winter-blue) !important; margin-bottom: 20px;
+            font-size: 2.5rem; font-family: 'Fredoka', sans-serif; font-weight: 700;
+            text-shadow: 0 0 20px rgba(14, 165, 233, 0.5);
+            animation: pulse 1.5s infinite;
         }
-        .load-bar-container {
-            width: 280px;
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 20px;
-            overflow: hidden;
-            position: relative;
-        }
-        .load-bar-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, var(--winter-blue), var(--danger));
-            animation: loadProgress 1s linear forwards;
-        }
-        @keyframes loadProgress {
-            0% { width: 0%; }
-            100% { width: 100%; }
-        }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        
+        .load-bar-container { width: 300px; height: 8px; background: rgba(255,255,255,0.1); border-radius: 20px; overflow: hidden; position: relative; }
+        .load-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--winter-blue), var(--danger)); animation: loadProgress 1s ease-in-out forwards; }
+        @keyframes loadProgress { 0% { width: 0%; } 100% { width: 100%; } }
+
+        /* Falling Snow Keyframes */
+        @keyframes fall { to { transform: translateY(105vh); } }
 
         html { scroll-behavior: smooth; }
         body { 
-            font-family: 'Fredoka', sans-serif; 
-            margin: 0; 
-            background: var(--bg-dark); 
-            color: var(--snow-white); 
-            padding-top: 70px; 
-            overflow-x: hidden; 
+            font-family: 'Fredoka', sans-serif; margin: 0; 
+            background: var(--bg-gradient); color: var(--text-main); 
+            padding-top: 70px; overflow-x: hidden; position: relative;
         }
         
-        h1, h2, h3, h4, h5, h6 { 
-            color: var(--snow-white) !important; 
-            font-weight: 700;
-        }
+        h1, h2, h3, h4, h5, h6 { color: var(--snow-white) !important; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        p, strong, b, label, .section-title { color: var(--text-main) !important; }
 
-        p, strong, b, label, .section-title { color: var(--snow-white) !important; }
-
-        .container { max-width: 1000px; margin: auto; padding: 20px; position: relative; z-index: 10; }
+        .container { max-width: 1050px; margin: auto; padding: 20px; position: relative; z-index: 10; }
         
+        /* Glassmorphism Containers */
         .about-section, .area-section, .form-container, .review-section { 
-            background: rgba(20, 24, 30, 0.95); padding: 40px; border-radius: 30px; 
-            margin-bottom: 40px; box-shadow: 0 15px 40px rgba(0, 242, 254, 0.1); border: 1px solid #1f2833;
+            background: var(--glass-bg); padding: 40px; border-radius: 24px; 
+            margin-bottom: 40px; box-shadow: var(--glass-shadow); 
+            border: 1px solid var(--glass-border); backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: transform 0.3s ease;
         }
+        .about-section:hover, .form-container:hover { transform: translateY(-5px); }
 
         @keyframes highlightFormPulse {
-            0% { transform: scale(1); border-color: #1f2833; }
-            50% { transform: scale(1.02); border-color: var(--winter-blue); box-shadow: 0 0 50px rgba(0, 242, 254, 0.6); }
-            100% { transform: scale(1); border-color: #1f2833; }
+            0% { transform: scale(1); border-color: var(--glass-border); }
+            50% { transform: scale(1.02); border-color: var(--winter-blue); box-shadow: 0 0 60px rgba(14, 165, 233, 0.4); }
+            100% { transform: scale(1); border-color: var(--glass-border); }
         }
         .highlight-pulse { animation: highlightFormPulse 1s ease-out; }
 
-        .about-section { border-top: 10px solid var(--danger); text-align: center; line-height: 1.6; }
-        .goal-bar { background: #1a1a1a; border-radius: 20px; height: 45px; width: 100%; max-width: 600px; margin: 15px auto; overflow: hidden; border: 2px solid #333; display: block !important; }
-        .progress-fill { height: 100%; width: 7.5%; display: flex; align-items: center; justify-content: center; color: #fff !important; font-weight: bold; background: linear-gradient(90deg, var(--danger), var(--orange)); min-width: 50px; }
+        .about-section { border-top: 5px solid var(--winter-blue); text-align: center; line-height: 1.8; font-size: 1.1rem; }
+        .goal-bar { background: rgba(0,0,0,0.5); border-radius: 30px; height: 50px; width: 100%; max-width: 650px; margin: 25px auto; overflow: hidden; border: 2px solid rgba(255,255,255,0.2); box-shadow: inset 0 0 10px rgba(0,0,0,0.5); display: block !important; }
+        .progress-fill { height: 100%; width: 7.5%; display: flex; align-items: center; justify-content: center; color: #fff !important; font-weight: 700; font-size: 1.2rem; background: linear-gradient(90deg, var(--danger), var(--orange)); min-width: 60px; box-shadow: 0 0 15px rgba(245, 158, 11, 0.8); }
 
-        .alert-box { background: rgba(255, 42, 95, 0.1); border: 3px solid var(--danger); color: var(--danger) !important; padding: 20px; border-radius: 15px; text-align: center; font-weight: bold; margin-bottom: 30px; }
+        .alert-box { background: rgba(239, 68, 68, 0.15); border: 2px solid var(--danger); color: #fca5a5 !important; padding: 20px; border-radius: 15px; text-align: center; font-weight: bold; margin-bottom: 40px; backdrop-filter: blur(5px); box-shadow: 0 0 20px rgba(239, 68, 68, 0.2); }
 
-        .section-title { text-align: center; font-size: 2.2rem; margin-top: 50px; margin-bottom: 20px; }
+        .section-title { text-align: center; font-size: 2.5rem; margin-top: 60px; margin-bottom: 30px; }
         
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 30px; 
-            margin-bottom: 40px; 
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-bottom: 40px; }
+
+        /* Carousel Styles */
+        .carousel-wrapper { display: flex; align-items: center; position: relative; margin-bottom: 30px; }
+        .carousel-button { 
+            background: rgba(14, 165, 233, 0.2); color: var(--winter-blue); border: 1px solid var(--winter-blue);
+            font-size: 1.5rem; padding: 15px 20px; cursor: pointer; border-radius: 50%; z-index: 10; margin: 0 10px; 
+            font-weight: bold; transition: all 0.3s ease; backdrop-filter: blur(5px);
         }
+        .carousel-button:hover { background: var(--winter-blue); color: #fff; transform: scale(1.1); box-shadow: 0 0 20px var(--winter-blue); }
+        .carousel-container { display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 30px; scroll-snap-type: x mandatory; padding: 20px 5px; flex-grow: 1; }
+        .carousel-container::-webkit-scrollbar { display: none; }
+        .carousel-container .card { min-width: 300px; scroll-snap-align: center; flex: 0 0 auto; margin-bottom: 0; }
+
+        /* Glass Cards */
         .card { 
-            background: #151b23; 
-            padding: 25px; 
-            border-radius: 20px; 
-            text-align: center; 
-            border: 2px solid #2a3644;
-            cursor: pointer; 
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: space-between; 
-            position: relative; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            background: rgba(255, 255, 255, 0.03); padding: 30px 25px; border-radius: 20px; text-align: center; 
+            border: 1px solid rgba(255, 255, 255, 0.1); cursor: pointer; 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            display: flex; flex-direction: column; justify-content: space-between; position: relative; 
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
         }
-        .card:hover { transform: translateY(-8px); border-color: var(--winter-blue); box-shadow: 0 10px 25px rgba(0, 242, 254, 0.2); }
-        .card h3, .card p { color: var(--snow-white) !important; margin: 10px 0; }
-        
-        .badge { background: var(--gold); color: #000 !important; padding: 5px 15px; font-size: 0.8rem; font-weight: bold; border-radius: 10px; position: absolute; top: 10px; right: 10px; }
-        
-        @keyframes corner-pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); box-shadow: 0 0 15px var(--danger); }
-            100% { transform: scale(1); }
+        .card:hover { 
+            transform: translateY(-12px) scale(1.02); 
+            border-color: var(--winter-blue); 
+            background: rgba(14, 165, 233, 0.05);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(14, 165, 233, 0.3); 
         }
+        .card h3 { color: var(--snow-white) !important; margin: 15px 0 10px; font-size: 1.4rem; }
+        .card p { color: var(--text-muted) !important; margin: 0 0 15px; font-size: 0.95rem; line-height: 1.5; }
+        
+        .badge { background: var(--gold); color: #000 !important; padding: 6px 15px; font-size: 0.75rem; font-weight: 800; border-radius: 20px; position: absolute; top: -12px; right: 20px; box-shadow: 0 5px 15px rgba(251, 191, 36, 0.4); text-transform: uppercase; letter-spacing: 1px; }
+        
+        @keyframes corner-pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); box-shadow: 0 0 20px var(--danger); } 100% { transform: scale(1); } }
         .badge-corner { background: var(--danger) !important; color: #fff !important; animation: corner-pulse 2s infinite ease-in-out; }
-        .badge-total { background: var(--winter-blue) !important; color: #000 !important; }
-        .price { font-size: 1.8rem; font-weight: bold; color: var(--winter-blue) !important; display: block; margin-top: 10px; }
+        .badge-total { background: linear-gradient(45deg, var(--winter-blue), #8b5cf6) !important; color: #fff !important; box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4); }
+        .price { font-size: 2.2rem; font-weight: 800; color: var(--winter-blue) !important; display: block; margin-top: auto; text-shadow: 0 2px 10px rgba(14, 165, 233, 0.2); }
 
-        /* Updated Navigation Bar for Visibility */
+        /* Modern Frosted Navbar */
         .top-nav { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 70px; 
-            background: #0b0c10; /* Solid background for visibility */
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 0 20px; 
-            box-sizing: border-box; 
-            z-index: 2000; 
-            border-bottom: 2px solid var(--winter-blue); 
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            position: fixed; top: 0; left: 0; width: 100%; height: 75px; 
+            background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 0 40px; box-sizing: border-box; z-index: 2000; 
+            border-bottom: 1px solid rgba(255,255,255,0.05); 
         }
-        .nav-logo { color: var(--snow-white) !important; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.5px; }
-        .nav-links { display: flex; gap: 15px; align-items: center; }
-        .nav-links a { color: var(--snow-white) !important; text-decoration: none; font-weight: 600; transition: 0.3s; font-size: 0.85rem; cursor: pointer; white-space: nowrap; }
-        .nav-links a:hover { color: var(--winter-blue) !important; }
-        .nav-cta { background: var(--danger); color: white !important; padding: 6px 12px; border-radius: 10px; font-weight: bold; font-size: 0.85rem !important; }
+        .nav-logo { color: var(--snow-white) !important; font-weight: 800; font-size: 1.4rem; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+        .nav-links { display: flex; gap: 25px; align-items: center; }
+        .nav-links a { color: var(--text-muted) !important; text-decoration: none; font-weight: 600; transition: 0.3s; font-size: 1rem; cursor: pointer; }
+        .nav-links a:hover { color: var(--winter-blue) !important; text-shadow: 0 0 10px rgba(14, 165, 233, 0.5); }
+        .nav-cta { background: linear-gradient(45deg, var(--danger), #f43f5e); color: white !important; padding: 10px 20px; border-radius: 50px; font-weight: bold; font-size: 0.95rem !important; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); transition: all 0.3s ease; }
+        .nav-cta:hover { transform: scale(1.05); box-shadow: 0 6px 25px rgba(239, 68, 68, 0.6); }
 
-        /* Mobile specific nav adjustments */
-        @media (max-width: 600px) {
-            .nav-logo { font-size: 0.9rem; }
-            .nav-links { gap: 10px; }
-            .nav-links a { font-size: 0.75rem; }
-            .top-nav { padding: 0 10px; }
+        @media (max-width: 768px) {
+            .nav-logo { font-size: 1rem; }
+            .nav-links { gap: 12px; }
+            .nav-links a { font-size: 0.8rem; }
+            .top-nav { padding: 0 15px; }
+            .carousel-button { padding: 10px 15px; font-size: 1.2rem; }
+            header h1 { font-size: 2.5rem !important; }
         }
 
+        /* Header / Hero Section */
         header { 
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1477601263568-180e2c6d046e?auto=format&fit=crop&w=1500&q=80'); 
-            background-size: cover; 
-            padding: 120px 20px 100px; 
-            text-align: center; 
-            border-bottom: none; 
+            position: relative;
+            background: radial-gradient(circle at center, rgba(14,165,233,0.15) 0%, rgba(15,23,42,1) 100%), url('https://images.unsplash.com/photo-1477601263568-180e2c6d046e?auto=format&fit=crop&w=1500&q=80') center/cover; 
+            padding: 160px 20px 120px; text-align: center; 
         }
-        header h1 { font-size: 3.2rem; margin-bottom: 10px; }
-        
-        .review-section { background: white; border-radius: 30px; padding: 20px; }
+        header::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(15,23,42,0.8), #0f172a); z-index: 1;
+        }
+        header > * { position: relative; z-index: 2; }
+        header h1 { font-size: 4rem; margin-bottom: 15px; letter-spacing: -1px; text-transform: uppercase; background: linear-gradient(to right, #fff, var(--winter-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        header p { color: var(--text-muted) !important; font-size: 1.2rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* Green Scrolling Bubble */
+        /* The Image Fix and Styling */
+        .profile-photo-container { 
+            background: rgba(255,255,255,0.05); padding: 10px; border-radius: 50%; 
+            display: inline-block; margin-bottom: 25px; 
+            box-shadow: 0 0 40px rgba(14, 165, 233, 0.4), inset 0 0 20px rgba(255,255,255,0.1); 
+            backdrop-filter: blur(10px); border: 2px solid rgba(14, 165, 233, 0.3);
+            position: relative; overflow: hidden;
+        }
+        .profile-photo-container img { 
+            width: 200px; height: 200px; object-fit: cover; border-radius: 50%; display: block; 
+            transition: transform 0.5s ease;
+        }
+        .profile-photo-container:hover img { transform: scale(1.1); }
+
+        .review-section { background: rgba(0,0,0,0.3); border-radius: 30px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); }
+
         .scroll-bubble {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--success-green);
-            color: white !important;
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            z-index: 3000;
-            box-shadow: 0 8px 25px rgba(46, 204, 113, 0.5);
-            opacity: 0;
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: rgba(16, 185, 129, 0.9); backdrop-filter: blur(5px); color: white !important;
+            padding: 15px 35px; border-radius: 50px; font-weight: 700; font-size: 1.1rem;
+            z-index: 3000; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.5); opacity: 0;
             transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s;
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            pointer-events: none; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.2);
         }
-        .scroll-bubble.active {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
+        .scroll-bubble.active { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        input, textarea { width: 100%; padding: 18px; margin-bottom: 15px; border: 2px solid #2a3644; background: #0b0c10; border-radius: 15px; box-sizing: border-box; font-size: 16px; color: var(--snow-white) !important; outline: none; font-family: 'Fredoka', sans-serif; }
-        input:focus, textarea:focus { border-color: var(--winter-blue); }
-        input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.4) !important; }
+        /* Toast Notification System */
+        #toast-container { position: fixed; bottom: 30px; right: 30px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            background: rgba(14, 165, 233, 0.9); backdrop-filter: blur(10px); color: white;
+            padding: 15px 25px; border-radius: 12px; font-weight: 600; box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-left: 5px solid #fff; font-family: 'Fredoka', sans-serif;
+        }
+        .toast.show { transform: translateX(0); }
+
+        /* Form Styling */
+        input, textarea { 
+            width: 100%; padding: 20px; margin-bottom: 20px; 
+            border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); 
+            border-radius: 15px; box-sizing: border-box; font-size: 16px; 
+            color: var(--snow-white) !important; outline: none; font-family: 'Fredoka', sans-serif; 
+            transition: all 0.3s ease; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+        }
+        input:focus, textarea:focus { border-color: var(--winter-blue); background: rgba(14,165,233,0.05); box-shadow: 0 0 15px rgba(14,165,233,0.3), inset 0 2px 5px rgba(0,0,0,0.5); }
+        input::placeholder, textarea::placeholder { color: #64748b !important; }
         
-        .submit-btn { background: var(--winter-blue); color: #0b0c10 !important; border: none; padding: 22px; width: 100%; border-radius: 15px; font-size: 1.4rem; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        .submit-btn:hover { background: var(--snow-white); transform: translateY(-2px); }
+        .submit-btn { 
+            background: linear-gradient(45deg, var(--winter-blue), #3b82f6); color: white !important; 
+            border: none; padding: 22px; width: 100%; border-radius: 15px; font-size: 1.4rem; 
+            font-weight: 800; cursor: pointer; transition: all 0.3s ease; 
+            box-shadow: 0 10px 25px rgba(14, 165, 233, 0.4); text-transform: uppercase; letter-spacing: 1px;
+        }
+        .submit-btn:hover { background: linear-gradient(45deg, #38bdf8, #60a5fa); transform: translateY(-3px); box-shadow: 0 15px 35px rgba(14, 165, 233, 0.6); }
+
+        .reset-btn { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: #fca5a5 !important; padding: 12px; width: 100%; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.3s; margin-bottom: 20px; font-family: 'Fredoka', sans-serif; backdrop-filter: blur(5px); }
+        .reset-btn:hover { background: var(--danger); color: white !important; box-shadow: 0 0 15px rgba(239,68,68,0.5); }
+
+        .gift-btn { 
+            background: linear-gradient(45deg, var(--success-green), #059669); color: white !important; 
+            border: none; padding: 20px; width: 100%; border-radius: 15px; font-size: 1.2rem; 
+            font-weight: 700; cursor: pointer; transition: 0.3s; margin-bottom: 50px;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4); font-family: 'Fredoka', sans-serif;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .gift-btn:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(16, 185, 129, 0.6); }
         
-        footer { background: #0b0c10; border-top: 1px solid #1f2833; padding: 50px 20px; text-align: center; }
+        footer { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.05); padding: 50px 20px; text-align: center; color: var(--text-muted); font-weight: 600; position: relative; z-index: 10; }
     </style>
 </head>
 <body>
+
+<div id="scroll-progress-container">
+    <div id="scroll-progress-bar"></div>
+</div>
+
+<div id="toast-container"></div>
 
 <div id="loading-screen">
     <h1>Gawynt Snow Shovelling</h1>
@@ -222,11 +258,11 @@
 </div>
 
 <div id="scroll-bubble" class="scroll-bubble">
-    <span>❄️ scrolling...</span>
+    <span>❄️ Auto-scrolling to form...</span>
 </div>
 
 <nav class="top-nav">
-    <div class="nav-logo">Gawynt's Shoveling</div>
+    <div class="nav-logo">❄️ Gawynt's Shoveling</div>
     <div class="nav-links">
         <a href="#about">About</a>
         <a href="#services">Services</a>
@@ -236,13 +272,16 @@
 </nav>
 
 <header>
-    <h1>Gawynt's Snow Shoveling</h1>
-    <p>Calgary Student • Hardworking & Reliable</p>
+    <div class="profile-photo-container" data-aos="zoom-in" data-aos-duration="1500">
+        <img src="IMG_2256.jpg" alt="Gawynt Ready to Shovel" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1517260739337-6799d239ce83?auto=format&fit=crop&w=600&q=80'; this.alt='Winter Placeholder';">
+    </div>
+    <h1 data-aos="fade-up" data-aos-delay="200">Gawynt's Snow Shoveling</h1>
+    <p data-aos="fade-up" data-aos-delay="400" id="dynamic-greeting">Calgary Student • Hardworking & Reliable</p>
 </header>
 
 <div class="container">
     
-    <section id="about" class="about-section" data-aos="fade-up">
+    <section id="about" class="about-section" data-aos="fade-up" data-aos-delay="100">
         <h2>About Me & My Goal ❄️</h2>
         <p>Hi, I’m Gawynt! I’m a 12-year-old Grade 7 student living right here in Calgary. I started this shoveling business because I love being active outdoors and I want to learn the value of hard work.</p>
         <p><strong>My Big Mission:</strong> I am saving up <strong>$1,000</strong> to pay for my own <strong>ski lessons, gear, and hill passes</strong> this winter!</p>
@@ -253,108 +292,197 @@
         <p><strong>Current Goal Progress: $75 / $1,000</strong></p>
     </section>
 
-    <div class="alert-box">⚠️ NO SALT SERVICE — Shoveling only! ⚠️</div>
+    <div class="alert-box" data-aos="shake">⚠️ NO SALT SERVICE — Shoveling only! ⚠️</div>
 
-    <h2 id="services" class="section-title">Individual Services</h2>
+    <h2 id="services" class="section-title" data-aos="fade-right">Individual Services</h2>
     <div class="grid">
-        <div class="card" onclick="sel('Walkway Only', 10)">
+        <div class="card" onclick="sel('Walkway Only', 10)" data-aos="fade-up" data-aos-delay="100">
             <h3>Walkway Only</h3>
             <p>The main path from the sidewalk to your front door.</p>
             <span class="price">$10</span>
         </div>
-        <div class="card" onclick="sel('Sidewalk Only', 10)">
+        <div class="card" onclick="sel('Sidewalk Only', 10)" data-aos="fade-up" data-aos-delay="200">
             <h3>Sidewalk Only</h3>
             <p>The city sidewalk in front of a standard single lot.</p>
             <span class="price">$10</span>
         </div>
-        <div class="card" onclick="sel('Corner Lot Sidewalks', 20)">
+        <div class="card" onclick="sel('Corner Lot Sidewalks', 20)" data-aos="fade-up" data-aos-delay="300">
             <div class="badge badge-corner">CORNER</div>
             <h3>Corner Lot Sidewalks</h3>
             <p>Clearing both city sidewalks on a corner property.</p>
             <span class="price">$20</span>
         </div>
-        <div class="card" onclick="sel('Driveway Only', 15)">
+        <div class="card" onclick="sel('Driveway Only', 15)" data-aos="fade-up" data-aos-delay="400">
             <h3>Driveway Only</h3>
             <p>Shoveling a standard 2-car driveway.</p>
             <span class="price">$15</span>
         </div>
     </div>
 
-    <h2 class="section-title">Bundle & Save 💰</h2>
-    <div class="grid">
-        <div class="card" onclick="sel('Sidewalk & Walkway', 15)">
-            <div class="badge">VALUE</div>
-            <h3>Sidewalk & Walkway</h3>
-            <p>Front path plus standard city sidewalk.</p>
-            <span class="price">$15</span>
+    <h2 class="section-title" data-aos="fade-left">Bundle & Save 💰</h2>
+    
+    <div class="carousel-wrapper" data-aos="fade-up">
+        <button class="carousel-button" onclick="scrollCarousel(-1)">&#10094;</button>
+        
+        <div class="carousel-container" id="planCarousel">
+            <div class="card" onclick="sel('Sidewalk & Walkway', 15)">
+                <div class="badge">VALUE</div>
+                <h3>Sidewalk & Walkway</h3>
+                <p>Front path plus standard city sidewalk.</p>
+                <span class="price">$15</span>
+            </div>
+            <div class="card" onclick="sel('Walkway & Corner Sidewalk', 25)">
+                <div class="badge badge-corner">CORNER</div>
+                <h3>Walkway & Corner Sidewalk</h3>
+                <p>Front path plus both corner city sidewalks.</p>
+                <span class="price">$25</span>
+            </div>
+            <div class="card" onclick="sel('Driveway & Walkway', 20)">
+                <div class="badge">VALUE</div>
+                <h3>Driveway & Walkway</h3>
+                <p>Shoveling your driveway and the path to the door.</p>
+                <span class="price">$20</span>
+            </div>
+            <div class="card" onclick="sel('Driveway & Corner Sidewalk', 30)">
+                <div class="badge badge-corner">CORNER</div>
+                <h3>Driveway & Corner Sidewalk</h3>
+                <p>Driveway plus both corner city sidewalks.</p>
+                <span class="price">$30</span>
+            </div>
+            <div class="card" onclick="sel('Full Regular Package', 30)">
+                <div class="badge badge-total">TOTAL CLEAR</div>
+                <h3>Full Regular Package</h3>
+                <p>Everything: Walkway, Sidewalk, and Driveway.</p>
+                <span class="price">$30</span>
+            </div>
+            <div class="card" onclick="sel('Full Corner Package', 40)">
+                <div class="badge badge-corner">CORNER TOTAL</div>
+                <h3>Full Corner Package</h3>
+                <p>The total works: Driveway, Walkway, and both Sidewalks.</p>
+                <span class="price">$40</span>
+            </div>
         </div>
-        <div class="card" onclick="sel('Walkway & Corner Sidewalk', 25)">
-            <div class="badge badge-corner">CORNER</div>
-            <h3>Walkway & Corner Sidewalk</h3>
-            <p>Front path plus both corner city sidewalks.</p>
-            <span class="price">$25</span>
-        </div>
-        <div class="card" onclick="sel('Driveway & Walkway', 20)">
-            <div class="badge">VALUE</div>
-            <h3>Driveway & Walkway</h3>
-            <p>Shoveling your driveway and the path to the door.</p>
-            <span class="price">$20</span>
-        </div>
-        <div class="card" onclick="sel('Driveway & Corner Sidewalk', 30)">
-            <div class="badge badge-corner">CORNER</div>
-            <h3>Driveway & Corner Sidewalk</h3>
-            <p>Driveway plus both corner city sidewalks.</p>
-            <span class="price">$30</span>
-        </div>
-        <div class="card" onclick="sel('Full Regular Package', 30)">
-            <div class="badge badge-total">TOTAL CLEAR</div>
-            <h3>Full Regular Package</h3>
-            <p>Everything: Walkway, Sidewalk, and Driveway.</p>
-            <span class="price">$30</span>
-        </div>
-        <div class="card" onclick="sel('Full Corner Package', 40)">
-            <div class="badge badge-corner">CORNER TOTAL</div>
-            <h3>Full Corner Package</h3>
-            <p>The total works: Driveway, Walkway, and both Sidewalks.</p>
-            <span class="price">$40</span>
-        </div>
+        
+        <button class="carousel-button" onclick="scrollCarousel(1)">&#10095;</button>
     </div>
+    
+    <button class="gift-btn" onclick="sel('Gift: Neighbour One-Time', 20)" data-aos="zoom-in">
+        🎁 Gift your neighbour a one-time snow clearing (at the same time) for $20 (full regular package)
+    </button>
 
-    <h2 id="reviews" class="section-title">Happy Neighbors</h2>
-    <section class="review-section">
+    <h2 id="reviews" class="section-title" data-aos="fade-right">Happy Neighbors</h2>
+    <section class="review-section" data-aos="fade-up">
         <div class="elfsight-app-7c582918-d760-4c75-b176-4b0d7a09ccb6" data-elfsight-app-lazy></div>
     </section>
 
-    <div class="form-container" id="booking-section">
+    <div class="form-container" id="booking-section" data-aos="fade-up">
         <form id="orderForm" action="https://formspree.io/f/xjgydwzk" method="POST">
-            <h2 id="form-head" style="text-align:center;">Book a Shoveling</h2>
-            <input type="text" name="Service" id="planInput" readonly required placeholder="Click a service above">
-            <label><b>Requested Date 📅</b></label>
+            <h2 id="form-head" style="text-align:center; color: var(--winter-blue) !important; font-size: 2.2rem; margin-bottom: 30px;">Book a Shoveling</h2>
+            
+            <input type="text" name="Service" id="planInput" readonly required placeholder="Click services above to build your custom package">
+            <button type="button" class="reset-btn" onclick="clearSelection()">Start Over / Clear Selection</button>
+            
+            <label style="display:block; margin-bottom:10px; font-size: 1.1rem;"><b>Requested Date 📅</b></label>
             <input type="date" name="Requested_Date" required>
             <input type="text" name="Name" placeholder="Full Name" required>
             <input type="text" name="Address" placeholder="House Address" required>
             <input type="tel" name="Phone" placeholder="Phone Number" required>
             <input type="email" name="Email" placeholder="Email Address" required>
-            <textarea name="Notes" placeholder="Special instructions (No Salt)"></textarea>
-            <button type="submit" class="submit-btn">Send Booking Request</button>
+            <textarea name="Notes" placeholder="Special instructions (No Salt, Gate codes, etc.)" rows="4"></textarea>
+            <button type="submit" class="submit-btn">Send Booking Request 🚀</button>
         </form>
     </div>
 </div>
 
 <footer>
-    <p>Gawynt's Snow Shoveling • 2026</p>
+    <p>Gawynt's Snow Shoveling • 2026 • Calgary, Alberta</p>
 </footer>
 
 <script>
+    // --- NEW JAVASCRIPT FEATURES ADDED HERE ---
+
+    // 1. Dynamic Greeting based on time of day
+    window.addEventListener('DOMContentLoaded', () => {
+        const hour = new Date().getHours();
+        let greeting = "Good Evening";
+        if(hour < 12) greeting = "Good Morning";
+        else if(hour < 18) greeting = "Good Afternoon";
+        
+        const subtitle = document.getElementById('dynamic-greeting');
+        subtitle.innerHTML = `${greeting}, Calgary! • Hardworking & Reliable Student`;
+    });
+
+    // 2. Pure JavaScript Snowflake Particle Engine
+    function createSnowflakes() {
+        const snowContainer = document.createElement('div');
+        snowContainer.style.position = 'fixed';
+        snowContainer.style.top = '0';
+        snowContainer.style.left = '0';
+        snowContainer.style.width = '100vw';
+        snowContainer.style.height = '100vh';
+        snowContainer.style.pointerEvents = 'none';
+        snowContainer.style.zIndex = '0'; // Behind the content
+        document.body.appendChild(snowContainer);
+
+        // Generate 50 snowflakes
+        for (let i = 0; i < 50; i++) {
+            let flake = document.createElement('div');
+            flake.style.position = 'absolute';
+            flake.style.background = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.3) + ')';
+            flake.style.borderRadius = '50%';
+            flake.style.width = (Math.random() * 6 + 2) + 'px';
+            flake.style.height = flake.style.width;
+            flake.style.left = Math.random() * 100 + 'vw';
+            flake.style.top = Math.random() * -20 + 'vh'; // Start above screen
+            flake.style.boxShadow = '0 0 10px rgba(255,255,255,0.8)';
+            
+            // Randomize fall speed and delay
+            let duration = Math.random() * 5 + 5; 
+            flake.style.animation = `fall ${duration}s linear infinite`;
+            flake.style.animationDelay = `${Math.random() * 5}s`;
+            
+            snowContainer.appendChild(flake);
+        }
+    }
+    createSnowflakes();
+
+    // 3. Scroll Progress Bar
+    window.onscroll = function() {
+        let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        let scrolled = (winScroll / height) * 100;
+        document.getElementById("scroll-progress-bar").style.width = scrolled + "%";
+    };
+
+    // 4. Toast Notification Function
+    function showToast(message) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerText = message;
+        container.appendChild(toast);
+        
+        // Trigger reflow to animate
+        setTimeout(() => toast.classList.add('show'), 10);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 400);
+        }, 3000);
+    }
+
+    // --- ORIGINAL LOGIC WITH UPGRADES ---
+
     window.addEventListener('load', function() {
         setTimeout(function() {
             const loader = document.getElementById('loading-screen');
             loader.style.opacity = '0';
-            setTimeout(() => loader.style.display = 'none', 500);
-        }, 1100); 
+            setTimeout(() => loader.style.display = 'none', 800);
+        }, 1200); 
     });
 
-    AOS.init({ duration: 1000, once: true });
+    AOS.init({ duration: 1000, once: true, offset: 100 });
     
     function scrollToForm() {
         const bubble = document.getElementById('scroll-bubble');
@@ -372,10 +500,47 @@
         }, 2000);
     }
 
+    let selectedServices = [];
+    let currentTotal = 0;
+
     function sel(name, price) {
-        document.getElementById('planInput').value = name + " ($" + price + ")";
-        document.getElementById('form-head').innerText = "Booking: " + name;
+        if (!selectedServices.includes(name)) {
+            selectedServices.push(name);
+            currentTotal += price;
+            
+            // Trigger New Toast Notification!
+            showToast(`✅ Added: ${name} (+$${price})`);
+        } else {
+            showToast(`⚠️ ${name} is already in your package!`);
+        }
+
+        let planInput = document.getElementById('planInput');
+        planInput.value = selectedServices.join(" + ") + " (Total: $" + currentTotal + ")";
+        
+        let formHead = document.getElementById('form-head');
+        if (selectedServices.length > 1) {
+            formHead.innerText = "Booking: Custom Package ($" + currentTotal + ")";
+        } else {
+            formHead.innerText = "Booking: " + name + " ($" + currentTotal + ")";
+        }
+
         scrollToForm();
+    }
+
+    function clearSelection() {
+        if(selectedServices.length > 0) {
+            showToast("🗑️ Selection Cleared");
+        }
+        selectedServices = [];
+        currentTotal = 0;
+        document.getElementById('planInput').value = "";
+        document.getElementById('form-head').innerText = "Book a Shoveling";
+    }
+
+    function scrollCarousel(direction) {
+        const container = document.getElementById('planCarousel');
+        const scrollAmount = 330; // Adjusted for wider cards
+        container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
     }
 </script>
 </body>
