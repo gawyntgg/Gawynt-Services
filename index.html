@@ -111,19 +111,6 @@
         /* Fixed Grid Minimum Size for Mobile */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 30px; margin-bottom: 40px; }
 
-        /* Carousel Styles */
-        .carousel-wrapper { display: flex; align-items: center; position: relative; margin-bottom: 30px; }
-        .carousel-button { 
-            background: rgba(255, 255, 255, 0.8); color: var(--winter-blue); border: 1px solid var(--winter-blue);
-            font-size: 1.5rem; padding: 15px 20px; cursor: pointer; border-radius: 50%; z-index: 10; margin: 0 10px; 
-            font-weight: bold; transition: all 0.3s ease; backdrop-filter: blur(5px); box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .carousel-button:hover { background: var(--winter-blue); color: #fff; transform: scale(1.1); box-shadow: 0 0 15px rgba(2, 132, 199, 0.3); }
-        .carousel-container { display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 30px; scroll-snap-type: x mandatory; padding: 20px 5px; flex-grow: 1; }
-        .carousel-container::-webkit-scrollbar { display: none; }
-        /* Fixed Carousel Card Minimum Size for Mobile */
-        .carousel-container .card { min-width: 240px; scroll-snap-align: center; flex: 0 0 auto; margin-bottom: 0; }
-
         /* Glass Cards */
         .card { 
             background: rgba(255, 255, 255, 0.6); padding: 30px 25px; border-radius: 20px; text-align: center; 
@@ -169,7 +156,6 @@
             .nav-logo { font-size: 1.2rem; }
             .nav-links { gap: 12px; flex-wrap: wrap; justify-content: center; }
             .nav-links a { font-size: 0.85rem; }
-            .carousel-button { padding: 8px 12px; font-size: 1.2rem; margin: 0 2px; }
             header { padding: 160px 15px 80px !important; } /* Push content down to avoid overlapping the taller stacked navbar */
             header h1 { font-size: 2.2rem !important; word-wrap: break-word; }
             header p { font-size: 1rem !important; }
@@ -266,7 +252,6 @@
             color: var(--text-main) !important; outline: none; font-family: 'Fredoka', sans-serif; 
             transition: all 0.3s ease; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
         }
-        /* Keep CSS custom properties for date picker styling cleanly */
         input[type="date"] {
             font-family: 'Fredoka', sans-serif;
             text-transform: uppercase;
@@ -376,6 +361,7 @@
     <div class="nav-links">
         <a href="#about">About</a>
         <a href="#services">Services</a>
+        <a href="#bundles">Bundles</a>
         <a href="#reviews">Reviews</a>
         <a onclick="scrollToForm()" class="nav-cta">Book Now</a>
     </div>
@@ -388,7 +374,6 @@
     <h1 data-aos="fade-up" data-aos-delay="200">Gawynt's Snow Shoveling</h1>
     <p data-aos="fade-up" data-aos-delay="400" id="dynamic-greeting">Calgary Student • Hardworking & Reliable</p>
     
-    <!-- NEW SERVICE AREA BADGE ADDED HERE -->
     <div class="service-area" data-aos="fade-up" data-aos-delay="500">
         📍 Serving Lower and Upper Mount Royal, Sunalta, Scarboro, Bankview and Marda Loop
     </div>
@@ -409,6 +394,7 @@
 
     <div class="alert-box" data-aos="shake">⚠️ NO SALT SERVICE — Shoveling only! ⚠️</div>
 
+    <!-- Individual Services Section -->
     <h2 id="services" class="section-title" data-aos="fade-right">Individual Services</h2>
     <div class="grid">
         <div class="card" onclick="sel('Walkway Only', 10)" data-aos="fade-up" data-aos-delay="100">
@@ -434,51 +420,45 @@
         </div>
     </div>
 
-    <h2 class="section-title" data-aos="fade-left">Bundle & Save 💰</h2>
-    
-    <div class="carousel-wrapper" data-aos="fade-up">
-        <button class="carousel-button" onclick="scrollCarousel(-1)">&#10094;</button>
-        
-        <div class="carousel-container" id="planCarousel">
-            <div class="card" onclick="sel('Sidewalk & Walkway', 15)">
-                <div class="badge">VALUE</div>
-                <h3>Sidewalk & Walkway</h3>
-                <p>Front path plus standard city sidewalk.</p>
-                <span class="price">$15</span>
-            </div>
-            <div class="card" onclick="sel('Walkway & Corner Sidewalk', 25)">
-                <div class="badge badge-corner">CORNER</div>
-                <h3>Walkway & Corner Sidewalk</h3>
-                <p>Front path plus both corner city sidewalks.</p>
-                <span class="price">$25</span>
-            </div>
-            <div class="card" onclick="sel('Driveway & Walkway', 20)">
-                <div class="badge">VALUE</div>
-                <h3>Driveway & Walkway</h3>
-                <p>Shoveling your driveway and the path to the door.</p>
-                <span class="price">$20</span>
-            </div>
-            <div class="card" onclick="sel('Driveway & Corner Sidewalk', 30)">
-                <div class="badge badge-corner">CORNER</div>
-                <h3>Driveway & Corner Sidewalk</h3>
-                <p>Driveway plus both corner city sidewalks.</p>
-                <span class="price">$30</span>
-            </div>
-            <div class="card" onclick="sel('Full Regular Package', 30)">
-                <div class="badge badge-total">TOTAL CLEAR</div>
-                <h3>Full Regular Package</h3>
-                <p>Everything: Walkway, Sidewalk, and Driveway.</p>
-                <span class="price">$30</span>
-            </div>
-            <div class="card" onclick="sel('Full Corner Package', 40)">
-                <div class="badge badge-corner">CORNER TOTAL</div>
-                <h3>Full Corner Package</h3>
-                <p>The total works: Driveway, Walkway, and both Sidewalks.</p>
-                <span class="price">$40</span>
-            </div>
+    <!-- Bundle & Save Section -->
+    <h2 id="bundles" class="section-title" data-aos="fade-left">Bundle & Save 💰</h2>
+    <div class="grid">
+        <div class="card" onclick="sel('Sidewalk & Walkway', 15)" data-aos="fade-up" data-aos-delay="100">
+            <div class="badge">VALUE</div>
+            <h3>Sidewalk & Walkway</h3>
+            <p>Front path plus standard city sidewalk.</p>
+            <span class="price">$15</span>
         </div>
-        
-        <button class="carousel-button" onclick="scrollCarousel(1)">&#10095;</button>
+        <div class="card" onclick="sel('Walkway & Corner Sidewalk', 25)" data-aos="fade-up" data-aos-delay="200">
+            <div class="badge badge-corner">CORNER</div>
+            <h3>Walkway & Corner Sidewalk</h3>
+            <p>Front path plus both corner city sidewalks.</p>
+            <span class="price">$25</span>
+        </div>
+        <div class="card" onclick="sel('Driveway & Walkway', 20)" data-aos="fade-up" data-aos-delay="300">
+            <div class="badge">VALUE</div>
+            <h3>Driveway & Walkway</h3>
+            <p>Shoveling your driveway and the path to the door.</p>
+            <span class="price">$20</span>
+        </div>
+        <div class="card" onclick="sel('Driveway & Corner Sidewalk', 30)" data-aos="fade-up" data-aos-delay="400">
+            <div class="badge badge-corner">CORNER</div>
+            <h3>Driveway & Corner Sidewalk</h3>
+            <p>Driveway plus both corner city sidewalks.</p>
+            <span class="price">$30</span>
+        </div>
+        <div class="card" onclick="sel('Full Regular Package', 30)" data-aos="fade-up" data-aos-delay="500">
+            <div class="badge badge-total">TOTAL CLEAR</div>
+            <h3>Full Regular Package</h3>
+            <p>Everything: Walkway, Sidewalk, and Driveway.</p>
+            <span class="price">$30</span>
+        </div>
+        <div class="card" onclick="sel('Full Corner Package', 40)" data-aos="fade-up" data-aos-delay="600">
+            <div class="badge badge-corner">CORNER TOTAL</div>
+            <h3>Full Corner Package</h3>
+            <p>The total works: Driveway, Walkway, and both Sidewalks.</p>
+            <span class="price">$40</span>
+        </div>
     </div>
 
     <h2 id="reviews" class="section-title" data-aos="fade-right">Happy Neighbors</h2>
@@ -487,10 +467,9 @@
     </section>
 
     <div class="form-container" id="booking-section" data-aos="fade-up">
-       <form id="orderForm" action="https://formspree.io/f/xjgydwzk" method="POST">
+        <form id="orderForm" action="https://formspree.io/f/xjgydwzk" method="POST">
             <h2 id="form-head" style="text-align:center; color: var(--winter-blue) !important; font-size: 2.2rem; margin-bottom: 30px;">Book a Shoveling</h2>
             
-            <!-- Modern Feature Display from Screenshot -->
             <div class="estimated-price-box">
                 <h4>Your Estimated Price</h4>
                 <div class="price-display" id="visualPriceDisplay">$0</div>
@@ -499,13 +478,13 @@
             <input type="text" name="Service" id="planInput" readonly required placeholder="Click services above to build your custom package">
             <button type="button" class="reset-btn" onclick="clearSelection()">Start Over / Clear Selection</button>
             
-            <!-- Normal HTML5 Date Picker Replaced Here -->
             <label for="requestedDate" style="display:block; margin-bottom:10px; font-size: 1.1rem; font-weight: 700; color: var(--text-main);">Requested Date 📅</label>
             <input type="date" name="Requested_Date" id="requestedDate" required>
             
             <input type="text" name="Name" required placeholder="Your Name">
             <input type="text" name="Address" required placeholder="Your Address">
-            <input type="text" name="Neighbour_Address" placeholder="Neighbor's Address (If booking for them)">
+            <!-- Neighbor Address Field Added Below -->
+            <input type="text" name="Neighbor_Address" placeholder="Neighbor's Address (If gifting a service)">
             <input type="email" name="Email" required placeholder="Email Address">
             <input type="tel" name="Phone" required placeholder="Phone Number">
             
@@ -574,72 +553,45 @@
             document.getElementById('visualPriceDisplay').innerText = '$' + total;
             showToast('🎁 Neighbor gift added to your package!');
         }
-        
         triggerAutoScroll();
     }
 
     function triggerAutoScroll() {
         const bubble = document.getElementById('scroll-bubble');
-        
-        // Show bubble
-        bubble.classList.add('active');
-        
-        // Auto-scroll to the booking section
-        document.getElementById('booking-section').scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start' 
-        });
-
-        // Hide bubble after scroll
-        setTimeout(() => {
-            bubble.classList.remove('active');
-        }, 2500);
-
-        // Highlight pulse effect on the form container
-        const formContainer = document.getElementById('booking-section');
-        formContainer.classList.remove('highlight-pulse');
-        void formContainer.offsetWidth; // Trigger reflow
-        formContainer.classList.add('highlight-pulse');
+        if (bubble) {
+            bubble.classList.add('active');
+            setTimeout(() => { bubble.classList.remove('active'); }, 3000);
+        }
+        scrollToForm();
     }
 
-    // Clear Selection
+    function scrollToForm() {
+        const form = document.getElementById('booking-section');
+        if (form) {
+            form.scrollIntoView({ behavior: 'smooth' });
+            form.classList.add('highlight-pulse');
+            setTimeout(() => { form.classList.remove('highlight-pulse'); }, 1000);
+        }
+    }
+
     function clearSelection() {
         selectedServices = [];
         total = 0;
         document.getElementById('planInput').value = '';
         document.getElementById('visualPriceDisplay').innerText = '$0';
+        showToast('🧹 Selection cleared. Start fresh!');
     }
 
-    // Scroll Carousel
-    function scrollCarousel(direction) {
-        const container = document.getElementById('planCarousel');
-        const scrollAmount = 300 * direction;
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-
-    // Nav CTA Scroll
-    function scrollToForm() {
-        document.getElementById('booking-section').scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start' 
-        });
-    }
-
-    // Toast Notification logic
     function showToast(message) {
-        const toastContainer = document.getElementById('toast-container');
+        const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
         toast.className = 'toast';
         toast.innerText = message;
-        toastContainer.appendChild(toast);
-        
-        // Small delay to allow element insertion before adding class for animation
-        setTimeout(() => toast.classList.add('show'), 10);
-        
-        // Remove toast after 3.5 seconds
+        container.appendChild(toast);
+        setTimeout(() => { toast.classList.add('show'); }, 100);
         setTimeout(() => {
             toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 400); // matches CSS transition duration
+            setTimeout(() => { toast.remove(); }, 400);
         }, 3500);
     }
 </script>
