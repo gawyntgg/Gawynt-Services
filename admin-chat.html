@@ -45,6 +45,14 @@
       <span id="who" class="email"></span>
       <button class="ghost" id="logout-btn">Log Out</button>
     </div>
+    <div class="card">
+      <h3 style="margin-top:0">🎁 Verify reward code</h3>
+      <div class="row">
+        <input type="text" id="code-input" placeholder="GWY-XXXXXX" autocomplete="off" style="flex:1;margin:0;text-transform:uppercase;">
+        <button id="code-check">Check</button>
+      </div>
+      <div id="code-result" style="margin-top:12px"></div>
+    </div>
     <input type="text" id="search" placeholder="Search members by name or email...">
     <div id="list"></div>
   </div>
@@ -58,7 +66,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getDatabase, ref, onValue, set, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+import { getDatabase, ref, onValue, set, update, remove, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
 const app = initializeApp({
   apiKey: "AIzaSyBuWWnqDX5mUra5pF3uuBxEVSKjcESifTk",
@@ -70,8 +78,10 @@ const app = initializeApp({
 const auth = getAuth(app), db = getDatabase(app);
 const $ = id => document.getElementById(id);
 
+const REWARD_AT = 100;
 let members = {};
-let stop = null;
+let stop = null, stopRed = null;
+let redemptions = {};
 
 function say(text, kind) { const m = $('msg'); m.textContent = text || ''; m.className = kind || ''; }
 const friendly = c => ({
@@ -91,12 +101,14 @@ $('search').addEventListener('input', render);
 
 onAuthStateChanged(auth, user => {
   if (stop) { stop(); stop = null; }
-  members = {}; render();
+  if (stopRed) { stopRed(); stopRed = null; }
+  members = {}; redemptions = {}; render();
   $('uid-card').classList.add('hidden');
   if (!user) { $('login-card').classList.remove('hidden'); $('app').classList.add('hidden'); return; }
   $('login-card').classList.add('hidden'); $('app').classList.remove('hidden');
   $('who').textContent = 'Logged in as ' + user.email;
   $('uid').textContent = user.uid;
+  stopRed = onValue(ref(db, 'redemptions'), snap => { redemptions = snap.val() || {}; render(); if ($('code-input').value.trim()) checkCode(); }, () => {});
   stop = onValue(ref(db, 'members'), snap => {
     members = snap.val() || {};
     $('uid-card').classList.add('hidden');
@@ -106,6 +118,55 @@ onAuthStateChanged(auth, user => {
     say('Could not load members.', 'err');
   });
 });
+
+function checkCode() {
+  const code = $('code-input').value.trim().toUpperCase();
+  const out = $('code-result'); out.innerHTML = '';
+  if (!code) return;
+  const line = (text, style) => { const d = document.createElement('div'); d.textContent = text; if (style) d.style.cssText = style; out.appendChild(d); };
+  let found = null;
+  Object.keys(redemptions).forEach(uid => {
+    const r = redemptions[uid];
+    if (r && r.code && String(r.code).toUpperCase() === code) found = Object.assign({ uid }, r);
+  });
+  if (!found) { line('❌ Code not found.', 'color:#dc2626;font-weight:800'); return; }
+  const m = members[found.uid] || {};
+  const pts = Number(m.points) || 0;
+  const name = found.name || (m.profile && m.profile.name) || '(no name)';
+  line(name, 'font-weight:800;font-size:1.1rem');
+  line(found.email || '', 'color:#64748b;font-size:.9rem;word-break:break-all');
+  line('Current points: ' + pts, 'margin:6px 0');
+  line('Created: ' + new Date(found.createdAt || 0).toLocaleString(), 'color:#64748b;font-size:.9rem');
+  if (found.status === 'used') {
+    line('⚠️ ALREADY USED' + (found.usedAt ? ' on ' + new Date(found.usedAt).toLocaleString() : ''), 'color:#dc2626;font-weight:800;margin-top:8px');
+    return;
+  }
+  line('✅ Valid code: worth $5 off', 'color:#059669;font-weight:800;margin:8px 0');
+  if (pts < REWARD_AT) line('Member has fewer than ' + REWARD_AT + ' points now, so this code cannot be used.', 'color:#dc2626;font-weight:700;margin-bottom:8px');
+  const row = document.createElement('div'); row.className = 'row';
+  const use = document.createElement('button'); use.type = 'button'; use.className = 'add';
+  use.textContent = '✅ Mark used (-' + REWARD_AT + ' pts)'; use.disabled = pts < REWARD_AT;
+  use.onclick = async () => {
+    if (!confirm('Mark this code as used and remove ' + REWARD_AT + ' points from ' + name + '?')) return;
+    use.disabled = true;
+    try {
+      const res = await runTransaction(ref(db, 'members/' + found.uid + '/points'), cur => ((Number(cur) || 0) >= REWARD_AT ? (Number(cur) || 0) - REWARD_AT : undefined));
+      if (!res.committed) { say('Not enough points. Code was not used.', 'err'); use.disabled = false; return; }
+      await update(ref(db, 'redemptions/' + found.uid), { status: 'used', usedAt: Date.now() });
+      say('Code used. ' + REWARD_AT + ' points removed from ' + name + '.', 'ok');
+    } catch (err) { say('Could not save. Check your database rules.', 'err'); use.disabled = false; }
+  };
+  const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'remove';
+  cancel.textContent = 'Cancel code';
+  cancel.onclick = async () => {
+    if (!confirm('Cancel this code? The member keeps their points and can make a new one.')) return;
+    try { await remove(ref(db, 'redemptions/' + found.uid)); say('Code cancelled.', 'ok'); }
+    catch (err) { say('Could not cancel. Check your database rules.', 'err'); }
+  };
+  row.appendChild(use); row.appendChild(cancel); out.appendChild(row);
+}
+$('code-check').onclick = checkCode;
+$('code-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkCode(); });
 
 function render() {
   const list = $('list'); list.innerHTML = '';
@@ -132,6 +193,13 @@ function render() {
     const n = document.createElement('div'); n.className = 'name'; n.textContent = r.name || '(no name)';
     const e = document.createElement('div'); e.className = 'email'; e.textContent = r.email;
     info.appendChild(n); info.appendChild(e);
+    const red = redemptions[r.uid];
+    if (red && red.status === 'active') {
+      const tag = document.createElement('div');
+      tag.style.cssText = 'color:#059669;font-weight:800;font-size:.9rem;margin-top:4px';
+      tag.textContent = '🎁 Active code: ' + red.code;
+      info.appendChild(tag);
+    }
     const pts = document.createElement('div'); pts.className = 'pts'; pts.textContent = '⭐ ' + r.points;
     top.appendChild(info); top.appendChild(pts);
     card.appendChild(top);
