@@ -391,6 +391,18 @@
     </div>
 </div>
 
+<!-- ADDED: Multi-payment modal (only used when more than one service needs a Stripe payment) -->
+<div id="stripeMultiModal" class="custom-modal-backdrop">
+    <div class="custom-modal-window">
+        <h3>Complete Your Payment 💳</h3>
+        <p>Your booking was sent! Please pay for each item below, then tap "I've Paid".</p>
+        <div id="stripe-multi-links" style="display:flex; flex-direction:column; gap:10px; margin-bottom:25px;"></div>
+        <div class="modal-action-row">
+            <a id="stripe-multi-finish" class="modal-btn confirm-yes" href="https://gawyntgg.github.io/Gawynt-Services-Thankyou/" style="text-decoration:none; display:block; box-sizing:border-box;">I've Paid</a>
+        </div>
+    </div>
+</div>
+
 <nav class="top-nav">
     <div class="nav-logo">❄️ Gawynt's Shoveling</div>
     <div class="nav-links">
@@ -555,7 +567,7 @@
     <section id="payment" class="py-12 font-sans rounded-3xl" style="background: rgba(255, 255, 255, 0.65); border: 1px solid var(--glass-border); backdrop-filter: blur(12px); box-shadow: var(--glass-shadow); margin-bottom: 40px;">
         <div class="max-w-4xl mx-auto px-4 text-center">
             <h2 class="text-3xl font-bold text-gray-900 mb-8" style="font-family: 'Fredoka', sans-serif;">Select Payment Method</h2>
-            <div class="flex flex-col sm:flex-row justify-center items-center gap-8 mb-8">
+            <div class="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-8 mb-8">
                 <div class="payment-btn bg-white px-8 py-6 rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center min-w-[200px] cursor-pointer hover:bg-gray-100 transition-colors" data-payment="E-transfer">
                     <i class="fa-solid fa-money-bill-transfer text-3xl text-gray-800 mr-4"></i>
                     <span class="text-xl font-semibold text-gray-900">E-transfer</span>
@@ -564,7 +576,23 @@
                     <i class="fa-brands fa-nfc-symbol text-3xl text-gray-800 mr-4"></i>
                     <span class="text-xl font-semibold text-gray-900">Tap to Pay</span>
                 </div>
+                <!-- ADDED: Pay Online via Stripe -->
+                <div class="payment-btn bg-white px-8 py-6 rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center min-w-[200px] cursor-pointer hover:bg-gray-100 transition-colors" data-payment="Pay Online (Stripe)">
+                    <i class="fa-brands fa-stripe text-3xl text-gray-800 mr-4"></i>
+                    <span class="text-xl font-semibold text-gray-900">Pay Online</span>
+                </div>
             </div>
+
+            <!-- ADDED: Stripe pay links panel (shown when "Pay Online" is selected) -->
+            <div id="stripe-panel" class="hidden max-w-xl mx-auto mb-8 bg-white border border-gray-200 rounded-2xl p-6 text-left shadow-sm">
+                <h3 class="text-xl font-bold text-gray-900 mb-2 m-0" style="font-family: 'Fredoka', sans-serif;"><i class="fa-brands fa-stripe mr-2"></i>Pay Online via Stripe</h3>
+                <p class="text-sm text-gray-600 mb-4">Tap "Pay Now" for each item below to pay securely with Stripe. Then finish your booking details.</p>
+                <div id="stripe-links" class="space-y-3"></div>
+                <button type="button" id="stripe-continue" class="w-full bg-black text-white font-semibold py-3 rounded-xl hover:bg-gray-800 cursor-pointer border-none mt-5">
+                    Continue to Booking Details
+                </button>
+            </div>
+
             <div class="inline-block bg-gray-900 text-white px-6 py-3 rounded-xl shadow-lg mt-4">
                 <p class="font-medium tracking-wide m-0" style="color: white !important;">
                     <i class="fa-solid fa-circle-exclamation mr-2 text-yellow-400"></i>
@@ -601,7 +629,7 @@
             
             <input type="text" name="Name" required placeholder="Your Name">
             <input type="text" name="Address" required placeholder="Your Address">
-            <input type="text" name="Neighbor_Address" placeholder="Neighbor's Address (If gifting a service)">
+            <input type="text" name="Neighbor_Address" placeholder="Neighbor's Address (If gifting a service)" style="display:none;">
             <input type="email" name="Email" required placeholder="Email Address">
             <input type="tel" name="Phone" required placeholder="Phone Number">
             
@@ -717,6 +745,8 @@
     });
 
     // Booking Logic
+    // Neighbour gift add-on switch: false = the gift popup never appears (all gift code is kept, just turned off)
+    const GIFT_ENABLED = false;
     let total = 0;
     let selectedServices = [];
 
@@ -726,7 +756,7 @@
         document.getElementById('planInput').value = selectedServices.join(', ');
         document.getElementById('visualPriceDisplay').innerText = '$' + total;
         
-        if (!serviceName.includes('Gift')) {
+        if (GIFT_ENABLED && !serviceName.includes('Gift')) {
             document.getElementById('giftModal').classList.add('open');
         } else {
             triggerAutoScroll();
@@ -779,6 +809,11 @@
         document.getElementById('planInput').value = '';
         document.getElementById('visualPriceDisplay').innerText = '$0';
         showToast('🧹 Selection cleared. Start fresh!');
+        // ADDED: keep the Stripe panel in sync if it is open
+        const stripePanelEl = document.getElementById('stripe-panel');
+        if (stripePanelEl && !stripePanelEl.classList.contains('hidden') && window.renderStripePanel) {
+            window.renderStripePanel();
+        }
     }
 
     function showToast(message) {
@@ -794,11 +829,124 @@
         }, 3000);
     }
 
+    // Turned off: the "Pay Online via Stripe / Tap Pay Now" panel no longer appears (code kept, set to true to bring it back)
+    window.SHOW_STRIPE_PANEL = false;
+
+    // --- ADDED: STRIPE PAYMENT LINKS ---
+    const STRIPE_LINKS = {
+        'Full Corner Package': 'https://buy.stripe.com/6oU5kF1vPe4u2kzata4ko00',
+        'Full Regular Package': 'https://buy.stripe.com/bJe4gB4I1d0q6APcBi4ko01',
+        'Driveway & Corner Sidewalk': 'https://buy.stripe.com/cNi00lb6p6C2cZdcBi4ko02',
+        'Driveway & Walkway': 'https://buy.stripe.com/9B63cx2zT7G6aR56cU4ko03',
+        'Walkway & Corner Sidewalk': 'https://buy.stripe.com/cNi9AVa2lgcC3oDfNu4ko04',
+        'Sidewalk & Walkway': 'https://buy.stripe.com/4gM28t2zT8Ka4sH9p64ko05',
+        'Driveway Only': 'https://buy.stripe.com/5kQeVf3DXe4uaR5cBi4ko06',
+        'Corner Lot Sidewalks': 'https://buy.stripe.com/14A28tb6paSi2kz0SA4ko07',
+        'Sidewalk Only': 'https://buy.stripe.com/cNi7sNfmF0dE8IX7gY4ko08',
+        'Walkway Only': 'https://buy.stripe.com/dRm7sNb6pgcC7ET1WE4ko09',
+        'Gift: Neighbour One-Time': 'https://buy.stripe.com/3cI28tdex9Oe5wL7gY4ko0a'
+    };
+
+    window.renderStripePanel = function() {
+        const panel = document.getElementById('stripe-panel');
+        const list = document.getElementById('stripe-links');
+        if (!panel || !list) return;
+        panel.classList.remove('hidden');
+        list.innerHTML = '';
+
+        if (selectedServices.length === 0) {
+            const msg = document.createElement('p');
+            msg.className = 'text-sm text-gray-600 m-0';
+            msg.textContent = 'Please select a service above first so we can show your payment link.';
+            list.appendChild(msg);
+            return;
+        }
+
+        selectedServices.forEach(function(name) {
+            const row = document.createElement('div');
+            row.className = 'flex justify-between items-center bg-gray-50 border border-gray-100 p-4 rounded-xl gap-3';
+
+            const label = document.createElement('span');
+            label.className = 'font-semibold text-gray-900';
+            label.textContent = name;
+            row.appendChild(label);
+
+            const url = STRIPE_LINKS[name];
+            if (url) {
+                const link = document.createElement('a');
+                link.href = url;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.className = 'text-sm font-semibold bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors no-underline whitespace-nowrap';
+                link.style.color = 'white';
+                link.style.textDecoration = 'none';
+                link.textContent = 'Pay Now';
+                row.appendChild(link);
+            } else {
+                const note = document.createElement('span');
+                note.className = 'text-xs text-gray-500 text-right';
+                note.textContent = 'Pay by E-transfer or Tap to Pay';
+                row.appendChild(note);
+            }
+            list.appendChild(row);
+        });
+    };
+
+    window.hideStripePanel = function() {
+        const panel = document.getElementById('stripe-panel');
+        if (panel) panel.classList.add('hidden');
+    };
+
+    document.getElementById('stripe-continue').addEventListener('click', function() {
+        document.getElementById('booking-section').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // ADDED: Send the customer to Stripe after the booking is submitted
+    window.startStripeCheckout = function() {
+        const urls = selectedServices.map(function(n) { return STRIPE_LINKS[n]; }).filter(Boolean);
+
+        if (urls.length === 0) {
+            window.location.href = "https://gawyntgg.github.io/Gawynt-Services-Thankyou/";
+            return;
+        }
+
+        if (urls.length === 1) {
+            // One payment: go straight to Stripe (Stripe then redirects to the thank you page)
+            window.location.href = urls[0];
+            return;
+        }
+
+        // Several payments: show a list of Pay Now links, then the thank you page
+        const list = document.getElementById('stripe-multi-links');
+        list.innerHTML = '';
+        selectedServices.forEach(function(name) {
+            const url = STRIPE_LINKS[name];
+            if (!url) return;
+            const link = document.createElement('a');
+            link.href = url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.className = 'modal-btn confirm-no';
+            link.style.textDecoration = 'none';
+            link.style.display = 'block';
+            link.style.boxSizing = 'border-box';
+            link.textContent = 'Pay: ' + name;
+            list.appendChild(link);
+        });
+        document.getElementById('stripeMultiModal').classList.add('open');
+    };
+
     // --- FORM INTERCEPTOR TO FORCE REDIRECT ---
     document.getElementById('orderForm').addEventListener('submit', function(event) {
         event.preventDefault(); // Stop default browser submission
         const form = event.target;
         const formData = new FormData(form);
+        // ADDED: make the Formspree email clearly show the payment method the customer chose
+        const chosenPayment = document.getElementById('paymentMethod').value || 'Not selected';
+        formData.append('_subject', 'New Snow Shoveling Booking - Payment: ' + chosenPayment);
+        formData.append('Payment_Note', chosenPayment === 'Pay Online (Stripe)'
+            ? 'Customer chose to pay ONLINE with STRIPE (sent to Stripe after booking)'
+            : 'Customer chose to pay by ' + chosenPayment);
         const submitBtn = form.querySelector('button[type="submit"]');
 
         submitBtn.disabled = true;
@@ -811,8 +959,13 @@
         })
         .then(response => {
             if (response.ok) {
-                // Success: Redirect to your Thank You page
-                window.location.href = "https://gawyntgg.github.io/Gawynt-Services-Thankyou/";
+                // Success: if paying online, go to Stripe first; otherwise redirect to your Thank You page
+                if (document.getElementById('paymentMethod').value === 'Pay Online (Stripe)' && window.startStripeCheckout) {
+                    submitBtn.innerText = "Taking you to payment...";
+                    window.startStripeCheckout();
+                } else {
+                    window.location.href = "https://gawyntgg.github.io/Gawynt-Services-Thankyou/";
+                }
             } else {
                 alert("Oops! There was a problem. Please try again.");
                 submitBtn.disabled = false;
@@ -1204,6 +1357,17 @@
         btn.addEventListener('click', (e) => {
             const method = e.currentTarget.getAttribute('data-payment');
             document.getElementById('paymentMethod').value = method;
+
+            // ADDED: Stripe option shows its pay links and stays in the payment section
+            if (method === 'Pay Online (Stripe)' && window.SHOW_STRIPE_PANEL) {
+                if (window.renderStripePanel) window.renderStripePanel();
+                const stripePanel = document.getElementById('stripe-panel');
+                if (stripePanel) stripePanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                showCalToast(`Pay online selected. Use the Pay Now link(s), then finalize your details.`, 'info');
+                return;
+            }
+            if (window.hideStripePanel) window.hideStripePanel();
+
             document.getElementById('booking-section').scrollIntoView({ behavior: 'smooth' });
             showCalToast(`${method} payment selected. Please finalize your details.`, 'info');
         });
