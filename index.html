@@ -356,6 +356,30 @@
         #cal-toast-container { position: fixed; bottom: 2rem; right: 2rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; }
         .cal-toast { background: #111827; color: white; padding: 1rem 1.5rem; border-radius: 0.75rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); animation: slideUp 0.3s forwards; opacity: 0; transition: opacity 0.3s ease; font-family: 'Inter', sans-serif;}
 
+        /* --- ADDED: LIVE SNOW FORECAST BANNER --- */
+        #snow-banner {
+            position: relative; z-index: 5; padding: 14px 20px; text-align: center; color: #ffffff;
+            background: linear-gradient(90deg, #0369a1, #0284c7, #38bdf8);
+            font-family: 'Fredoka', sans-serif; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.25);
+        }
+        #snow-banner.no-snow { background: linear-gradient(90deg, #475569, #64748b, #94a3b8); }
+        .snow-banner-main { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; }
+        #snow-banner-text { font-size: 1.15rem; font-weight: 700; color: #ffffff; }
+        #snow-banner-temp { font-size: 0.9rem; font-weight: 600; background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 50px; color: #ffffff; }
+        #snow-banner-btn {
+            background: #ffffff; color: #0369a1; border: none; border-radius: 50px; padding: 8px 18px;
+            font-weight: 800; font-size: 0.95rem; cursor: pointer; font-family: 'Fredoka', sans-serif;
+            transition: transform 0.2s ease;
+        }
+        #snow-banner-btn:hover { transform: scale(1.06); }
+        #snow-banner-days { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px; }
+        .snow-day { background: rgba(255,255,255,0.18); border-radius: 12px; padding: 6px 12px; font-size: 0.85rem; color: #ffffff; min-width: 92px; }
+        .snow-day-name { font-weight: 800; display: block; color: #ffffff; }
+        @media (max-width: 768px) {
+            #snow-banner-text { font-size: 1rem; }
+            .snow-day { min-width: 80px; padding: 5px 8px; font-size: 0.8rem; }
+        }
+
         /* --- ADDED: LIVE CHAT WIDGET --- */
         #toast-container { bottom: 110px; }
         #cal-toast-container { bottom: 110px; }
@@ -477,6 +501,16 @@
     </div>
 </nav>
 
+<!-- ADDED: Live Calgary snow forecast banner -->
+<div id="snow-banner">
+    <div class="snow-banner-main">
+        <span id="snow-banner-text">❄️ Checking Calgary's snow forecast...</span>
+        <span id="snow-banner-temp" style="display:none;"></span>
+        <button type="button" id="snow-banner-btn" onclick="var s=document.getElementById('services'); if(s) s.scrollIntoView({behavior:'smooth'});">Book Now</button>
+    </div>
+    <div id="snow-banner-days"></div>
+</div>
+
 <header>
     <div class="profile-photo-container" data-aos="zoom-in" data-aos-duration="1500">
         <img src="IMG_2256.jpg" alt="Gawynt Ready to Shovel" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1517260739337-6799d239ce83?auto=format&fit=crop&w=600&q=80'; this.alt='Winter Placeholder';">
@@ -494,12 +528,12 @@
     <section id="about" class="about-section" data-aos="fade-up" data-aos-delay="100">
         <h2>About Me & My Goal ❄️</h2>
         <p>Hi, I’m Gawynt! I’m a 12-year-old Grade 8 student living right here in Calgary. I started this shoveling business because I love being active outdoors and I want to learn the value of hard work.</p>
-        <p><strong>My Big Mission:</strong> I am saving up <strong>$1,000</strong> to pay for my own <strong>ski lessons, gear, and hill passes</strong> this winter!</p>
+        <p><strong>My Big Mission:</strong> I am saving up <strong id="goalTargetInline">$1,000</strong> to pay for my own <strong>ski lessons, gear, and hill passes</strong> this winter!</p>
         
         <div class="goal-bar">
-            <div class="progress-fill" style="width: 20%;">$200</div>
+            <div class="progress-fill" id="goalFill" style="width: 20%;">$200</div>
         </div>
-        <p><strong>Current Goal Progress: $200 / $1,000</strong></p>
+        <p><strong id="goalText">Current Goal Progress: $200 / $1,000</strong></p>
     </section>
 
     <div class="alert-box" data-aos="shake">⚠️ NO SALT SERVICE — Shoveling only! ⚠️</div>
@@ -1579,6 +1613,140 @@
         renderCalendar();
         initAuth();
     });
+</script>
+
+<!-- ADDED: Live goal progress (reads from your Firebase; you change it in admin-chat.html) -->
+<script type="module">
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+    const goalFirebaseConfig = {
+        apiKey: "AIzaSyBuWWnqDX5mUra5pF3uuBxEVSKjcESifTk",
+        authDomain: "gawynt-hub.firebaseapp.com",
+        databaseURL: "https://gawynt-hub-default-rtdb.firebaseio.com",
+        projectId: "gawynt-hub",
+        storageBucket: "gawynt-hub.firebasestorage.app",
+        messagingSenderId: "330651852035",
+        appId: "1:330651852035:web:db931f867da21b6a519d36",
+        measurementId: "G-XLXGTVSPXT"
+    };
+
+    try {
+        const goalApp = getApps().length ? getApp() : initializeApp(goalFirebaseConfig);
+        const goalDb = getDatabase(goalApp);
+
+        onValue(ref(goalDb, 'settings/goal'), function(snap) {
+            const g = snap.val();
+            if (!g) return; // nothing saved yet: keep the numbers already on the page
+            const cur = Number(g.current);
+            const tgt = Number(g.target);
+            if (!isFinite(cur) || !isFinite(tgt) || tgt <= 0 || cur < 0) return;
+
+            const fmt = function(n) { return '$' + n.toLocaleString('en-CA'); };
+            const pct = Math.min(100, Math.max(0, (cur / tgt) * 100));
+
+            const fill = document.getElementById('goalFill');
+            const text = document.getElementById('goalText');
+            const inline = document.getElementById('goalTargetInline');
+
+            if (fill) {
+                fill.style.width = pct + '%';
+                fill.textContent = fmt(cur);
+            }
+            if (text) {
+                text.textContent = cur >= tgt
+                    ? '🎉 Goal reached! ' + fmt(cur) + ' / ' + fmt(tgt) + ' - thank you, neighbours!'
+                    : 'Current Goal Progress: ' + fmt(cur) + ' / ' + fmt(tgt);
+            }
+            if (inline) inline.textContent = fmt(tgt);
+        }, function() { /* if it can't load, the page keeps its default numbers */ });
+    } catch (e) {
+        console.warn('Goal progress could not load', e);
+    }
+</script>
+
+<!-- ADDED: Live snow forecast logic (free Open-Meteo API, no key needed) -->
+<script>
+(function() {
+    const banner = document.getElementById('snow-banner');
+    if (!banner) return;
+    const textEl = document.getElementById('snow-banner-text');
+    const tempEl = document.getElementById('snow-banner-temp');
+    const daysEl = document.getElementById('snow-banner-days');
+
+    const url = 'https://api.open-meteo.com/v1/forecast?latitude=51.0447&longitude=-114.0719'
+        + '&current=temperature_2m'
+        + '&daily=snowfall_sum,temperature_2m_max,temperature_2m_min,precipitation_probability_max'
+        + '&timezone=America%2FEdmonton&forecast_days=4';
+
+    function dayName(dateStr, i) {
+        if (i === 0) return 'Today';
+        if (i === 1) return 'Tomorrow';
+        const p = dateStr.split('-');
+        return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2])).toLocaleDateString('en-CA', { weekday: 'long' });
+    }
+
+    function fmtCm(n) {
+        return (Math.round(n * 10) / 10) + ' cm';
+    }
+
+    fetch(url)
+        .then(function(r) { if (!r.ok) throw new Error('bad'); return r.json(); })
+        .then(function(d) {
+            const daily = d.daily;
+            const snow = daily.snowfall_sum;
+            const SNOW_MIN = 0.5; // cm
+
+            // Find the first day in the next 3 days with real snow
+            let firstSnow = -1;
+            for (let i = 0; i < 3; i++) {
+                if (snow[i] >= SNOW_MIN) { firstSnow = i; break; }
+            }
+
+            if (firstSnow === 0) {
+                textEl.textContent = '❄️ Snow today in Calgary: about ' + fmtCm(snow[0]) + ' expected. Book your shoveling now!';
+            } else if (firstSnow === 1) {
+                textEl.textContent = '❄️ Snow expected tomorrow: about ' + fmtCm(snow[1]) + '. Book now to get a spot!';
+            } else if (firstSnow === 2) {
+                textEl.textContent = '❄️ Snow coming ' + dayName(daily.time[2], 2) + ': about ' + fmtCm(snow[2]) + '. Book ahead!';
+            } else {
+                banner.classList.add('no-snow');
+                textEl.textContent = '☀️ No snow in the 3-day forecast. Book ahead to be first in line for the next storm!';
+            }
+
+            if (d.current && typeof d.current.temperature_2m === 'number') {
+                tempEl.textContent = 'Now in Calgary: ' + Math.round(d.current.temperature_2m) + '°C';
+                tempEl.style.display = 'inline-block';
+            }
+
+            daysEl.innerHTML = '';
+            for (let i = 0; i < 4; i++) {
+                const chip = document.createElement('div');
+                chip.className = 'snow-day';
+                const name = document.createElement('span');
+                name.className = 'snow-day-name';
+                name.textContent = dayName(daily.time[i], i);
+                chip.appendChild(name);
+
+                const icon = snow[i] >= SNOW_MIN ? '❄️' : (daily.precipitation_probability_max[i] >= 50 ? '🌧️' : '☀️');
+                const line1 = document.createElement('span');
+                line1.style.display = 'block';
+                line1.textContent = icon + ' ' + (snow[i] >= SNOW_MIN ? fmtCm(snow[i]) : 'No snow');
+                chip.appendChild(line1);
+
+                const line2 = document.createElement('span');
+                line2.style.display = 'block';
+                line2.textContent = Math.round(daily.temperature_2m_max[i]) + '° / ' + Math.round(daily.temperature_2m_min[i]) + '°';
+                chip.appendChild(line2);
+
+                daysEl.appendChild(chip);
+            }
+        })
+        .catch(function() {
+            // If the forecast can't load, quietly hide the banner so the site still looks clean
+            banner.style.display = 'none';
+        });
+})();
 </script>
 
 <!-- ADDED: Live chat <-> your Firebase connection -->
