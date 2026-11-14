@@ -1168,7 +1168,8 @@
 
     async function initAuth() {
         try {
-            await signInAnonymously(auth);
+            await auth.authStateReady();
+            if (!auth.currentUser) await signInAnonymously(auth);
             listenToSchedule();
         } catch (error) {
             console.error("Firebase Auth Error", error);
@@ -1771,6 +1772,7 @@
     const chatDb = getDatabase(chatApp);
 
     const chatAuthReady = (async () => {
+        await chatAuth.authStateReady();
         if (!chatAuth.currentUser) await signInAnonymously(chatAuth);
     })();
 
