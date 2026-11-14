@@ -1168,8 +1168,7 @@
 
     async function initAuth() {
         try {
-            await auth.authStateReady();
-            if (!auth.currentUser) await signInAnonymously(auth);
+            await signInAnonymously(auth);
             listenToSchedule();
         } catch (error) {
             console.error("Firebase Auth Error", error);
@@ -1772,7 +1771,6 @@
     const chatDb = getDatabase(chatApp);
 
     const chatAuthReady = (async () => {
-        await chatAuth.authStateReady();
         if (!chatAuth.currentUser) await signInAnonymously(chatAuth);
     })();
 
@@ -2126,11 +2124,18 @@
 </div>
 
 <script type="module">
-import { getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-const auth = getAuth(getApp()), db = getDatabase(getApp());
+const mApp = initializeApp({
+  apiKey: "AIzaSyBuWWnqDX5mUra5pF3uuBxEVSKjcESifTk",
+  authDomain: "gawynt-hub.firebaseapp.com",
+  databaseURL: "https://gawynt-hub-default-rtdb.firebaseio.com",
+  projectId: "gawynt-hub",
+  appId: "1:330651852035:web:db931f867da21b6a519d36"
+}, 'members');
+const auth = getAuth(mApp), db = getDatabase(mApp);
 const $ = id => document.getElementById(id);
 const REWARD_AT = 100;
 let mode = 'login', stopPts = null;
