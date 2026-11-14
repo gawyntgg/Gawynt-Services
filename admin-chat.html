@@ -43,13 +43,33 @@
             #chat-list { border-right: none; border-bottom: 1px solid #e2e8f0; }
             .msg { max-width: 90%; }
         }
+
+        #goal-panel { position: fixed; top: 60px; right: 12px; width: 300px; max-width: calc(100vw - 24px); background: #fff; border-radius: 16px; padding: 18px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); z-index: 50; }
+        #goal-panel h3 { margin: 0 0 12px; }
+        #goal-panel label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: #475569; }
+        #goal-panel input { width: 100%; padding: 10px; margin-bottom: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; }
+        #goal-panel button { width: 100%; padding: 11px; border: none; border-radius: 10px; background: #0284c7; color: #fff; font-weight: 700; cursor: pointer; font-size: 1rem; }
+        #goal-status { font-size: 0.85rem; margin: 8px 0 0; min-height: 1em; }
     </style>
 </head>
 <body>
 
 <div class="topbar">
     <h1>❄️ Chat Inbox</h1>
-    <button id="btn-logout" class="hidden">Log out</button>
+    <div style="display:flex; gap:8px;">
+        <button id="btn-goal" class="hidden">🎯 Goal</button>
+        <button id="btn-logout" class="hidden">Log out</button>
+    </div>
+</div>
+
+<div id="goal-panel" class="hidden">
+    <h3>🎯 Update goal progress</h3>
+    <label for="goal-current">Money saved so far ($)</label>
+    <input type="number" id="goal-current" min="0" step="1" inputmode="decimal">
+    <label for="goal-target">Goal amount ($)</label>
+    <input type="number" id="goal-target" min="1" step="1" inputmode="decimal">
+    <button type="button" id="goal-save">Save to website</button>
+    <p id="goal-status"></p>
 </div>
 
 <div id="login">
@@ -75,7 +95,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getDatabase, ref, onValue, push, update } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+    import { getDatabase, ref, onValue, push, update, set } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBuWWnqDX5mUra5pF3uuBxEVSKjcESifTk",
@@ -235,8 +255,61 @@
             })
             .catch(function() { alert('Could not send. Check your connection and database rules.'); });
     });
+
+    // --- Goal progress controls ---
+    const goalEl = {
+        btn: document.getElementById('btn-goal'),
+        panel: document.getElementById('goal-panel'),
+        current: document.getElementById('goal-current'),
+        target: document.getElementById('goal-target'),
+        save: document.getElementById('goal-save'),
+        status: document.getElementById('goal-status')
+    };
+    let goalLoaded = false;
+
+    onAuthStateChanged(auth, function(user) {
+        if (user && user.email) {
+            goalEl.btn.classList.remove('hidden');
+            if (!goalLoaded) {
+                goalLoaded = true;
+                onValue(ref(db, 'settings/goal'), function(snap) {
+                    const g = snap.val();
+                    if (g && document.activeElement !== goalEl.current && document.activeElement !== goalEl.target) {
+                        goalEl.current.value = g.current;
+                        goalEl.target.value = g.target;
+                    }
+                });
+            }
+        } else {
+            goalEl.btn.classList.add('hidden');
+            goalEl.panel.classList.add('hidden');
+        }
+    });
+
+    goalEl.btn.addEventListener('click', function() {
+        goalEl.panel.classList.toggle('hidden');
+        goalEl.status.textContent = '';
+    });
+
+    goalEl.save.addEventListener('click', function() {
+        const cur = Number(goalEl.current.value);
+        const tgt = Number(goalEl.target.value);
+        if (goalEl.current.value === '' || !isFinite(cur) || cur < 0 || !isFinite(tgt) || tgt <= 0) {
+            goalEl.status.style.color = '#b91c1c';
+            goalEl.status.textContent = 'Enter a saved amount (0 or more) and a goal above 0.';
+            return;
+        }
+        set(ref(db, 'settings/goal'), { current: cur, target: tgt, updatedAt: Date.now() })
+            .then(function() {
+                goalEl.status.style.color = '#047857';
+                goalEl.status.textContent = 'Saved! Your website is updated.';
+            })
+            .catch(function() {
+                goalEl.status.style.color = '#b91c1c';
+                goalEl.status.textContent = "Couldn't save. Check your database rules.";
+            });
+    });
 </script>
 
 </body>
 </html>
-
