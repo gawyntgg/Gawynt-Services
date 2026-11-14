@@ -110,7 +110,11 @@
         body { 
             font-family: 'Fredoka', sans-serif; margin: 0; 
             background: var(--bg-gradient); color: var(--text-main); 
-            padding-top: 70px; position: relative;
+            padding-top: 75px; position: relative;
+        }
+        /* FIX: keep the banner from hiding under the fixed top menu */
+        @media (max-width: 768px) {
+            body { padding-top: 130px; }
         }
         
         h1, h2, h3, h4, h5, h6 { color: var(--snow-white) !important; font-weight: 700; text-shadow: 0 2px 5px rgba(0,0,0,0.05); }
@@ -2207,6 +2211,19 @@ onAuthStateChanged(auth, user => {
     badge.style.display = 'inline';
   }, () => {});
 });
+</script>
+
+<!-- FIX: measures the real menu height so the banner is never covered -->
+<script>
+(function () {
+    function fixNavSpacing() {
+        var nav = document.querySelector('.top-nav');
+        if (nav) document.body.style.paddingTop = nav.offsetHeight + 'px';
+    }
+    window.addEventListener('load', fixNavSpacing);
+    window.addEventListener('resize', fixNavSpacing);
+    fixNavSpacing();
+})();
 </script>
 
 </body>
