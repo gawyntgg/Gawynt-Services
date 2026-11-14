@@ -540,6 +540,15 @@
         <p><strong id="goalText">Current Goal Progress: $200 / $1,000</strong></p>
     </section>
 
+    <section id="member-card" class="about-section" data-aos="fade-up">
+        <h2>⭐ My Rewards</h2>
+        <div id="member-points" style="font-size:4rem;font-weight:800;color:var(--winter-blue);line-height:1.1;">—</div>
+        <div style="font-weight:700;color:var(--text-muted);margin-bottom:5px;">points</div>
+        <div class="goal-bar"><div class="progress-fill" id="member-fill" style="width:0%;min-width:0;"></div></div>
+        <p id="member-msg" style="margin:0 0 15px;">Log in or sign up to see your reward points.</p>
+        <button type="button" id="member-login-btn" class="submit-btn" style="max-width:280px;font-size:1.1rem;padding:14px;">Log In / Sign Up</button>
+    </section>
+
     <div class="alert-box" data-aos="shake">⚠️ NO SALT SERVICE — Shoveling only! ⚠️</div>
 
     <h2 id="services" class="section-title" data-aos="fade-right">Individual Services</h2>
@@ -2194,10 +2203,26 @@ $('auth-forgot').onclick = async () => {
   catch (err) { $('auth-msg').style.color = '#b91c1c'; $('auth-msg').textContent = friendly(err.code); }
 };
 
+function renderCard(p) {
+  const ptsEl = $('member-points'), fill = $('member-fill'), msg = $('member-msg'), btn = $('member-login-btn');
+  if (!ptsEl) return;
+  if (p === null) {
+    ptsEl.textContent = '—'; fill.style.width = '0%'; fill.textContent = '';
+    msg.textContent = 'Log in or sign up to see your reward points.'; btn.style.display = 'inline-block';
+    return;
+  }
+  ptsEl.textContent = p; btn.style.display = 'none';
+  fill.style.width = Math.min(100, Math.max(0, p / REWARD_AT * 100)) + '%';
+  fill.style.minWidth = p > 0 ? '60px' : '0';
+  fill.textContent = p > 0 ? p + ' / ' + REWARD_AT : '';
+  msg.textContent = p >= REWARD_AT ? '🎁 Reward ready! Mention it in your next booking.' : (REWARD_AT - p) + ' points to your next reward';
+}
+$('member-login-btn').onclick = () => openModal();
+
 onAuthStateChanged(auth, user => {
   if (stopPts) { stopPts(); stopPts = null; }
   const member = user && !user.isAnonymous;
-  if (!member) { nav.textContent = 'Log In / Sign Up'; nav.onclick = openModal; badge.style.display = 'none'; return; }
+  if (!member) { nav.textContent = 'Log In / Sign Up'; nav.onclick = openModal; badge.style.display = 'none'; renderCard(null); return; }
   nav.textContent = 'Hi, ' + (user.displayName || user.email.split('@')[0]) + ' · Log Out';
   nav.onclick = () => signOut(auth);
   const n = document.querySelector('#orderForm [name="Name"]'), m = document.querySelector('#orderForm [name="Email"]');
@@ -2209,6 +2234,7 @@ onAuthStateChanged(auth, user => {
     badge.textContent = '⭐ ' + p + ' pts' + (p >= REWARD_AT ? ' 🎁' : '');
     badge.title = p >= REWARD_AT ? 'Reward ready! Mention it in your next booking.' : (REWARD_AT - p) + ' points to your next reward';
     badge.style.display = 'inline';
+    renderCard(p);
   }, () => {});
 });
 </script>
