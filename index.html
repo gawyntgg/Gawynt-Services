@@ -355,6 +355,69 @@
         
         #cal-toast-container { position: fixed; bottom: 2rem; right: 2rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; }
         .cal-toast { background: #111827; color: white; padding: 1rem 1.5rem; border-radius: 0.75rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); animation: slideUp 0.3s forwards; opacity: 0; transition: opacity 0.3s ease; font-family: 'Inter', sans-serif;}
+
+        /* --- ADDED: LIVE CHAT WIDGET --- */
+        #toast-container { bottom: 110px; }
+        #cal-toast-container { bottom: 110px; }
+
+        #chat-launcher {
+            position: fixed; bottom: 30px; right: 30px; width: 64px; height: 64px;
+            border-radius: 50%; border: none; cursor: pointer; z-index: 9000;
+            background: linear-gradient(45deg, var(--winter-blue), #3b82f6); color: #ffffff;
+            font-size: 1.7rem; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.4);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+        }
+        #chat-launcher:hover { transform: scale(1.1); box-shadow: 0 14px 30px rgba(2, 132, 199, 0.5); }
+
+        #chat-panel {
+            position: fixed; bottom: 105px; right: 30px; width: 350px; max-width: calc(100vw - 30px);
+            height: 480px; max-height: calc(100vh - 140px); background: #ffffff; border-radius: 22px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2); border: 1px solid #e2e8f0;
+            display: flex; flex-direction: column; overflow: hidden; z-index: 9000;
+            opacity: 0; transform: translateY(20px) scale(0.95); pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: 'Fredoka', sans-serif;
+        }
+        #chat-panel.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+
+        .chat-header {
+            background: linear-gradient(45deg, var(--winter-blue), #3b82f6); color: #ffffff;
+            padding: 16px 18px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .chat-header-title { font-weight: 700; font-size: 1.1rem; color: #ffffff; }
+        .chat-header-sub { font-size: 0.8rem; color: #e0f2fe; font-weight: 400; }
+        .chat-close { background: transparent; border: none; color: #ffffff; font-size: 1.3rem; cursor: pointer; padding: 4px 8px; }
+
+        #chat-messages { flex: 1; overflow-y: auto; padding: 16px; background: #f8fafc; display: flex; flex-direction: column; gap: 10px; }
+        .chat-msg { max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 0.95rem; line-height: 1.45; white-space: pre-line; word-wrap: break-word; }
+        .chat-msg.bot { background: #ffffff; color: var(--text-main); border: 1px solid #e2e8f0; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .chat-msg.user { background: var(--winter-blue); color: #ffffff; align-self: flex-end; border-bottom-right-radius: 4px; }
+
+        .chat-options { display: flex; flex-direction: column; gap: 8px; align-self: stretch; }
+        .chat-opt {
+            background: #ffffff; border: 2px solid var(--winter-blue); color: var(--winter-blue);
+            padding: 10px 14px; border-radius: 14px; font-weight: 600; font-size: 0.95rem;
+            cursor: pointer; text-align: left; font-family: 'Fredoka', sans-serif; transition: all 0.2s ease;
+        }
+        .chat-opt:hover { background: var(--winter-blue); color: #ffffff; }
+
+        #chat-form { display: flex; gap: 8px; padding: 12px; border-top: 1px solid #e2e8f0; background: #ffffff; }
+        #chat-input {
+            flex: 1; width: auto; margin: 0; padding: 10px 14px; border-radius: 12px;
+            border: 2px solid #e2e8f0; font-size: 16px; background: #ffffff;
+        }
+        #chat-send {
+            background: var(--winter-blue); color: #ffffff; border: none; border-radius: 12px;
+            padding: 0 16px; font-weight: 700; cursor: pointer; font-family: 'Fredoka', sans-serif;
+        }
+        #chat-send:hover { background: #0369a1; }
+
+        @media (max-width: 768px) {
+            #chat-launcher { bottom: 20px; right: 15px; width: 58px; height: 58px; }
+            #chat-panel { right: 15px; bottom: 90px; }
+            #toast-container, #cal-toast-container { right: 15px; bottom: 90px; }
+        }
     </style>
 </head>
 <body>
@@ -717,6 +780,23 @@
 <footer>
     <p>&copy; 2026 Gawynt's Snow Shoveling. All Rights Reserved.</p>
 </footer>
+
+<!-- ADDED: Live chat button and window -->
+<button id="chat-launcher" type="button" aria-label="Open live chat">💬</button>
+<div id="chat-panel" role="dialog" aria-label="Live chat">
+    <div class="chat-header">
+        <div>
+            <div class="chat-header-title">❄️ Gawynt's Help Chat</div>
+            <div class="chat-header-sub">We're here to help!</div>
+        </div>
+        <button type="button" class="chat-close" id="chat-close" aria-label="Close chat">✕</button>
+    </div>
+    <div id="chat-messages"></div>
+    <form id="chat-form" autocomplete="off">
+        <input type="text" id="chat-input" placeholder="Type a message..." maxlength="500">
+        <button type="submit" id="chat-send">Send</button>
+    </form>
+</div>
 
 <script>
     // Initialize AOS
@@ -1499,6 +1579,354 @@
         renderCalendar();
         initAuth();
     });
+</script>
+
+<!-- ADDED: Live chat <-> your Firebase connection -->
+<script type="module">
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getDatabase, ref, push, set, update, onChildAdded } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+    const chatFirebaseConfig = {
+        apiKey: "AIzaSyBuWWnqDX5mUra5pF3uuBxEVSKjcESifTk",
+        authDomain: "gawynt-hub.firebaseapp.com",
+        databaseURL: "https://gawynt-hub-default-rtdb.firebaseio.com",
+        projectId: "gawynt-hub",
+        storageBucket: "gawynt-hub.firebasestorage.app",
+        messagingSenderId: "330651852035",
+        appId: "1:330651852035:web:db931f867da21b6a519d36",
+        measurementId: "G-XLXGTVSPXT"
+    };
+
+    const chatApp = getApps().length ? getApp() : initializeApp(chatFirebaseConfig);
+    const chatAuth = getAuth(chatApp);
+    const chatDb = getDatabase(chatApp);
+
+    const chatAuthReady = (async () => {
+        if (!chatAuth.currentUser) await signInAnonymously(chatAuth);
+    })();
+
+    window.chatFB = {
+        start: async function(id, name) {
+            await chatAuthReady;
+            await set(ref(chatDb, 'chats/' + id + '/meta'), {
+                name: name, startedAt: Date.now(), updatedAt: Date.now(), unread: true, lastText: '(opened the chat)'
+            });
+        },
+        send: async function(id, name, sid, text) {
+            await chatAuthReady;
+            await push(ref(chatDb, 'chats/' + id + '/messages'), { from: 'customer', text: text, ts: Date.now(), sid: sid });
+            await update(ref(chatDb, 'chats/' + id + '/meta'), { name: name, updatedAt: Date.now(), unread: true, lastText: text });
+        },
+        listen: function(id, cb) {
+            chatAuthReady.then(function() {
+                onChildAdded(ref(chatDb, 'chats/' + id + '/messages'), function(snap) { cb(snap.val()); });
+            }).catch(function() {});
+        }
+    };
+</script>
+
+<!-- ADDED: Live chat logic -->
+<script>
+(function() {
+    const launcher = document.getElementById('chat-launcher');
+    const panel = document.getElementById('chat-panel');
+    const closeBtn = document.getElementById('chat-close');
+    const messages = document.getElementById('chat-messages');
+    const form = document.getElementById('chat-form');
+    const input = document.getElementById('chat-input');
+
+    let started = false;
+    let step = null; // null | 'name' | 'contact' | 'message'
+    const lead = {};
+    let chatId = null;
+    let liveConfirmed = false;
+    const sid = Math.random().toString(36).slice(2);
+
+    function scrollDown() { messages.scrollTop = messages.scrollHeight; }
+
+    function addMsg(text, who) {
+        const div = document.createElement('div');
+        div.className = 'chat-msg ' + who;
+        div.textContent = text;
+        messages.appendChild(div);
+        scrollDown();
+    }
+
+    function clearOptions() {
+        messages.querySelectorAll('.chat-options').forEach(function(el) { el.remove(); });
+    }
+
+    function showOptions(list) {
+        clearOptions();
+        const wrap = document.createElement('div');
+        wrap.className = 'chat-options';
+        list.forEach(function(opt) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'chat-opt';
+            b.textContent = opt.label;
+            b.addEventListener('click', function() {
+                clearOptions();
+                addMsg(opt.label, 'user');
+                setTimeout(opt.fn, 300);
+            });
+            wrap.appendChild(b);
+        });
+        messages.appendChild(wrap);
+        scrollDown();
+    }
+
+    function mainOptions() {
+        showOptions([
+            { label: '🙋 Connect me to someone', fn: startConnect },
+            { label: '💰 Services & prices', fn: showPrices },
+            { label: '💳 Payment options', fn: showPayment },
+            { label: '📍 Where do you shovel?', fn: showArea },
+            { label: '📅 How do I book?', fn: showBooking }
+        ]);
+    }
+
+    function backOptions() {
+        showOptions([
+            { label: '⬅️ Back to options', fn: function() { addMsg('What else can I help you with?', 'bot'); mainOptions(); } }
+        ]);
+    }
+
+    function showPrices() {
+        addMsg("Here are our services:\n\nINDIVIDUAL\n• Walkway Only: $10\n• Sidewalk Only: $10\n• Corner Lot Sidewalks: $20\n• Driveway Only: $15\n\nBUNDLES (save money!)\n• Sidewalk & Walkway: $15\n• Driveway & Walkway: $20\n• Walkway & Corner Sidewalk: $25\n• Driveway & Corner Sidewalk: $30\n• Full Regular Package: $30\n• Full Corner Package: $40\n\n⚠️ Shoveling only, no salt service.", 'bot');
+        backOptions();
+    }
+
+    function showPayment() {
+        addMsg("You can pay 3 ways:\n• E-transfer\n• Tap to Pay\n• Pay Online (secure Stripe checkout)\n\nWe take payment 0-2 hours before the service.", 'bot');
+        backOptions();
+    }
+
+    function showArea() {
+        addMsg("📍 We serve Lower and Upper Mount Royal, Sunalta, Scarboro, Bankview and Marda Loop.", 'bot');
+        backOptions();
+    }
+
+    function showBooking() {
+        addMsg("Booking is easy:\n1. Tap the services you want\n2. Pick a date and time on the calendar\n3. Choose a payment method\n4. Fill in your details and tap Complete Booking", 'bot');
+        showOptions([
+            { label: '❄️ Take me to the services', fn: function() {
+                panel.classList.remove('open');
+                const s = document.getElementById('services');
+                if (s) s.scrollIntoView({ behavior: 'smooth' });
+            } },
+            { label: '⬅️ Back to options', fn: function() { addMsg('What else can I help you with?', 'bot'); mainOptions(); } }
+        ]);
+    }
+
+    // Phone alert settings: install the free "ntfy" app and subscribe to this topic to get a ping on your phone.
+    // (Change the topic to any new secret word if you ever want to reset it.)
+    const NTFY_TOPIC = 'gawynt-snow-chat-x7k2m9q4';
+
+    function notifyOwner(title, text) {
+        if (!NTFY_TOPIC) return;
+        try {
+            fetch('https://ntfy.sh/' + NTFY_TOPIC, {
+                method: 'POST',
+                headers: { 'Title': title, 'Priority': 'high', 'Tags': 'speech_balloon', 'Click': new URL('admin-chat.html', location.href).href },
+                body: text
+            }).catch(function() {});
+        } catch (err) {}
+    }
+
+    function pingChatStarted() {
+        notifyOwner('New chat on your snow site', lead.name + ' just opened the live chat and is waiting for you.');
+        fetch('https://formspree.io/f/xjgydwzk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                _subject: 'LIVE CHAT STARTED: ' + lead.name + ' is waiting',
+                Name: lead.name,
+                Source: 'Website live chat (chat opened)'
+            })
+        }).catch(function() {});
+    }
+
+    // --- Live chat (Firebase) helpers ---
+    function saveSession() {
+        try { localStorage.setItem('gawynt_chat', JSON.stringify({ id: chatId, name: lead.name })); } catch (e) {}
+    }
+    function loadSession() {
+        try {
+            const s = JSON.parse(localStorage.getItem('gawynt_chat') || 'null');
+            return (s && s.id && s.name) ? s : null;
+        } catch (e) { return null; }
+    }
+    function newChatId() {
+        const a = new Uint8Array(12);
+        crypto.getRandomValues(a);
+        return Array.from(a).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+    }
+    function withFB(fn, tries) {
+        tries = tries || 0;
+        if (window.chatFB) { fn(window.chatFB); return; }
+        if (tries < 20) setTimeout(function() { withFB(fn, tries + 1); }, 500);
+    }
+    function attachChat() {
+        withFB(function(fb) {
+            fb.listen(chatId, function(m) {
+                if (!m || !m.text) return;
+                if (m.from === 'admin') addMsg('Gawynt: ' + m.text, 'bot');
+                else if (m.from === 'customer' && m.sid !== sid) addMsg(m.text, 'user');
+            });
+        });
+    }
+    function startLiveChat() {
+        chatId = newChatId();
+        saveSession();
+        withFB(function(fb) { fb.start(chatId, lead.name).catch(function() {}); });
+        attachChat();
+    }
+    function fallbackEmail(text) {
+        fetch('https://formspree.io/f/xjgydwzk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                _subject: 'Live Chat message from ' + lead.name,
+                Name: lead.name,
+                Message: text,
+                Source: 'Website live chat (backup email)'
+            })
+        }).catch(function() {});
+    }
+    function sendLive(text) {
+        if (!window.chatFB) {
+            addMsg("Live chat isn't available right now, so I emailed your message instead.", 'bot');
+            fallbackEmail(text);
+            notifyOwner('Chat message from ' + lead.name, text);
+            return;
+        }
+        window.chatFB.send(chatId, lead.name, sid, text).then(function() {
+            notifyOwner('Chat message from ' + lead.name, text);
+            if (!liveConfirmed) {
+                liveConfirmed = true;
+                addMsg("Message sent! Gawynt will reply right here, so please keep this page open. 💬", 'bot');
+            }
+        }).catch(function() {
+            addMsg("Live chat isn't available right now, so I emailed your message instead.", 'bot');
+            fallbackEmail(text);
+            notifyOwner('Chat message from ' + lead.name, text);
+        });
+    }
+
+    function startConnect() {
+        if (window.chatFB && chatId) {
+            addMsg("You're connected! Type your message below and Gawynt will reply right here in the chat. Please keep this page open.", 'bot');
+            input.focus();
+            return;
+        }
+        if (!lead.contact) {
+            step = 'contact';
+            addMsg("Happy to connect you with someone who can help, " + lead.name + "! What's the best email or phone number to reach you?", 'bot');
+        } else {
+            step = 'message';
+            addMsg("What would you like help with?", 'bot');
+        }
+        input.focus();
+    }
+
+    function sendLead() {
+        addMsg('Sending your message...', 'bot');
+        fetch('https://formspree.io/f/xjgydwzk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                _subject: 'Live Chat Request from ' + lead.name,
+                Name: lead.name,
+                Contact: lead.contact,
+                Message: lead.message,
+                Source: 'Website live chat'
+            })
+        })
+        .then(function(res) {
+            if (res.ok) {
+                step = null;
+                notifyOwner('Chat message from ' + lead.name, lead.name + ' (' + lead.contact + '): ' + lead.message);
+                addMsg("✅ Thanks, " + lead.name + "! Your message was sent. Someone will get back to you as soon as possible.", 'bot');
+                backOptions();
+            } else {
+                throw new Error('bad response');
+            }
+        })
+        .catch(function() {
+            step = 'message';
+            addMsg("Sorry, that didn't send. Please type your message again to retry.", 'bot');
+        });
+    }
+
+    function openChat() {
+        panel.classList.add('open');
+        if (!started) {
+            started = true;
+            const saved = loadSession();
+            if (saved) {
+                lead.name = saved.name;
+                chatId = saved.id;
+                attachChat();
+                setTimeout(function() {
+                    addMsg("Welcome back, " + saved.name + "! 👋 Type a message any time, or pick an option:", 'bot');
+                    mainOptions();
+                }, 500);
+                return;
+            }
+            setTimeout(function() { addMsg("Welcome! 👋", 'bot'); }, 300);
+            setTimeout(function() {
+                step = 'name';
+                addMsg("What's your name?", 'bot');
+                input.focus();
+            }, 900);
+        }
+    }
+
+    launcher.addEventListener('click', function() {
+        if (panel.classList.contains('open')) {
+            panel.classList.remove('open');
+        } else {
+            openChat();
+        }
+    });
+    closeBtn.addEventListener('click', function() { panel.classList.remove('open'); });
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const text = input.value.trim();
+        if (!text) return;
+        input.value = '';
+        addMsg(text, 'user');
+
+        if (step === 'name') {
+            lead.name = text;
+            step = null;
+            startLiveChat();
+            pingChatStarted();
+            setTimeout(function() {
+                addMsg("Nice to meet you, " + text + "! I've let Gawynt know you're here. Do you want me to connect you to someone who can help? Here are your options:", 'bot');
+                mainOptions();
+            }, 300);
+        } else if (step === 'contact') {
+            lead.contact = text;
+            step = 'message';
+            setTimeout(function() { addMsg("Got it. What would you like help with?", 'bot'); }, 300);
+        } else if (step === 'message') {
+            lead.message = text;
+            sendLead();
+        } else if (chatId) {
+            clearOptions();
+            sendLive(text);
+        } else {
+            setTimeout(function() {
+                addMsg("I'm not sure I understood that, but here's what I can help with:", 'bot');
+                mainOptions();
+            }, 300);
+        }
+    });
+})();
 </script>
 
 </body>
