@@ -2096,6 +2096,111 @@
     });
 })();
 </script>
+<style>
+.auth-tabs{display:flex;gap:8px;margin-bottom:20px}
+.auth-tab{flex:1;padding:12px;border:2px solid var(--winter-blue);background:#fff;color:var(--winter-blue);border-radius:12px;font-weight:700;cursor:pointer;font-family:'Fredoka',sans-serif}
+.auth-tab.active{background:var(--winter-blue);color:#fff}
+#authModal input{margin-bottom:12px;padding:14px}
+#auth-msg{min-height:20px;font-size:.9rem;margin:0 0 12px;color:#b91c1c !important}
+.auth-link{background:none;border:none;color:var(--winter-blue);cursor:pointer;margin-top:12px;font-family:inherit;font-size:.95rem}
+</style>
+<div id="authModal" class="custom-modal-backdrop">
+  <div class="custom-modal-window">
+    <h3 id="auth-title">Welcome Back ❄️</h3>
+    <div class="auth-tabs">
+      <button type="button" class="auth-tab active" id="tab-login">Log In</button>
+      <button type="button" class="auth-tab" id="tab-signup">Sign Up</button>
+    </div>
+    <form id="auth-form">
+      <input type="text" id="auth-name" placeholder="Your Name" style="display:none">
+      <input type="email" id="auth-email" placeholder="Email" required>
+      <input type="password" id="auth-pass" placeholder="Password (6+ characters)" required minlength="6">
+      <p id="auth-msg"></p>
+      <button type="submit" class="submit-btn" id="auth-submit" style="font-size:1.1rem;padding:16px">Log In</button>
+    </form>
+    <button type="button" class="auth-link" id="auth-forgot">Forgot password?</button><br>
+    <button type="button" class="auth-link" id="auth-close">Close</button>
+  </div>
+</div>
+
+<script type="module">
+import { getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+const auth = getAuth(getApp()), db = getDatabase(getApp());
+const $ = id => document.getElementById(id);
+const REWARD_AT = 100;
+let mode = 'login', stopPts = null;
+
+const navLinks = document.querySelector('.nav-links');
+const cta = navLinks.querySelector('.nav-cta');
+const nav = document.createElement('a'); nav.id = 'nav-account'; nav.textContent = 'Log In / Sign Up';
+const badge = document.createElement('a'); badge.style.cssText = 'display:none;font-weight:700;color:#d97706 !important;cursor:default';
+navLinks.insertBefore(nav, cta); navLinks.insertBefore(badge, cta);
+
+function setMode(m) {
+  mode = m; const s = m === 'signup';
+  $('tab-login').classList.toggle('active', !s); $('tab-signup').classList.toggle('active', s);
+  $('auth-name').style.display = s ? 'block' : 'none'; $('auth-name').required = s;
+  $('auth-submit').textContent = s ? 'Create Account' : 'Log In';
+  $('auth-title').textContent = s ? 'Join Gawynt’s Neighbours ❄️' : 'Welcome Back ❄️';
+  $('auth-msg').textContent = '';
+}
+const openModal = () => { setMode('login'); $('authModal').classList.add('open'); };
+const closeModal = () => $('authModal').classList.remove('open');
+const friendly = c => ({
+  'auth/email-already-in-use': 'That email already has an account. Try logging in.',
+  'auth/invalid-credential': 'Wrong email or password.',
+  'auth/invalid-email': 'Please enter a valid email.',
+  'auth/weak-password': 'Password must be at least 6 characters.',
+  'auth/too-many-requests': 'Too many tries. Please wait and retry.'
+})[c] || 'Something went wrong. Please try again.';
+
+$('tab-login').onclick = () => setMode('login');
+$('tab-signup').onclick = () => setMode('signup');
+$('auth-close').onclick = closeModal;
+$('authModal').addEventListener('click', e => { if (e.target.id === 'authModal') closeModal(); });
+
+$('auth-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = $('auth-submit'); btn.disabled = true; $('auth-msg').style.color = '#b91c1c'; $('auth-msg').textContent = '';
+  try {
+    const email = $('auth-email').value.trim(), pass = $('auth-pass').value;
+    if (mode === 'signup') {
+      const c = await createUserWithEmailAndPassword(auth, email, pass);
+      await updateProfile(c.user, { displayName: $('auth-name').value.trim() });
+    } else await signInWithEmailAndPassword(auth, email, pass);
+    $('auth-form').reset(); closeModal();
+  } catch (err) { $('auth-msg').textContent = friendly(err.code); }
+  btn.disabled = false;
+});
+
+$('auth-forgot').onclick = async () => {
+  const email = $('auth-email').value.trim();
+  if (!email) { $('auth-msg').textContent = 'Type your email above first.'; return; }
+  try { await sendPasswordResetEmail(auth, email); $('auth-msg').style.color = '#059669'; $('auth-msg').textContent = 'Reset email sent!'; }
+  catch (err) { $('auth-msg').style.color = '#b91c1c'; $('auth-msg').textContent = friendly(err.code); }
+};
+
+onAuthStateChanged(auth, user => {
+  if (stopPts) { stopPts(); stopPts = null; }
+  const member = user && !user.isAnonymous;
+  if (!member) { nav.textContent = 'Log In / Sign Up'; nav.onclick = openModal; badge.style.display = 'none'; return; }
+  nav.textContent = 'Hi, ' + (user.displayName || user.email.split('@')[0]) + ' · Log Out';
+  nav.onclick = () => signOut(auth);
+  const n = document.querySelector('#orderForm [name="Name"]'), m = document.querySelector('#orderForm [name="Email"]');
+  if (n && !n.value) n.value = user.displayName || '';
+  if (m && !m.value) m.value = user.email;
+  set(ref(db, 'members/' + user.uid + '/profile'), { name: user.displayName || '', email: user.email }).catch(() => {});
+  stopPts = onValue(ref(db, 'members/' + user.uid + '/points'), s => {
+    const p = s.val() || 0;
+    badge.textContent = '⭐ ' + p + ' pts' + (p >= REWARD_AT ? ' 🎁' : '');
+    badge.title = p >= REWARD_AT ? 'Reward ready! Mention it in your next booking.' : (REWARD_AT - p) + ' points to your next reward';
+    badge.style.display = 'inline';
+  }, () => {});
+});
+</script>
 
 </body>
 </html>
