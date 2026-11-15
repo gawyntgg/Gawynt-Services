@@ -1,475 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gawynt's Snow Shoveling</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <script src="https://elfsightcdn.com/platform.js" async></script>
-    
-    <!-- INJECTED FROM CODE 1: Tailwind, FontAwesome, and Inter Font -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            corePlugins: {
-                preflight: false, // Prevents Tailwind from stripping Code 2's base styles
-            },
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#f9fafb',
-                            100: '#f3f4f6',
-                            900: '#111827',
-                        }
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.3s ease-out',
-                        'slide-up': 'slideUp 0.4s ease-out',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        },
-                        slideUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        /* --- ULTRA MODERN WINTER GLASSMORPHISM THEME (LIGHT MODE) --- */
-        :root { 
-            --winter-blue: #0284c7; 
-            --light-blue: #bae6fd; 
-            --snow-white: #0f172a; 
-            --text-main: #1e293b; 
-            --text-muted: #475569;
-            --orange: #ea580c; 
-            --danger: #ef4444; 
-            --gold: #d97706; 
-            --bg-gradient: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%); 
-            --success-green: #059669;
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.7);
-            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
-        }
-
-        ::-webkit-scrollbar { width: 10px; }
-        ::-webkit-scrollbar-track { background: #e0f2fe; }
-        ::-webkit-scrollbar-thumb { background: var(--winter-blue); border-radius: 5px; }
-        ::-webkit-scrollbar-thumb:hover { background: #0369a1; }
-
-        html, body { max-width: 100%; overflow-x: hidden; scroll-behavior: smooth; }
-
-        #scroll-progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 5px; background: rgba(0,0,0,0.05); z-index: 9999; }
-        #scroll-progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--winter-blue), #38bdf8); box-shadow: 0 0 10px var(--winter-blue); }
-
-        #loading-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #ffffff; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 10000;
-            transition: opacity 0.8s ease;
-        }
-        .loader-card {
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 32px;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 0 20px 50px -12px rgba(0,0,0,0.1);
-        }
-        #loading-screen h1 {
-            color: #0f172a !important; margin-bottom: 25px; margin-top: 0;
-            font-size: 2.8rem; font-family: 'Fredoka', sans-serif; font-weight: 700;
-            text-shadow: none;
-            animation: pulse 1.5s infinite; text-align: center; padding: 0 15px;
-        }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
-        
-        .load-bar-container { width: 80%; max-width: 300px; height: 8px; background: #f1f5f9; border-radius: 20px; overflow: hidden; position: relative; }
-        .load-bar-fill { width: 0%; height: 100%; background: var(--winter-blue); animation: loadProgress 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; box-shadow: 0 0 12px rgba(2, 132, 199, 0.4); }
-        @keyframes loadProgress { 0% { width: 0%; } 100% { width: 100%; } }
-
-        @keyframes fall { to { transform: translateY(105vh); } }
-
-        body { 
-            font-family: 'Fredoka', sans-serif; margin: 0; 
-            background: var(--bg-gradient); color: var(--text-main); 
-            padding-top: 75px; position: relative;
-        }
-        /* FIX: keep the banner from hiding under the fixed top menu */
-        @media (max-width: 768px) {
-            body { padding-top: 130px; }
-        }
-        
-        h1, h2, h3, h4, h5, h6 { color: var(--snow-white) !important; font-weight: 700; text-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        p, strong, b, label, .section-title { color: var(--text-main) !important; }
-
-        .container { max-width: 1050px; margin: auto; padding: 20px; position: relative; z-index: 10; box-sizing: border-box; }
-        
-        .about-section, .area-section, .form-container, .review-section { 
-            background: var(--glass-bg); padding: 40px; border-radius: 24px; 
-            margin-bottom: 40px; box-shadow: var(--glass-shadow); 
-            border: 1px solid var(--glass-border); backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            transition: transform 0.3s ease;
-        }
-        .about-section:hover, .form-container:hover { transform: translateY(-5px); }
-
-        @keyframes highlightFormPulse {
-            0% { transform: scale(1); border-color: var(--glass-border); }
-            50% { transform: scale(1.02); border-color: var(--winter-blue); box-shadow: 0 0 60px rgba(2, 132, 199, 0.2); }
-            100% { transform: scale(1); border-color: var(--glass-border); }
-        }
-        .highlight-pulse { animation: highlightFormPulse 1s ease-out; }
-
-        .about-section { border-top: 5px solid var(--winter-blue); text-align: center; line-height: 1.8; font-size: 1.1rem; }
-        .goal-bar { background: rgba(0,0,0,0.05); border-radius: 30px; height: 50px; width: 100%; max-width: 650px; margin: 25px auto; overflow: hidden; border: 2px solid rgba(0,0,0,0.1); box-shadow: inset 0 0 10px rgba(0,0,0,0.05); display: block !important; }
-        .progress-fill { height: 100%; width: 7.5%; display: flex; align-items: center; justify-content: center; color: #fff !important; font-weight: 700; font-size: 1.2rem; background: linear-gradient(90deg, var(--danger), var(--orange)); min-width: 60px; box-shadow: 0 0 15px rgba(234, 88, 12, 0.6); }
-
-        .alert-box { background: rgba(239, 68, 68, 0.15); border: 2px solid var(--danger); color: #b91c1c !important; padding: 20px; border-radius: 15px; text-align: center; font-weight: bold; margin-bottom: 40px; backdrop-filter: blur(5px); box-shadow: 0 0 20px rgba(239, 68, 68, 0.1); }
-
-        .section-title { text-align: center; font-size: 2.5rem; margin-top: 60px; margin-bottom: 30px; }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 30px; margin-bottom: 40px; }
-
-        .card { 
-            background: rgba(255, 255, 255, 0.6); padding: 30px 25px; border-radius: 20px; text-align: center; 
-            border: 1px solid rgba(0, 0, 0, 0.05); cursor: pointer; 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            display: flex; flex-direction: column; justify-content: space-between; position: relative; 
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-        }
-        .card:hover { 
-            transform: translateY(-12px) scale(1.02); 
-            border-color: var(--winter-blue); 
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08), 0 0 20px rgba(2, 132, 199, 0.15); 
-        }
-        .card h3 { color: var(--snow-white) !important; margin: 15px 0 10px; font-size: 1.4rem; }
-        .card p { color: var(--text-muted) !important; margin: 0 0 15px; font-size: 0.95rem; line-height: 1.5; }
-        
-        .badge { background: var(--gold); color: #fff !important; padding: 6px 15px; font-size: 0.75rem; font-weight: 800; border-radius: 20px; position: absolute; top: -12px; right: 20px; box-shadow: 0 5px 15px rgba(217, 119, 6, 0.3); text-transform: uppercase; letter-spacing: 1px; }
-        
-        @keyframes corner-pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); } 100% { transform: scale(1); } }
-        .badge-corner { background: var(--danger) !important; color: #fff !important; animation: corner-pulse 2s infinite ease-in-out; }
-        .badge-total { background: linear-gradient(45deg, var(--winter-blue), #8b5cf6) !important; color: #fff !important; box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3); }
-        .price { font-size: 2.2rem; font-weight: 800; color: var(--winter-blue) !important; display: block; margin-top: auto; text-shadow: 0 2px 5px rgba(2, 132, 199, 0.1); }
-
-        .top-nav { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 75px; 
-            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 0 40px; box-sizing: border-box; z-index: 2000; 
-            border-bottom: 1px solid rgba(0,0,0,0.05); box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-        }
-        .nav-logo { color: var(--snow-white) !important; font-weight: 800; font-size: 1.4rem; letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
-        .nav-links { display: flex; gap: 25px; align-items: center; }
-        .nav-links a { color: var(--text-muted) !important; text-decoration: none; font-weight: 600; transition: 0.3s; font-size: 1rem; cursor: pointer; }
-        .nav-links a:hover { color: var(--winter-blue) !important; text-shadow: 0 0 10px rgba(2, 132, 199, 0.2); }
-        .nav-cta { background: linear-gradient(45deg, var(--danger), #f43f5e); color: white !important; padding: 10px 20px; border-radius: 50px; font-weight: bold; font-size: 0.95rem !important; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); transition: all 0.3s ease; }
-        .nav-cta:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4); }
-
-        @media (max-width: 768px) {
-            .top-nav { flex-direction: column; justify-content: center; height: auto; padding: 15px 10px; gap: 10px; }
-            .nav-logo { font-size: 1.2rem; }
-            .nav-links { gap: 12px; flex-wrap: wrap; justify-content: center; }
-            .nav-links a { font-size: 0.85rem; }
-            header { padding: 160px 15px 80px !important; }
-            header h1 { font-size: 2.2rem !important; word-wrap: break-word; }
-            header p { font-size: 1rem !important; }
-            .about-section, .area-section, .form-container, .review-section { padding: 25px 15px; }
-            .section-title { font-size: 2rem; }
-            .picker-wrapper { flex-direction: column; gap: 15px; }
-        }
-
-        header { 
-            position: relative;
-            background: radial-gradient(circle at center, rgba(14,165,233,0.1) 0%, #f0f9ff 100%), url('https://images.unsplash.com/photo-1477601263568-180e2c6d046e?auto=format&fit=crop&w=1500&q=80') center/cover; 
-            padding: 140px 20px 100px; text-align: center; 
-        }
-        header::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.7), #f0f9ff); z-index: 1;
-        }
-        header > * { position: relative; z-index: 2; }
-        
-        header h1 { 
-            font-size: 4.5rem; 
-            margin-bottom: 15px; 
-            letter-spacing: -0.5px; 
-            text-transform: uppercase; 
-            background: linear-gradient(135deg, #0f172a 30%, #0284c7 100%); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            text-shadow: 2px 4px 10px rgba(2, 132, 199, 0.1);
-        }
-        header p { color: var(--text-muted) !important; font-size: 1.2rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
-
-        .service-area {
-            display: inline-block;
-            background: rgba(2, 132, 199, 0.1);
-            border: 1px solid rgba(2, 132, 199, 0.2);
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-size: 1rem;
-            color: var(--winter-blue) !important;
-            font-weight: 700;
-            margin-top: 10px;
-            backdrop-filter: blur(5px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        @media (max-width: 768px) {
-            .service-area { font-size: 0.85rem; padding: 8px 15px; line-height: 1.4; }
-        }
-
-        .profile-photo-container { 
-            background: rgba(255,255,255,0.8); padding: 12px; border-radius: 16px;
-            display: inline-block; margin-bottom: 25px; 
-            box-shadow: 0 0 40px rgba(2, 132, 199, 0.15), inset 0 0 20px rgba(0,0,0,0.05); 
-            backdrop-filter: blur(10px); border: 2px solid rgba(14, 165, 233, 0.3);
-            position: relative; overflow: hidden;
-            max-width: 90%;
-        }
-        .profile-photo-container img { 
-            width: 280px; height: 280px; max-width: 100%; object-fit: cover; border-radius: 10px;
-            display: block; transition: transform 0.5s ease;
-        }
-        .profile-photo-container:hover img { transform: scale(1.1); }
-
-        .review-section { background: rgba(255,255,255,0.6); border-radius: 30px; padding: 20px; border: 1px solid rgba(0,0,0,0.05); }
-
-        .scroll-bubble {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
-            background: rgba(16, 185, 129, 0.95); backdrop-filter: blur(5px); color: white !important;
-            padding: 15px 35px; border-radius: 50px; font-weight: 700; font-size: 1.1rem;
-            z-index: 3000; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3); opacity: 0;
-            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s;
-            pointer-events: none; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.5);
-        }
-        .scroll-bubble.active { transform: translateX(-50%) translateY(0); opacity: 1; }
-
-        #toast-container { position: fixed; bottom: 30px; right: 30px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast {
-            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); color: var(--text-main);
-            padding: 15px 25px; border-radius: 12px; font-weight: 600; box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border-left: 5px solid var(--winter-blue); font-family: 'Fredoka', sans-serif;
-        }
-        .toast.show { transform: translateX(0); }
-
-        input, textarea { 
-            width: 100%; padding: 20px; margin-bottom: 20px; 
-            border: 2px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.8); 
-            border-radius: 15px; box-sizing: border-box; font-size: 16px; 
-            color: var(--text-main) !important; outline: none; font-family: 'Fredoka', sans-serif; 
-            transition: all 0.3s ease; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);
-        }
-        input[type="date"] {
-            font-family: 'Fredoka', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-main);
-            cursor: pointer;
-        }
-        
-        input:focus, textarea:focus { border-color: var(--winter-blue); background: #ffffff; box-shadow: 0 0 15px rgba(2,132,199,0.15), inset 0 2px 5px rgba(0,0,0,0.02); }
-        input::placeholder, textarea::placeholder { color: #94a3b8 !important; }
-        
-        .submit-btn { 
-            background: linear-gradient(45deg, var(--winter-blue), #3b82f6); color: white !important; 
-            border: none; padding: 22px; width: 100%; border-radius: 15px; font-size: 1.4rem; 
-            font-weight: 800; cursor: pointer; transition: all 0.3s ease; 
-            box-shadow: 0 10px 20px rgba(2, 132, 199, 0.25); text-transform: uppercase; letter-spacing: 1px;
-        }
-        .submit-btn:hover { background: linear-gradient(45deg, #0ea5e9, #60a5fa); transform: translateY(-3px); box-shadow: 0 15px 25px rgba(2, 132, 199, 0.35); }
-
-        .reset-btn { background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: #b91c1c !important; padding: 12px; width: 100%; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: 0.3s; margin-bottom: 20px; font-family: 'Fredoka', sans-serif; backdrop-filter: blur(5px); }
-        .reset-btn:hover { background: var(--danger); color: white !important; box-shadow: 0 0 15px rgba(239,68,68,0.3); }
-
-        .estimated-price-box {
-            background: linear-gradient(135deg, #00d2ff 0%, #00a8ff 100%);
-            border-radius: 24px; padding: 25px; text-align: center;
-            box-shadow: 0 12px 30px rgba(0, 168, 255, 0.3); margin-bottom: 30px;
-            transition: all 0.3s ease;
-        }
-        .estimated-price-box h4 {
-            margin: 0 0 5px; font-size: 1.2rem; font-weight: 600;
-            color: #ffffff !important; letter-spacing: 0.5px; text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        .estimated-price-box .price-display {
-            font-size: 4.5rem; font-weight: 800; color: #ffffff !important;
-            margin: 0; line-height: 1; text-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .custom-modal-backdrop {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.3); backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px); display: flex; justify-content: center;
-            align-items: center; z-index: 11000; opacity: 0; pointer-events: none;
-            transition: opacity 0.4s ease;
-        }
-        .custom-modal-backdrop.open { opacity: 1; pointer-events: auto; }
-        .custom-modal-window {
-            background: #ffffff; padding: 35px 30px; border-radius: 24px;
-            max-width: 440px; width: 90%; text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-            transform: scale(0.9); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .custom-modal-backdrop.open .custom-modal-window { transform: scale(1); }
-        .custom-modal-window h3 { margin-top: 0; font-size: 1.6rem; color: var(--snow-white) !important; margin-bottom: 15px; }
-        .custom-modal-window p { font-size: 1.05rem; color: var(--text-muted) !important; line-height: 1.6; margin-bottom: 30px; }
-        .modal-action-row { display: flex; gap: 15px; justify-content: center; }
-        .modal-btn {
-            flex: 1; padding: 15px 25px; border-radius: 14px; font-weight: 700;
-            font-size: 1.1rem; border: none; cursor: pointer; transition: all 0.2s ease;
-            font-family: 'Fredoka', sans-serif;
-        }
-        .modal-btn.confirm-yes { background: var(--success-green); color: #ffffff !important; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25); }
-        .modal-btn.confirm-yes:hover { background: #047857; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(5, 150, 105, 0.35); }
-        .modal-btn.confirm-no { background: #f1f5f9; color: #475569 !important; }
-        .modal-btn.confirm-no:hover { background: #e2e8f0; transform: translateY(-2px); }
-
-        footer { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-top: 1px solid rgba(0,0,0,0.05); padding: 50px 20px; text-align: center; color: var(--text-muted); font-weight: 600; position: relative; z-index: 10; }
-
-        /* --- INJECTED FROM CODE 1: Custom Calendar Styles --- */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .card-shadow { box-shadow: 0 4px 24px -6px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; }
-        .card-shadow:hover { box-shadow: 0 10px 32px -8px rgba(0, 0, 0, 0.1); transform: translateY(-2px); }
-        .calendar-day { aspect-ratio: 1; transition: all 0.2s ease; border: 1px solid transparent; }
-        .calendar-day:hover:not(.empty-day) { background-color: #f3f4f6; cursor: pointer; }
-        .modern-input { width: 100%; padding: 0.75rem 1rem; border: 1px solid #e5e7eb; border-radius: 0.75rem; background-color: #f9fafb; transition: all 0.2s; outline: none; }
-        .modern-input:focus:not([readonly]) { border-color: #111827; background-color: #ffffff; box-shadow: 0 0 0 4px rgba(17, 24, 39, 0.05); }
-        
-        #cal-toast-container { position: fixed; bottom: 2rem; right: 2rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; }
-        .cal-toast { background: #111827; color: white; padding: 1rem 1.5rem; border-radius: 0.75rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); animation: slideUp 0.3s forwards; opacity: 0; transition: opacity 0.3s ease; font-family: 'Inter', sans-serif;}
-
-        /* --- ADDED: LIVE SNOW FORECAST BANNER --- */
-        #snow-banner {
-            position: relative; z-index: 5; padding: 14px 20px; text-align: center; color: #ffffff;
-            background: linear-gradient(90deg, #0369a1, #0284c7, #38bdf8);
-            font-family: 'Fredoka', sans-serif; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.25);
-        }
-        #snow-banner.no-snow { background: linear-gradient(90deg, #475569, #64748b, #94a3b8); }
-        .snow-banner-main { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; }
-        #snow-banner-text { font-size: 1.15rem; font-weight: 700; color: #ffffff; }
-        #snow-banner-temp { font-size: 0.9rem; font-weight: 600; background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 50px; color: #ffffff; }
-        #snow-banner-btn {
-            background: #ffffff; color: #0369a1; border: none; border-radius: 50px; padding: 8px 18px;
-            font-weight: 800; font-size: 0.95rem; cursor: pointer; font-family: 'Fredoka', sans-serif;
-            transition: transform 0.2s ease;
-        }
-        #snow-banner-btn:hover { transform: scale(1.06); }
-        #snow-banner-days { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 10px; }
-        .snow-day { background: rgba(255,255,255,0.18); border-radius: 12px; padding: 6px 12px; font-size: 0.85rem; color: #ffffff; min-width: 92px; }
-        .snow-day-name { font-weight: 800; display: block; color: #ffffff; }
-        @media (max-width: 768px) {
-            #snow-banner-text { font-size: 1rem; }
-            .snow-day { min-width: 80px; padding: 5px 8px; font-size: 0.8rem; }
-        }
-
-        /* --- ADDED: LIVE CHAT WIDGET --- */
-        #toast-container { bottom: 110px; }
-        #cal-toast-container { bottom: 110px; }
-
-        #chat-launcher {
-            position: fixed; bottom: 30px; right: 30px; width: 64px; height: 64px;
-            border-radius: 50%; border: none; cursor: pointer; z-index: 9000;
-            background: linear-gradient(45deg, var(--winter-blue), #3b82f6); color: #ffffff;
-            font-size: 1.7rem; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.4);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
-        }
-        #chat-launcher:hover { transform: scale(1.1); box-shadow: 0 14px 30px rgba(2, 132, 199, 0.5); }
-
-        #chat-panel {
-            position: fixed; bottom: 105px; right: 30px; width: 350px; max-width: calc(100vw - 30px);
-            height: 480px; max-height: calc(100vh - 140px); background: #ffffff; border-radius: 22px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2); border: 1px solid #e2e8f0;
-            display: flex; flex-direction: column; overflow: hidden; z-index: 9000;
-            opacity: 0; transform: translateY(20px) scale(0.95); pointer-events: none;
-            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-family: 'Fredoka', sans-serif;
-        }
-        #chat-panel.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
-
-        .chat-header {
-            background: linear-gradient(45deg, var(--winter-blue), #3b82f6); color: #ffffff;
-            padding: 16px 18px; display: flex; justify-content: space-between; align-items: center;
-        }
-        .chat-header-title { font-weight: 700; font-size: 1.1rem; color: #ffffff; }
-        .chat-header-sub { font-size: 0.8rem; color: #e0f2fe; font-weight: 400; }
-        .chat-close { background: transparent; border: none; color: #ffffff; font-size: 1.3rem; cursor: pointer; padding: 4px 8px; }
-
-        #chat-messages { flex: 1; overflow-y: auto; padding: 16px; background: #f8fafc; display: flex; flex-direction: column; gap: 10px; }
-        .chat-msg { max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 0.95rem; line-height: 1.45; white-space: pre-line; word-wrap: break-word; }
-        .chat-msg.bot { background: #ffffff; color: var(--text-main); border: 1px solid #e2e8f0; align-self: flex-start; border-bottom-left-radius: 4px; }
-        .chat-msg.user { background: var(--winter-blue); color: #ffffff; align-self: flex-end; border-bottom-right-radius: 4px; }
-
-        .chat-options { display: flex; flex-direction: column; gap: 8px; align-self: stretch; }
-        .chat-opt {
-            background: #ffffff; border: 2px solid var(--winter-blue); color: var(--winter-blue);
-            padding: 10px 14px; border-radius: 14px; font-weight: 600; font-size: 0.95rem;
-            cursor: pointer; text-align: left; font-family: 'Fredoka', sans-serif; transition: all 0.2s ease;
-        }
-        .chat-opt:hover { background: var(--winter-blue); color: #ffffff; }
-
-        #chat-form { display: flex; gap: 8px; padding: 12px; border-top: 1px solid #e2e8f0; background: #ffffff; }
-        #chat-input {
-            flex: 1; width: auto; margin: 0; padding: 10px 14px; border-radius: 12px;
-            border: 2px solid #e2e8f0; font-size: 16px; background: #ffffff;
-        }
-        #chat-send {
-            background: var(--winter-blue); color: #ffffff; border: none; border-radius: 12px;
-            padding: 0 16px; font-weight: 700; cursor: pointer; font-family: 'Fredoka', sans-serif;
-        }
-        #chat-send:hover { background: #0369a1; }
-
-        @media (max-width: 768px) {
-            #chat-launcher { bottom: 20px; right: 15px; width: 58px; height: 58px; }
-            #chat-panel { right: 15px; bottom: 90px; }
-            #toast-container, #cal-toast-container { right: 15px; bottom: 90px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gawynt's Snow Shoveling</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://elfsightcdn.com/platform.js" async></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+tailwind.config={corePlugins:{preflight:false},theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{brand:{50:'#f9fafb',100:'#f3f4f6',900:'#111827'}},animation:{'fade-in':'fadeIn 0.3s ease-out','slide-up':'slideUp 0.4s ease-out'},keyframes:{fadeIn:{'0%':{opacity:'0'},'100%':{opacity:'1'}},slideUp:{'0%':{opacity:'0',transform:'translateY(20px)'},'100%':{opacity:'1',transform:'translateY(0)'}}}}}}
+</script>
+<style>
+:root{--winter-blue:#0284c7;--light-blue:#bae6fd;--snow-white:#0f172a;--text-main:#1e293b;--text-muted:#475569;--orange:#ea580c;--danger:#ef4444;--gold:#d97706;--bg-gradient:linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 50%,#bae6fd 100%);--success-green:#059669;--glass-bg:rgba(255,255,255,0.65);--glass-border:rgba(255,255,255,0.7);--glass-shadow:0 8px 32px 0 rgba(0,0,0,0.08)}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:#e0f2fe}
+::-webkit-scrollbar-thumb{background:var(--winter-blue);border-radius:5px}
+::-webkit-scrollbar-thumb:hover{background:#0369a1}
+html,body{max-width:100%;overflow-x:hidden;scroll-behavior:smooth}
+#scroll-progress-container{position:fixed;top:0;left:0;width:100%;height:5px;background:rgba(0,0,0,0.05);z-index:9999}
+#scroll-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--winter-blue),#38bdf8);box-shadow:0 0 10px var(--winter-blue)}
+#loading-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:10000;transition:opacity 0.8s ease}
+.loader-card{background:#fff;padding:40px;border-radius:32px;border:1px solid #e2e8f0;display:flex;flex-direction:column;align-items:center;box-shadow:0 20px 50px -12px rgba(0,0,0,0.1)}
+#loading-screen h1{color:#0f172a!important;margin-bottom:25px;margin-top:0;font-size:2.8rem;font-family:'Fredoka',sans-serif;font-weight:700;text-shadow:none;animation:pulse 1.5s infinite;text-align:center;padding:0 15px}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+.load-bar-container{width:80%;max-width:300px;height:8px;background:#f1f5f9;border-radius:20px;overflow:hidden;position:relative}
+.load-bar-fill{width:0%;height:100%;background:var(--winter-blue);animation:loadProgress 1.4s cubic-bezier(0.4,0,0.2,1) forwards;box-shadow:0 0 12px rgba(2,132,199,0.4)}
+@keyframes loadProgress{0%{width:0%}100%{width:100%}}
+@keyframes fall{to{transform:translateY(105vh)}}
+body{font-family:'Fredoka',sans-serif;margin:0;background:var(--bg-gradient);color:var(--text-main);padding-top:75px;position:relative}
+@media(max-width:768px){body{padding-top:130px}}
+h1,h2,h3,h4,h5,h6{color:var(--snow-white)!important;font-weight:700;text-shadow:0 2px 5px rgba(0,0,0,0.05)}
+p,strong,b,label,.section-title{color:var(--text-main)!important}
+.container{max-width:1050px;margin:auto;padding:20px;position:relative;z-index:10;box-sizing:border-box}
+.about-section,.area-section,.form-container,.review-section{background:var(--glass-bg);padding:40px;border-radius:24px;margin-bottom:40px;box-shadow:var(--glass-shadow);border:1px solid var(--glass-border);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:transform 0.3s ease}
+.about-section:hover,.form-container:hover{transform:translateY(-5px)}
+@keyframes highlightFormPulse{0%{transform:scale(1);border-color:var(--glass-border)}50%{transform:scale(1.02);border-color:var(--winter-blue);box-shadow:0 0 60px rgba(2,132,199,0.2)}100%{transform:scale(1);border-color:var(--glass-border)}}
+.highlight-pulse{animation:highlightFormPulse 1s ease-out}
+.about-section{border-top:5px solid var(--winter-blue);text-align:center;line-height:1.8;font-size:1.1rem}
+.goal-bar{background:rgba(0,0,0,0.05);border-radius:30px;height:50px;width:100%;max-width:650px;margin:25px auto;overflow:hidden;border:2px solid rgba(0,0,0,0.1);box-shadow:inset 0 0 10px rgba(0,0,0,0.05);display:block!important}
+.progress-fill{height:100%;width:7.5%;display:flex;align-items:center;justify-content:center;color:#fff!important;font-weight:700;font-size:1.2rem;background:linear-gradient(90deg,var(--danger),var(--orange));min-width:60px;box-shadow:0 0 15px rgba(234,88,12,0.6)}
+.alert-box{background:rgba(239,68,68,0.15);border:2px solid var(--danger);color:#b91c1c!important;padding:20px;border-radius:15px;text-align:center;font-weight:bold;margin-bottom:40px;backdrop-filter:blur(5px);box-shadow:0 0 20px rgba(239,68,68,0.1)}
+.section-title{text-align:center;font-size:2.5rem;margin-top:60px;margin-bottom:30px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:30px;margin-bottom:40px}
+.card{background:rgba(255,255,255,0.6);padding:30px 25px;border-radius:20px;text-align:center;border:1px solid rgba(0,0,0,0.05);cursor:pointer;transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);display:flex;flex-direction:column;justify-content:space-between;position:relative;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.card:hover{transform:translateY(-12px) scale(1.02);border-color:var(--winter-blue);background:rgba(255,255,255,0.95);box-shadow:0 15px 35px rgba(0,0,0,0.08),0 0 20px rgba(2,132,199,0.15)}
+.card h3{color:var(--snow-white)!important;margin:15px 0 10px;font-size:1.4rem}
+.card p{color:var(--text-muted)!important;margin:0 0 15px;font-size:0.95rem;line-height:1.5}
+.badge{background:var(--gold);color:#fff!important;padding:6px 15px;font-size:0.75rem;font-weight:800;border-radius:20px;position:absolute;top:-12px;right:20px;box-shadow:0 5px 15px rgba(217,119,6,0.3);text-transform:uppercase;letter-spacing:1px}
+@keyframes corner-pulse{0%{transform:scale(1)}50%{transform:scale(1.08);box-shadow:0 0 15px rgba(239,68,68,0.4)}100%{transform:scale(1)}}
+.badge-corner{background:var(--danger)!important;color:#fff!important;animation:corner-pulse 2s infinite ease-in-out}
+.badge-total{background:linear-gradient(45deg,var(--winter-blue),#8b5cf6)!important;color:#fff!important;box-shadow:0 5px 15px rgba(139,92,246,0.3)}
+.price{font-size:2.2rem;font-weight:800;color:var(--winter-blue)!important;display:block;margin-top:auto;text-shadow:0 2px 5px rgba(2,132,199,0.1)}
+.top-nav{position:fixed;top:0;left:0;width:100%;height:75px;background:rgba(255,255,255,0.85);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);display:flex;justify-content:space-between;align-items:center;padding:0 40px;box-sizing:border-box;z-index:2000;border-bottom:1px solid rgba(0,0,0,0.05);box-shadow:0 2px 10px rgba(0,0,0,0.02)}
+.nav-logo{color:var(--snow-white)!important;font-weight:800;font-size:1.4rem;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.nav-links{display:flex;gap:25px;align-items:center}
+.nav-links a{color:var(--text-muted)!important;text-decoration:none;font-weight:600;transition:0.3s;font-size:1rem;cursor:pointer}
+.nav-links a:hover{color:var(--winter-blue)!important;text-shadow:0 0 10px rgba(2,132,199,0.2)}
+.nav-cta{background:linear-gradient(45deg,var(--danger),#f43f5e);color:#fff!important;padding:10px 20px;border-radius:50px;font-weight:bold;font-size:0.95rem!important;box-shadow:0 4px 15px rgba(239,68,68,0.3);transition:all 0.3s ease}
+.nav-cta:hover{transform:scale(1.05);box-shadow:0 6px 20px rgba(239,68,68,0.4)}
+@media(max-width:768px){
+.top-nav{flex-direction:column;justify-content:center;height:auto;padding:15px 10px;gap:10px}
+.nav-logo{font-size:1.2rem}
+.nav-links{gap:12px;flex-wrap:wrap;justify-content:center}
+.nav-links a{font-size:0.85rem}
+header{padding:160px 15px 80px!important}
+header h1{font-size:2.2rem!important;word-wrap:break-word}
+header p{font-size:1rem!important}
+.about-section,.area-section,.form-container,.review-section{padding:25px 15px}
+.section-title{font-size:2rem}
+.picker-wrapper{flex-direction:column;gap:15px}}
+header{position:relative;background:radial-gradient(circle at center,rgba(14,165,233,0.1) 0%,#f0f9ff 100%),url('https://images.unsplash.com/photo-1477601263568-180e2c6d046e?auto=format&fit=crop&w=1500&q=80') center/cover;padding:140px 20px 100px;text-align:center}
+header::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(to bottom,rgba(255,255,255,0.7),#f0f9ff);z-index:1}
+header>*{position:relative;z-index:2}
+header h1{font-size:4.5rem;margin-bottom:15px;letter-spacing:-0.5px;text-transform:uppercase;background:linear-gradient(135deg,#0f172a 30%,#0284c7 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-shadow:2px 4px 10px rgba(2,132,199,0.1)}
+header p{color:var(--text-muted)!important;font-size:1.2rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.service-area{display:inline-block;background:rgba(2,132,199,0.1);border:1px solid rgba(2,132,199,0.2);padding:10px 20px;border-radius:50px;font-size:1rem;color:var(--winter-blue)!important;font-weight:700;margin-top:10px;backdrop-filter:blur(5px);box-shadow:0 4px 15px rgba(0,0,0,0.05)}
+@media(max-width:768px){.service-area{font-size:0.85rem;padding:8px 15px;line-height:1.4}}
+.profile-photo-container{background:rgba(255,255,255,0.8);padding:12px;border-radius:16px;display:inline-block;margin-bottom:25px;box-shadow:0 0 40px rgba(2,132,199,0.15),inset 0 0 20px rgba(0,0,0,0.05);backdrop-filter:blur(10px);border:2px solid rgba(14,165,233,0.3);position:relative;overflow:hidden;max-width:90%}
+.profile-photo-container img{width:280px;height:280px;max-width:100%;object-fit:cover;border-radius:10px;display:block;transition:transform 0.5s ease}
+.profile-photo-container:hover img{transform:scale(1.1)}
+.review-section{background:rgba(255,255,255,0.6);border-radius:30px;padding:20px;border:1px solid rgba(0,0,0,0.05)}
+.scroll-bubble{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:rgba(16,185,129,0.95);backdrop-filter:blur(5px);color:#fff!important;padding:15px 35px;border-radius:50px;font-weight:700;font-size:1.1rem;z-index:3000;box-shadow:0 10px 30px rgba(16,185,129,0.3);opacity:0;transition:transform 0.6s cubic-bezier(0.175,0.885,0.32,1.275),opacity 0.4s;pointer-events:none;display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,0.5)}
+.scroll-bubble.active{transform:translateX(-50%) translateY(0);opacity:1}
+#toast-container{position:fixed;bottom:30px;right:30px;z-index:9999;display:flex;flex-direction:column;gap:10px}
+.toast{background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);color:var(--text-main);padding:15px 25px;border-radius:12px;font-weight:600;box-shadow:0 8px 25px rgba(0,0,0,0.1);transform:translateX(120%);transition:transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275);border-left:5px solid var(--winter-blue);font-family:'Fredoka',sans-serif}
+.toast.show{transform:translateX(0)}
+input,textarea{width:100%;padding:20px;margin-bottom:20px;border:2px solid rgba(0,0,0,0.1);background:rgba(255,255,255,0.8);border-radius:15px;box-sizing:border-box;font-size:16px;color:var(--text-main)!important;outline:none;font-family:'Fredoka',sans-serif;transition:all 0.3s ease;box-shadow:inset 0 2px 5px rgba(0,0,0,0.02)}
+input[type="date"]{font-family:'Fredoka',sans-serif;text-transform:uppercase;letter-spacing:1px;color:var(--text-main);cursor:pointer}
+input:focus,textarea:focus{border-color:var(--winter-blue);background:#fff;box-shadow:0 0 15px rgba(2,132,199,0.15),inset 0 2px 5px rgba(0,0,0,0.02)}
+input::placeholder,textarea::placeholder{color:#94a3b8!important}
+.submit-btn{background:linear-gradient(45deg,var(--winter-blue),#3b82f6);color:#fff!important;border:none;padding:22px;width:100%;border-radius:15px;font-size:1.4rem;font-weight:800;cursor:pointer;transition:all 0.3s ease;box-shadow:0 10px 20px rgba(2,132,199,0.25);text-transform:uppercase;letter-spacing:1px}
+.submit-btn:hover{background:linear-gradient(45deg,#0ea5e9,#60a5fa);transform:translateY(-3px);box-shadow:0 15px 25px rgba(2,132,199,0.35)}
+.reset-btn{background:rgba(239,68,68,0.1);border:1px solid var(--danger);color:#b91c1c!important;padding:12px;width:100%;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;transition:0.3s;margin-bottom:20px;font-family:'Fredoka',sans-serif;backdrop-filter:blur(5px)}
+.reset-btn:hover{background:var(--danger);color:#fff!important;box-shadow:0 0 15px rgba(239,68,68,0.3)}
+.estimated-price-box{background:linear-gradient(135deg,#00d2ff 0%,#00a8ff 100%);border-radius:24px;padding:25px;text-align:center;box-shadow:0 12px 30px rgba(0,168,255,0.3);margin-bottom:30px;transition:all 0.3s ease}
+.estimated-price-box h4{margin:0 0 5px;font-size:1.2rem;font-weight:600;color:#fff!important;letter-spacing:0.5px;text-shadow:0 1px 2px rgba(0,0,0,0.1)}
+.estimated-price-box .price-display{font-size:4.5rem;font-weight:800;color:#fff!important;margin:0;line-height:1;text-shadow:0 4px 12px rgba(0,0,0,0.15)}
+.custom-modal-backdrop{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.3);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;justify-content:center;align-items:center;z-index:11000;opacity:0;pointer-events:none;transition:opacity 0.4s ease}
+.custom-modal-backdrop.open{opacity:1;pointer-events:auto}
+.custom-modal-window{background:#fff;padding:35px 30px;border-radius:24px;max-width:440px;width:90%;text-align:center;box-shadow:0 25px 50px -12px rgba(0,0,0,0.15);transform:scale(0.9);transition:transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275)}
+.custom-modal-backdrop.open .custom-modal-window{transform:scale(1)}
+.custom-modal-window h3{margin-top:0;font-size:1.6rem;color:var(--snow-white)!important;margin-bottom:15px}
+.custom-modal-window p{font-size:1.05rem;color:var(--text-muted)!important;line-height:1.6;margin-bottom:30px}
+.modal-action-row{display:flex;gap:15px;justify-content:center}
+.modal-btn{flex:1;padding:15px 25px;border-radius:14px;font-weight:700;font-size:1.1rem;border:none;cursor:pointer;transition:all 0.2s ease;font-family:'Fredoka',sans-serif}
+.modal-btn.confirm-yes{background:var(--success-green);color:#fff!important;box-shadow:0 4px 12px rgba(5,150,105,0.25)}
+.modal-btn.confirm-yes:hover{background:#047857;transform:translateY(-2px);box-shadow:0 6px 18px rgba(5,150,105,0.35)}
+.modal-btn.confirm-no{background:#f1f5f9;color:#475569!important}
+.modal-btn.confirm-no:hover{background:#e2e8f0;transform:translateY(-2px)}
+footer{background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);border-top:1px solid rgba(0,0,0,0.05);padding:50px 20px;text-align:center;color:var(--text-muted);font-weight:600;position:relative;z-index:10}
+.no-scrollbar::-webkit-scrollbar{display:none}
+.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
+.card-shadow{box-shadow:0 4px 24px -6px rgba(0,0,0,0.05);transition:all 0.3s ease}
+.card-shadow:hover{box-shadow:0 10px 32px -8px rgba(0,0,0,0.1);transform:translateY(-2px)}
+.calendar-day{aspect-ratio:1;transition:all 0.2s ease;border:1px solid transparent}
+.calendar-day:hover:not(.empty-day){background-color:#f3f4f6;cursor:pointer}
+.modern-input{width:100%;padding:0.75rem 1rem;border:1px solid #e5e7eb;border-radius:0.75rem;background-color:#f9fafb;transition:all 0.2s;outline:none}
+.modern-input:focus:not([readonly]){border-color:#111827;background-color:#fff;box-shadow:0 0 0 4px rgba(17,24,39,0.05)}
+#cal-toast-container{position:fixed;bottom:2rem;right:2rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem}
+.cal-toast{background:#111827;color:#fff;padding:1rem 1.5rem;border-radius:0.75rem;box-shadow:0 10px 25px -5px rgba(0,0,0,0.2);animation:slideUp 0.3s forwards;opacity:0;transition:opacity 0.3s ease;font-family:'Inter',sans-serif}
+#snow-banner{position:relative;z-index:5;padding:14px 20px;text-align:center;color:#fff;background:linear-gradient(90deg,#0369a1,#0284c7,#38bdf8);font-family:'Fredoka',sans-serif;box-shadow:0 4px 15px rgba(2,132,199,0.25)}
+#snow-banner.no-snow{background:linear-gradient(90deg,#475569,#64748b,#94a3b8)}
+.snow-banner-main{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px}
+#snow-banner-text{font-size:1.15rem;font-weight:700;color:#fff}
+#snow-banner-temp{font-size:0.9rem;font-weight:600;background:rgba(255,255,255,0.2);padding:4px 12px;border-radius:50px;color:#fff}
+#snow-banner-btn{background:#fff;color:#0369a1;border:none;border-radius:50px;padding:8px 18px;font-weight:800;font-size:0.95rem;cursor:pointer;font-family:'Fredoka',sans-serif;transition:transform 0.2s ease}
+#snow-banner-btn:hover{transform:scale(1.06)}
+#snow-banner-days{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px}
+.snow-day{background:rgba(255,255,255,0.18);border-radius:12px;padding:6px 12px;font-size:0.85rem;color:#fff;min-width:92px}
+.snow-day-name{font-weight:800;display:block;color:#fff}
+@media(max-width:768px){#snow-banner-text{font-size:1rem}.snow-day{min-width:80px;padding:5px 8px;font-size:0.8rem}}
+#toast-container{bottom:110px}
+#cal-toast-container{bottom:110px}
+#chat-launcher{position:fixed;bottom:30px;right:30px;width:64px;height:64px;border-radius:50%;border:none;cursor:pointer;z-index:9000;background:linear-gradient(45deg,var(--winter-blue),#3b82f6);color:#fff;font-size:1.7rem;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 25px rgba(2,132,199,0.4);transition:transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275),box-shadow 0.3s ease}
+#chat-launcher:hover{transform:scale(1.1);box-shadow:0 14px 30px rgba(2,132,199,0.5)}
+#chat-panel{position:fixed;bottom:105px;right:30px;width:350px;max-width:calc(100vw - 30px);height:480px;max-height:calc(100vh - 140px);background:#fff;border-radius:22px;box-shadow:0 20px 50px rgba(0,0,0,0.2);border:1px solid #e2e8f0;display:flex;flex-direction:column;overflow:hidden;z-index:9000;opacity:0;transform:translateY(20px) scale(0.95);pointer-events:none;transition:opacity 0.3s ease,transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275);font-family:'Fredoka',sans-serif}
+#chat-panel.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.chat-header{background:linear-gradient(45deg,var(--winter-blue),#3b82f6);color:#fff;padding:16px 18px;display:flex;justify-content:space-between;align-items:center}
+.chat-header-title{font-weight:700;font-size:1.1rem;color:#fff}
+.chat-header-sub{font-size:0.8rem;color:#e0f2fe;font-weight:400}
+.chat-close{background:transparent;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:4px 8px}
+#chat-messages{flex:1;overflow-y:auto;padding:16px;background:#f8fafc;display:flex;flex-direction:column;gap:10px}
+.chat-msg{max-width:85%;padding:10px 14px;border-radius:16px;font-size:0.95rem;line-height:1.45;white-space:pre-line;word-wrap:break-word}
+.chat-msg.bot{background:#fff;color:var(--text-main);border:1px solid #e2e8f0;align-self:flex-start;border-bottom-left-radius:4px}
+.chat-msg.user{background:var(--winter-blue);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.chat-options{display:flex;flex-direction:column;gap:8px;align-self:stretch}
+.chat-opt{background:#fff;border:2px solid var(--winter-blue);color:var(--winter-blue);padding:10px 14px;border-radius:14px;font-weight:600;font-size:0.95rem;cursor:pointer;text-align:left;font-family:'Fredoka',sans-serif;transition:all 0.2s ease}
+.chat-opt:hover{background:var(--winter-blue);color:#fff}
+#chat-form{display:flex;gap:8px;padding:12px;border-top:1px solid #e2e8f0;background:#fff}
+#chat-input{flex:1;width:auto;margin:0;padding:10px 14px;border-radius:12px;border:2px solid #e2e8f0;font-size:16px;background:#fff}
+#chat-send{background:var(--winter-blue);color:#fff;border:none;border-radius:12px;padding:0 16px;font-weight:700;cursor:pointer;font-family:'Fredoka',sans-serif}
+#chat-send:hover{background:#0369a1}
+@media(max-width:768px){#chat-launcher{bottom:20px;right:15px;width:58px;height:58px}#chat-panel{right:15px;bottom:90px}#toast-container,#cal-toast-container{right:15px;bottom:90px}}
+/* ADDED: service area map + address check */
+#area-map{height:380px;border-radius:18px;margin:20px 0;z-index:1}
+.area-row{display:flex;gap:10px;flex-wrap:wrap}
+.area-row input{flex:1;min-width:220px;margin:0}
+.area-row button{padding:0 24px;border:none;border-radius:15px;background:var(--winter-blue);color:#fff;font-weight:700;font-size:1rem;cursor:pointer;font-family:'Fredoka',sans-serif;min-height:56px}
+.area-row button:hover{background:#0369a1}
+#area-result{margin-top:15px;font-weight:700;text-align:center}
+.area-ok{color:#059669!important}
+.area-no{color:#ef4444!important}
+/* ADDED: tip section */
+.tip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:15px;max-width:640px;margin:25px auto 0}
+.tip-btn{display:block;text-decoration:none;text-align:center;padding:20px 10px;border-radius:18px;background:#fff;border:2px solid var(--winter-blue);color:var(--winter-blue)!important;font-size:1.8rem;font-weight:800;transition:all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);box-shadow:0 6px 18px rgba(2,132,199,0.12)}
+.tip-btn:hover{background:var(--winter-blue);color:#fff!important;transform:translateY(-6px) scale(1.05);box-shadow:0 12px 25px rgba(2,132,199,0.3)}
+</style>
 </head>
 <body>
 
-<div id="scroll-progress-container">
-    <div id="scroll-progress-bar"></div>
-</div>
-
+<div id="scroll-progress-container"><div id="scroll-progress-bar"></div></div>
 <div id="toast-container"></div>
-<!-- Injected Calendar Toast Container -->
 <div id="cal-toast-container"></div>
 
 <div id="loading-screen">
     <div class="loader-card">
         <h1>Gawynt Snow Shovelling</h1>
-        <div class="load-bar-container">
-            <div class="load-bar-fill"></div>
-        </div>
+        <div class="load-bar-container"><div class="load-bar-fill"></div></div>
     </div>
 </div>
 
-<div id="scroll-bubble" class="scroll-bubble">
-    <span>❄️ Auto-scrolling to calendar...</span>
-</div>
+<div id="scroll-bubble" class="scroll-bubble"><span>❄️ Auto-scrolling to calendar...</span></div>
 
 <div id="giftModal" class="custom-modal-backdrop">
     <div class="custom-modal-window">
@@ -482,7 +199,6 @@
     </div>
 </div>
 
-<!-- ADDED: Multi-payment modal (only used when more than one service needs a Stripe payment) -->
 <div id="stripeMultiModal" class="custom-modal-backdrop">
     <div class="custom-modal-window">
         <h3>Complete Your Payment 💳</h3>
@@ -498,14 +214,15 @@
     <div class="nav-logo">❄️ Gawynt's Shoveling</div>
     <div class="nav-links">
         <a href="#about">About</a>
+        <a href="#area-check">Area</a>
         <a href="#services">Services</a>
         <a href="#bundles">Bundles</a>
         <a href="#reviews">Reviews</a>
+        <a href="#tip">Tip</a>
         <a onclick="scrollToForm()" class="nav-cta">Book Now</a>
     </div>
 </nav>
 
-<!-- ADDED: Live Calgary snow forecast banner -->
 <div id="snow-banner">
     <div class="snow-banner-main">
         <span id="snow-banner-text">❄️ Checking Calgary's snow forecast...</span>
@@ -521,23 +238,33 @@
     </div>
     <h1 data-aos="fade-up" data-aos-delay="200">Gawynt's Snow Shoveling</h1>
     <p data-aos="fade-up" data-aos-delay="400" id="dynamic-greeting">Calgary Student • Hardworking & Reliable</p>
-    
     <div class="service-area" data-aos="fade-up" data-aos-delay="500">
-        📍 Serving Lower and Upper Mount Royal, Sunalta, Scarboro, Bankview and Marda Loop
+        📍 Serving Lower and Upper Mount Royal, Scarboro, Bankview and Marda Loop
     </div>
 </header>
 
 <div class="container">
-    
+
     <section id="about" class="about-section" data-aos="fade-up" data-aos-delay="100">
         <h2>About Me & My Goal ❄️</h2>
         <p>Hi, I’m Gawynt! I’m a 12-year-old Grade 8 student living right here in Calgary. I started this shoveling business because I love being active outdoors and I want to learn the value of hard work.</p>
         <p><strong>My Big Mission:</strong> I am saving up <strong id="goalTargetInline">$1,000</strong> to pay for my own <strong>ski lessons, gear, and hill passes</strong> this winter!</p>
-        
         <div class="goal-bar">
             <div class="progress-fill" id="goalFill" style="width: 20%;">$200</div>
         </div>
         <p><strong id="goalText">Current Goal Progress: $200 / $1,000</strong></p>
+    </section>
+
+    <!-- ADDED: Service area map + address checker -->
+    <section id="area-check" class="area-section" data-aos="fade-up">
+        <h2 style="text-align:center">Service Area & Address Check 📍</h2>
+        <p style="text-align:center">Green = our service area. Type your address to check that we serve you.</p>
+        <div id="area-map"></div>
+        <div class="area-row">
+            <input type="text" id="areaAddress" placeholder="Type your address (e.g. 1234 14 St SW)">
+            <button type="button" id="areaBtn">Check Address</button>
+        </div>
+        <p id="area-result"></p>
     </section>
 
     <div class="alert-box" data-aos="shake">⚠️ NO SALT SERVICE — Shoveling only! ⚠️</div>
@@ -612,7 +339,7 @@
         <div class="elfsight-app-7c582918-d760-4c75-b176-4b0d7a09ccb6" data-elfsight-app-lazy></div>
     </section>
 
-    <!-- INJECTED FROM CODE 1: Live Calendar Section -->
+
     <section id="calendar" class="py-12 relative font-sans rounded-3xl" style="background: rgba(255, 255, 255, 0.65); border: 1px solid var(--glass-border); backdrop-filter: blur(12px); box-shadow: var(--glass-shadow); margin-bottom: 40px;">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="flex flex-col md:flex-row justify-between items-end mb-10">
@@ -620,7 +347,6 @@
                     <h2 id="calendar-title" class="text-3xl font-extrabold text-gray-900 mb-2 select-none cursor-pointer" style="font-family: 'Fredoka', sans-serif;">Select Schedule Date & Time</h2>
                     <p class="text-gray-600 font-medium">Live availability. Tap any date to view open times.</p>
                 </div>
-                
                 <div id="admin-controls" class="hidden mt-4 md:mt-0 flex items-center bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-2 rounded-lg text-sm font-medium">
                     <i class="fa-solid fa-user-shield mr-2"></i> Admin Mode Active
                     <button id="btn-open-dashboard" class="ml-4 text-blue-600 hover:text-blue-800 underline font-bold">Dashboard</button>
@@ -632,15 +358,10 @@
                 <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
                     <h3 id="month-display" class="text-lg font-bold text-gray-900 uppercase tracking-wide m-0"></h3>
                     <div class="flex space-x-2">
-                        <button id="btn-prev-month" class="p-2 rounded-full hover:bg-gray-200 text-gray-600 transition-colors cursor-pointer border-none bg-transparent">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </button>
-                        <button id="btn-next-month" class="p-2 rounded-full hover:bg-gray-200 text-gray-600 transition-colors cursor-pointer border-none bg-transparent">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </button>
+                        <button id="btn-prev-month" class="p-2 rounded-full hover:bg-gray-200 text-gray-600 transition-colors cursor-pointer border-none bg-transparent"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button id="btn-next-month" class="p-2 rounded-full hover:bg-gray-200 text-gray-600 transition-colors cursor-pointer border-none bg-transparent"><i class="fa-solid fa-chevron-right"></i></button>
                     </div>
                 </div>
-
                 <div class="p-6">
                     <div class="grid grid-cols-7 gap-2 mb-2">
                         <div class="text-center text-xs font-semibold text-gray-400 uppercase">Sun</div>
@@ -651,12 +372,10 @@
                         <div class="text-center text-xs font-semibold text-gray-400 uppercase">Fri</div>
                         <div class="text-center text-xs font-semibold text-gray-400 uppercase">Sat</div>
                     </div>
-                    <div id="calendar-grid" class="grid grid-cols-7 gap-2 lg:gap-4">
-                        <!-- Days injected here via JS -->
-                    </div>
+                    <div id="calendar-grid" class="grid grid-cols-7 gap-2 lg:gap-4"></div>
                 </div>
             </div>
-            
+
             <div class="mt-6 flex items-center justify-center space-x-6 text-sm text-gray-600 font-medium">
                 <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-black mr-2 inline-block"></span> Times Available</div>
                 <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-gray-200 mr-2 inline-block"></span> Fully Booked</div>
@@ -664,7 +383,6 @@
         </div>
     </section>
 
-    <!-- INJECTED FROM CODE 1: Payment Method Section -->
     <section id="payment" class="py-12 font-sans rounded-3xl" style="background: rgba(255, 255, 255, 0.65); border: 1px solid var(--glass-border); backdrop-filter: blur(12px); box-shadow: var(--glass-shadow); margin-bottom: 40px;">
         <div class="max-w-4xl mx-auto px-4 text-center">
             <h2 class="text-3xl font-bold text-gray-900 mb-8" style="font-family: 'Fredoka', sans-serif;">Select Payment Method</h2>
@@ -677,21 +395,17 @@
                     <i class="fa-brands fa-nfc-symbol text-3xl text-gray-800 mr-4"></i>
                     <span class="text-xl font-semibold text-gray-900">Tap to Pay</span>
                 </div>
-                <!-- ADDED: Pay Online via Stripe -->
                 <div class="payment-btn bg-white px-8 py-6 rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center min-w-[200px] cursor-pointer hover:bg-gray-100 transition-colors" data-payment="Pay Online (Stripe)">
                     <i class="fa-brands fa-stripe text-3xl text-gray-800 mr-4"></i>
                     <span class="text-xl font-semibold text-gray-900">Pay Online</span>
                 </div>
             </div>
 
-            <!-- ADDED: Stripe pay links panel (shown when "Pay Online" is selected) -->
             <div id="stripe-panel" class="hidden max-w-xl mx-auto mb-8 bg-white border border-gray-200 rounded-2xl p-6 text-left shadow-sm">
                 <h3 class="text-xl font-bold text-gray-900 mb-2 m-0" style="font-family: 'Fredoka', sans-serif;"><i class="fa-brands fa-stripe mr-2"></i>Pay Online via Stripe</h3>
                 <p class="text-sm text-gray-600 mb-4">Tap "Pay Now" for each item below to pay securely with Stripe. Then finish your booking details.</p>
                 <div id="stripe-links" class="space-y-3"></div>
-                <button type="button" id="stripe-continue" class="w-full bg-black text-white font-semibold py-3 rounded-xl hover:bg-gray-800 cursor-pointer border-none mt-5">
-                    Continue to Booking Details
-                </button>
+                <button type="button" id="stripe-continue" class="w-full bg-black text-white font-semibold py-3 rounded-xl hover:bg-gray-800 cursor-pointer border-none mt-5">Continue to Booking Details</button>
             </div>
 
             <div class="inline-block bg-gray-900 text-white px-6 py-3 rounded-xl shadow-lg mt-4">
@@ -705,11 +419,12 @@
 
     <div class="form-container" id="booking-section" data-aos="fade-up">
         <form id="orderForm" action="https://formspree.io/f/xjgydwzk" method="POST">
-            <!-- Ensure this hidden input is here for the redirect to work -->
             <input type="hidden" name="_next" value="https://gawyntgg.github.io/Gawynt-Services-Thankyou/">
-            
+            <input type="hidden" name="Area_Zone" id="areaZone">
+            <input type="hidden" name="Total_Price" id="totalPrice">
+
             <h2 id="form-head" style="text-align:center; color: var(--winter-blue) !important; font-size: 2.2rem; margin-bottom: 30px;">Finalize Booking details</h2>
-            
+
             <div class="estimated-price-box">
                 <h4>Your Estimated Price</h4>
                 <div class="price-display" id="visualPriceDisplay">$0</div>
@@ -717,31 +432,42 @@
 
             <input type="text" name="Service" id="planInput" readonly required placeholder="Click services above to build your custom package">
             <button type="button" class="reset-btn" onclick="clearSelection()">Start Over / Clear Selection</button>
-            
+
             <label for="requestedDate" style="display:block; margin-bottom:10px; font-size: 1.1rem; font-weight: 700; color: var(--text-main);">Requested Date 📅</label>
             <input type="text" name="Requested_Date" id="requestedDate" readonly required placeholder="Please select from calendar above">
 
-            <!-- INJECTED FROM CODE 1: Added Time and Payment bindings to form -->
             <label for="requestedTime" style="display:block; margin-bottom:10px; font-size: 1.1rem; font-weight: 700; color: var(--text-main);">Requested Time ⏰</label>
             <input type="text" name="Requested_Time" id="requestedTime" readonly required placeholder="Please select from calendar above">
 
             <label for="paymentMethod" style="display:block; margin-bottom:10px; font-size: 1.1rem; font-weight: 700; color: var(--text-main);">Payment Method 💳</label>
             <input type="text" name="Payment_Method" id="paymentMethod" readonly required placeholder="Please select payment method above">
-            
+
             <input type="text" name="Name" required placeholder="Your Name">
-            <input type="text" name="Address" required placeholder="Your Address">
+            <input type="text" name="Address" id="bookAddress" required placeholder="Your Address">
             <input type="text" name="Neighbor_Address" placeholder="Neighbor's Address (If gifting a service)" style="display:none;">
             <input type="email" name="Email" required placeholder="Email Address">
             <input type="tel" name="Phone" required placeholder="Phone Number">
-            
+
             <textarea name="Comments" rows="4" placeholder="Any special instructions or comments?"></textarea>
-            
+
+            <!-- ADDED: optional tip inside the booking form -->
+            <div id="tip" style="text-align:center;margin:10px 0 25px;padding:22px 15px;border-radius:20px;background:rgba(255,255,255,0.7);border:1px solid rgba(2,132,199,0.2)">
+                <h3 style="margin:0 0 8px;font-size:1.5rem">Leave a Tip 💙 <span style="font-size:0.9rem;font-weight:600;color:var(--text-muted)">(optional)</span></h3>
+                <p style="margin:0;font-size:0.95rem">Tips help me get to my ski lessons faster! ⛷️ Opens Stripe in a new tab, so your booking stays here.</p>
+                <div class="tip-grid">
+                    <a class="tip-btn" href="https://buy.stripe.com/fZu9AV0rLd0q5wL0SA4ko0c" target="_blank" rel="noopener noreferrer">$3</a>
+                    <a class="tip-btn" href="https://buy.stripe.com/4gM4gB8Yh5xY9N10SA4ko0d" target="_blank" rel="noopener noreferrer">$5</a>
+                    <a class="tip-btn" href="https://buy.stripe.com/14AeVf7Udf8y3oD9p64ko0e" target="_blank" rel="noopener noreferrer">$7</a>
+                    <a class="tip-btn" href="https://buy.stripe.com/00w14pdexbWm0crgRy4ko0f" target="_blank" rel="noopener noreferrer">$10</a>
+                </div>
+            </div>
+
             <button type="submit" class="submit-btn">Complete Booking</button>
         </form>
     </div>
+
 </div>
 
-<!-- INJECTED FROM CODE 1: Modals Container -->
 <div class="font-sans">
     <div id="admin-modal" class="fixed inset-0 z-50 hidden bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl transform transition-all">
@@ -753,9 +479,7 @@
                 <p class="text-sm text-gray-500 mb-4">Please enter the admin password to modify the schedule.</p>
                 <input type="password" id="admin-password-input" class="modern-input mb-4" placeholder="Password">
                 <p id="admin-error" class="text-red-500 text-xs mb-4 hidden">Incorrect password.</p>
-                <button id="btn-verify-admin" class="w-full bg-black text-white font-semibold py-3 rounded-xl hover:bg-gray-800 cursor-pointer border-none">
-                    Login
-                </button>
+                <button id="btn-verify-admin" class="w-full bg-black text-white font-semibold py-3 rounded-xl hover:bg-gray-800 cursor-pointer border-none">Login</button>
             </div>
         </div>
     </div>
@@ -764,9 +488,7 @@
         <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl transform transition-all flex flex-col max-h-[90vh]">
             <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                 <h3 id="modal-date-title" class="text-xl font-bold text-gray-900 m-0">Date</h3>
-                <button class="close-modal text-gray-400 hover:text-gray-900 bg-white rounded-full p-2 shadow-sm border border-gray-100 cursor-pointer">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+                <button class="close-modal text-gray-400 hover:text-gray-900 bg-white rounded-full p-2 shadow-sm border border-gray-100 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-6 overflow-y-auto no-scrollbar flex-grow">
                 <div id="slots-container" class="space-y-3"></div>
@@ -778,9 +500,7 @@
                     <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 m-0"><i class="fa-solid fa-plus-circle mr-2"></i>Add Time Slot</h4>
                     <div class="flex gap-2">
                         <input type="time" id="new-time-input" class="modern-input flex-grow" style="margin-bottom:0;">
-                        <button id="btn-add-time" class="bg-black text-white px-6 rounded-xl font-medium hover:bg-gray-800 transition-colors shadow-sm cursor-pointer border-none">
-                            Add
-                        </button>
+                        <button id="btn-add-time" class="bg-black text-white px-6 rounded-xl font-medium hover:bg-gray-800 transition-colors shadow-sm cursor-pointer border-none">Add</button>
                     </div>
                 </div>
             </div>
@@ -791,9 +511,7 @@
         <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl transform transition-all flex flex-col">
             <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                 <h3 class="text-xl font-bold text-gray-900 m-0"><i class="fa-solid fa-calendar-plus mr-2 text-blue-600"></i>Admin Dashboard</h3>
-                <button class="close-modal text-gray-400 hover:text-gray-900 bg-white rounded-full p-2 shadow-sm border border-gray-100 cursor-pointer">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+                <button class="close-modal text-gray-400 hover:text-gray-900 bg-white rounded-full p-2 shadow-sm border border-gray-100 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-6">
                 <p class="text-gray-500 mb-6 text-sm">Add a new available time slot directly to the calendar schedule.</p>
@@ -806,9 +524,7 @@
                         <label class="block text-sm font-semibold text-gray-700 mb-2 mt-4">Select Time</label>
                         <input type="time" id="dash-time-input" class="modern-input" style="margin-bottom:0;">
                     </div>
-                    <button id="btn-dash-add-time" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-colors shadow-md mt-6 cursor-pointer border-none">
-                        Add to Calendar
-                    </button>
+                    <button id="btn-dash-add-time" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-colors shadow-md mt-6 cursor-pointer border-none">Add to Calendar</button>
                 </div>
             </div>
         </div>
@@ -819,7 +535,6 @@
     <p>&copy; 2026 Gawynt's Snow Shoveling. All Rights Reserved.</p>
 </footer>
 
-<!-- ADDED: Live chat button and window -->
 <button id="chat-launcher" type="button" aria-label="Open live chat">💬</button>
 <div id="chat-panel" role="dialog" aria-label="Live chat">
     <div class="chat-header">
@@ -837,1016 +552,818 @@
 </div>
 
 <script>
-    // Initialize AOS
-    AOS.init({
-        once: true,
-        duration: 800
-    });
+AOS.init({once:true,duration:800});
 
-    // Loading screen logic
-    window.addEventListener('load', function() {
-        setTimeout(function() {
-            const loader = document.getElementById('loading-screen');
-            if (loader) {
-                loader.style.opacity = '0';
-                setTimeout(function() {
-                    loader.style.display = 'none';
-                }, 800);
-            }
-        }, 1400); 
-    });
+window.addEventListener('load',function(){
+    setTimeout(function(){
+        const loader=document.getElementById('loading-screen');
+        if(loader){loader.style.opacity='0';setTimeout(function(){loader.style.display='none';},800);}
+    },1400);
+});
 
-    // Scroll Progress Bar
-    window.addEventListener('scroll', function() {
-        let scrollPercent = (document.body.scrollTop + document.documentElement.scrollTop) / (document.documentElement.scrollHeight - document.documentElement.clientHeight);
-        document.getElementById('scroll-progress-bar').style.width = scrollPercent * 100 + '%';
-    });
+window.addEventListener('scroll',function(){
+    let p=(document.body.scrollTop+document.documentElement.scrollTop)/(document.documentElement.scrollHeight-document.documentElement.clientHeight);
+    document.getElementById('scroll-progress-bar').style.width=p*100+'%';
+});
 
-    // Booking Logic
-    // Neighbour gift add-on switch: false = the gift popup never appears (all gift code is kept, just turned off)
-    const GIFT_ENABLED = false;
-    let total = 0;
-    let selectedServices = [];
+// Neighbour gift add-on switch (off)
+const GIFT_ENABLED=false;
+let total=0;
+let selectedServices=[];
+window.areaZone=null;
 
-    // Shows the current total in the price box
-    function updatePriceDisplay() {
-        document.getElementById('visualPriceDisplay').innerText = '$' + total;
-    }
+function updatePriceDisplay(){
+    document.getElementById('visualPriceDisplay').innerText='$'+total;
+    document.getElementById('totalPrice').value=total;
+}
 
-    function sel(serviceName, price) {
-        selectedServices.push(serviceName);
-        total += price;
-        document.getElementById('planInput').value = selectedServices.join(', ');
-        updatePriceDisplay();
-        
-        if (GIFT_ENABLED && !serviceName.includes('Gift')) {
-            document.getElementById('giftModal').classList.add('open');
-        } else {
-            triggerAutoScroll();
-        }
-    }
-
-    function handleModalResponse(isYes) {
-        document.getElementById('giftModal').classList.remove('open');
-        
-        if (isYes) {
-            selectedServices.push('Gift: Neighbour One-Time');
-            total += 20;
-            document.getElementById('planInput').value = selectedServices.join(', ');
-            updatePriceDisplay();
-            showToast('🎁 Neighbor gift added to your package!');
-        }
+function sel(serviceName,price){
+    selectedServices.push(serviceName);
+    total+=price;
+    document.getElementById('planInput').value=selectedServices.join(', ');
+    updatePriceDisplay();
+    if(GIFT_ENABLED&&!serviceName.includes('Gift')){
+        document.getElementById('giftModal').classList.add('open');
+    }else{
         triggerAutoScroll();
     }
+}
 
-    function triggerAutoScroll() {
-        const bubble = document.getElementById('scroll-bubble');
-        if (bubble) {
-            bubble.classList.add('active');
-            setTimeout(() => { bubble.classList.remove('active'); }, 3000);
-        }
-        scrollToCalendar();
-    }
-
-    function scrollToForm() {
-        const form = document.getElementById('booking-section');
-        if (form) {
-            form.scrollIntoView({ behavior: 'smooth' });
-            form.classList.add('highlight-pulse');
-            setTimeout(() => { form.classList.remove('highlight-pulse'); }, 1000);
-        }
-    }
-
-    function scrollToCalendar() {
-        const calendar = document.getElementById('calendar');
-        if (calendar) {
-            calendar.scrollIntoView({ behavior: 'smooth' });
-            calendar.classList.add('highlight-pulse');
-            setTimeout(() => { calendar.classList.remove('highlight-pulse'); }, 1000);
-        }
-    }
-
-    function clearSelection() {
-        selectedServices = [];
-        total = 0;
-        document.getElementById('planInput').value = '';
+function handleModalResponse(isYes){
+    document.getElementById('giftModal').classList.remove('open');
+    if(isYes){
+        selectedServices.push('Gift: Neighbour One-Time');
+        total+=20;
+        document.getElementById('planInput').value=selectedServices.join(', ');
         updatePriceDisplay();
-        showToast('🧹 Selection cleared. Start fresh!');
-        // ADDED: keep the Stripe panel in sync if it is open
-        const stripePanelEl = document.getElementById('stripe-panel');
-        if (stripePanelEl && !stripePanelEl.classList.contains('hidden') && window.renderStripePanel) {
-            window.renderStripePanel();
+        showToast('🎁 Neighbor gift added to your package!');
+    }
+    triggerAutoScroll();
+}
+
+function triggerAutoScroll(){
+    const bubble=document.getElementById('scroll-bubble');
+    if(bubble){bubble.classList.add('active');setTimeout(()=>{bubble.classList.remove('active');},3000);}
+    scrollToCalendar();
+}
+
+function scrollToForm(){
+    const form=document.getElementById('booking-section');
+    if(form){
+        form.scrollIntoView({behavior:'smooth'});
+        form.classList.add('highlight-pulse');
+        setTimeout(()=>{form.classList.remove('highlight-pulse');},1000);
+    }
+}
+
+function scrollToCalendar(){
+    const calendar=document.getElementById('calendar');
+    if(calendar){
+        calendar.scrollIntoView({behavior:'smooth'});
+        calendar.classList.add('highlight-pulse');
+        setTimeout(()=>{calendar.classList.remove('highlight-pulse');},1000);
+    }
+}
+
+function clearSelection(){
+    selectedServices=[];
+    total=0;
+    document.getElementById('planInput').value='';
+    updatePriceDisplay();
+    showToast('🧹 Selection cleared. Start fresh!');
+    const sp=document.getElementById('stripe-panel');
+    if(sp&&!sp.classList.contains('hidden')&&window.renderStripePanel){window.renderStripePanel();}
+}
+
+function showToast(message){
+    const container=document.getElementById('toast-container');
+    const toast=document.createElement('div');
+    toast.className='toast';
+    toast.innerText=message;
+    container.appendChild(toast);
+    setTimeout(()=>{toast.classList.add('show');},100);
+    setTimeout(()=>{toast.classList.remove('show');setTimeout(()=>{toast.remove();},400);},3000);
+}
+
+// Stripe panel switch (off)
+window.SHOW_STRIPE_PANEL=false;
+
+const STRIPE_LINKS={
+    'Full Corner Package':'https://buy.stripe.com/6oU5kF1vPe4u2kzata4ko00',
+    'Full Regular Package':'https://buy.stripe.com/bJe4gB4I1d0q6APcBi4ko01',
+    'Driveway & Corner Sidewalk':'https://buy.stripe.com/cNi00lb6p6C2cZdcBi4ko02',
+    'Driveway & Walkway':'https://buy.stripe.com/9B63cx2zT7G6aR56cU4ko03',
+    'Walkway & Corner Sidewalk':'https://buy.stripe.com/cNi9AVa2lgcC3oDfNu4ko04',
+    'Sidewalk & Walkway':'https://buy.stripe.com/4gM28t2zT8Ka4sH9p64ko05',
+    'Driveway Only':'https://buy.stripe.com/5kQeVf3DXe4uaR5cBi4ko06',
+    'Corner Lot Sidewalks':'https://buy.stripe.com/14A28tb6paSi2kz0SA4ko07',
+    'Sidewalk Only':'https://buy.stripe.com/cNi7sNfmF0dE8IX7gY4ko08',
+    'Walkway Only':'https://buy.stripe.com/dRm7sNb6pgcC7ET1WE4ko09',
+    'Gift: Neighbour One-Time':'https://buy.stripe.com/3cI28tdex9Oe5wL7gY4ko0a'
+};
+
+window.renderStripePanel=function(){
+    const panel=document.getElementById('stripe-panel');
+    const list=document.getElementById('stripe-links');
+    if(!panel||!list)return;
+    panel.classList.remove('hidden');
+    list.innerHTML='';
+    if(selectedServices.length===0){
+        const msg=document.createElement('p');
+        msg.className='text-sm text-gray-600 m-0';
+        msg.textContent='Please select a service above first so we can show your payment link.';
+        list.appendChild(msg);
+        return;
+    }
+    selectedServices.forEach(function(name){
+        const row=document.createElement('div');
+        row.className='flex justify-between items-center bg-gray-50 border border-gray-100 p-4 rounded-xl gap-3';
+        const label=document.createElement('span');
+        label.className='font-semibold text-gray-900';
+        label.textContent=name;
+        row.appendChild(label);
+        const url=STRIPE_LINKS[name];
+        if(url){
+            const link=document.createElement('a');
+            link.href=url;link.target='_blank';link.rel='noopener noreferrer';
+            link.className='text-sm font-semibold bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors no-underline whitespace-nowrap';
+            link.style.color='white';link.style.textDecoration='none';
+            link.textContent='Pay Now';
+            row.appendChild(link);
+        }else{
+            const note=document.createElement('span');
+            note.className='text-xs text-gray-500 text-right';
+            note.textContent='Pay by E-transfer or Tap to Pay';
+            row.appendChild(note);
         }
+        list.appendChild(row);
+    });
+};
+
+window.hideStripePanel=function(){
+    const panel=document.getElementById('stripe-panel');
+    if(panel)panel.classList.add('hidden');
+};
+
+document.getElementById('stripe-continue').addEventListener('click',function(){
+    document.getElementById('booking-section').scrollIntoView({behavior:'smooth'});
+});
+
+window.startStripeCheckout=function(){
+    const names=selectedServices.slice();
+    const urls=names.map(function(n){return STRIPE_LINKS[n];}).filter(Boolean);
+    if(urls.length===0){window.location.href="https://gawyntgg.github.io/Gawynt-Services-Thankyou/";return;}
+    if(urls.length===1){window.location.href=urls[0];return;}
+    const list=document.getElementById('stripe-multi-links');
+    list.innerHTML='';
+    names.forEach(function(name){
+        const url=STRIPE_LINKS[name];
+        if(!url)return;
+        const link=document.createElement('a');
+        link.href=url;link.target='_blank';link.rel='noopener noreferrer';
+        link.className='modal-btn confirm-no';
+        link.style.textDecoration='none';link.style.display='block';link.style.boxSizing='border-box';
+        link.textContent='Pay: '+name;
+        list.appendChild(link);
+    });
+    document.getElementById('stripeMultiModal').classList.add('open');
+};
+
+// --- FORM SUBMIT: checks address zone, checks the time is still free, sends, then reserves the time slot ---
+document.getElementById('orderForm').addEventListener('submit',async function(event){
+    event.preventDefault();
+    const form=event.target;
+
+    if(!window.areaZone||window.areaZone==='out'){
+        alert('Please check your address in the Service Area section first. We need to confirm we serve your address.');
+        document.getElementById('area-check').scrollIntoView({behavior:'smooth'});
+        return;
     }
 
-    function showToast(message) {
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerText = message;
-        container.appendChild(toast);
-        setTimeout(() => { toast.classList.add('show'); }, 100);
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => { toast.remove(); }, 400);
-        }, 3000);
+    const dateStr=document.getElementById('requestedDate').value;
+    const timeEl=document.getElementById('requestedTime');
+    const raw=timeEl.dataset.raw;
+    if(window.slotIsFree&&raw&&!window.slotIsFree(dateStr,raw)){
+        alert('Sorry, that time was just booked by someone else. Please pick another time.');
+        timeEl.value='';timeEl.dataset.raw='';
+        document.getElementById('requestedDate').value='';
+        document.getElementById('calendar').scrollIntoView({behavior:'smooth'});
+        return;
     }
 
-    // Turned off: the "Pay Online via Stripe / Tap Pay Now" panel no longer appears (code kept, set to true to bring it back)
-    window.SHOW_STRIPE_PANEL = false;
+    updatePriceDisplay();
+    const formData=new FormData(form);
+    const chosenPayment=document.getElementById('paymentMethod').value||'Not selected';
+    formData.append('_subject','New Snow Shoveling Booking - Payment: '+chosenPayment);
+    formData.append('Payment_Note',chosenPayment==='Pay Online (Stripe)'
+        ?'Customer chose to pay ONLINE with STRIPE (sent to Stripe after booking)'
+        :'Customer chose to pay by '+chosenPayment);
+    const submitBtn=form.querySelector('button[type="submit"]');
+    submitBtn.disabled=true;
+    submitBtn.innerText="Sending...";
 
-    // --- ADDED: STRIPE PAYMENT LINKS ---
-    const STRIPE_LINKS = {
-        'Full Corner Package': 'https://buy.stripe.com/6oU5kF1vPe4u2kzata4ko00',
-        'Full Regular Package': 'https://buy.stripe.com/bJe4gB4I1d0q6APcBi4ko01',
-        'Driveway & Corner Sidewalk': 'https://buy.stripe.com/cNi00lb6p6C2cZdcBi4ko02',
-        'Driveway & Walkway': 'https://buy.stripe.com/9B63cx2zT7G6aR56cU4ko03',
-        'Walkway & Corner Sidewalk': 'https://buy.stripe.com/cNi9AVa2lgcC3oDfNu4ko04',
-        'Sidewalk & Walkway': 'https://buy.stripe.com/4gM28t2zT8Ka4sH9p64ko05',
-        'Driveway Only': 'https://buy.stripe.com/5kQeVf3DXe4uaR5cBi4ko06',
-        'Corner Lot Sidewalks': 'https://buy.stripe.com/14A28tb6paSi2kz0SA4ko07',
-        'Sidewalk Only': 'https://buy.stripe.com/cNi7sNfmF0dE8IX7gY4ko08',
-        'Walkway Only': 'https://buy.stripe.com/dRm7sNb6pgcC7ET1WE4ko09',
-        'Gift: Neighbour One-Time': 'https://buy.stripe.com/3cI28tdex9Oe5wL7gY4ko0a'
-    };
-
-    window.renderStripePanel = function() {
-        const panel = document.getElementById('stripe-panel');
-        const list = document.getElementById('stripe-links');
-        if (!panel || !list) return;
-        panel.classList.remove('hidden');
-        list.innerHTML = '';
-
-        if (selectedServices.length === 0) {
-            const msg = document.createElement('p');
-            msg.className = 'text-sm text-gray-600 m-0';
-            msg.textContent = 'Please select a service above first so we can show your payment link.';
-            list.appendChild(msg);
-            return;
-        }
-
-        selectedServices.forEach(function(name) {
-            const row = document.createElement('div');
-            row.className = 'flex justify-between items-center bg-gray-50 border border-gray-100 p-4 rounded-xl gap-3';
-
-            const label = document.createElement('span');
-            label.className = 'font-semibold text-gray-900';
-            label.textContent = name;
-            row.appendChild(label);
-
-            const url = STRIPE_LINKS[name];
-            if (url) {
-                const link = document.createElement('a');
-                link.href = url;
-                link.target = '_blank';
-                link.rel = 'noopener noreferrer';
-                link.className = 'text-sm font-semibold bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors no-underline whitespace-nowrap';
-                link.style.color = 'white';
-                link.style.textDecoration = 'none';
-                link.textContent = 'Pay Now';
-                row.appendChild(link);
-            } else {
-                const note = document.createElement('span');
-                note.className = 'text-xs text-gray-500 text-right';
-                note.textContent = 'Pay by E-transfer or Tap to Pay';
-                row.appendChild(note);
+    try{
+        const response=await fetch(form.action,{method:'POST',body:formData,headers:{'Accept':'application/json'}});
+        if(response.ok){
+            // Reserve the time so nobody else can book it
+            try{if(window.reserveSlot&&raw)await window.reserveSlot(dateStr,raw);}catch(e){console.warn('Could not reserve slot',e);}
+            if(chosenPayment==='Pay Online (Stripe)'&&window.startStripeCheckout){
+                submitBtn.innerText="Taking you to payment...";
+                window.startStripeCheckout();
+            }else{
+                window.location.href="https://gawyntgg.github.io/Gawynt-Services-Thankyou/";
             }
-            list.appendChild(row);
-        });
-    };
-
-    window.hideStripePanel = function() {
-        const panel = document.getElementById('stripe-panel');
-        if (panel) panel.classList.add('hidden');
-    };
-
-    document.getElementById('stripe-continue').addEventListener('click', function() {
-        document.getElementById('booking-section').scrollIntoView({ behavior: 'smooth' });
-    });
-
-    // ADDED: Send the customer to Stripe after the booking is submitted
-    window.startStripeCheckout = function() {
-        const urls = selectedServices.map(function(n) { return STRIPE_LINKS[n]; }).filter(Boolean);
-
-        if (urls.length === 0) {
-            window.location.href = "https://gawyntgg.github.io/Gawynt-Services-Thankyou/";
-            return;
+        }else{
+            alert("Oops! There was a problem. Please try again.");
+            submitBtn.disabled=false;submitBtn.innerText="Complete Booking";
         }
-
-        if (urls.length === 1) {
-            // One payment: go straight to Stripe (Stripe then redirects to the thank you page)
-            window.location.href = urls[0];
-            return;
-        }
-
-        // Several payments: show a list of Pay Now links, then the thank you page
-        const list = document.getElementById('stripe-multi-links');
-        list.innerHTML = '';
-        selectedServices.forEach(function(name) {
-            const url = STRIPE_LINKS[name];
-            if (!url) return;
-            const link = document.createElement('a');
-            link.href = url;
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
-            link.className = 'modal-btn confirm-no';
-            link.style.textDecoration = 'none';
-            link.style.display = 'block';
-            link.style.boxSizing = 'border-box';
-            link.textContent = 'Pay: ' + name;
-            list.appendChild(link);
-        });
-        document.getElementById('stripeMultiModal').classList.add('open');
-    };
-
-    // --- FORM INTERCEPTOR TO FORCE REDIRECT ---
-    document.getElementById('orderForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Stop default browser submission
-        const form = event.target;
-        const formData = new FormData(form);
-        // ADDED: make the Formspree email clearly show the payment method the customer chose
-        const chosenPayment = document.getElementById('paymentMethod').value || 'Not selected';
-        formData.append('_subject', 'New Snow Shoveling Booking - Payment: ' + chosenPayment);
-        formData.append('Payment_Note', chosenPayment === 'Pay Online (Stripe)'
-            ? 'Customer chose to pay ONLINE with STRIPE (sent to Stripe after booking)'
-            : 'Customer chose to pay by ' + chosenPayment);
-        const submitBtn = form.querySelector('button[type="submit"]');
-
-        submitBtn.disabled = true;
-        submitBtn.innerText = "Sending...";
-
-        fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: { 'Accept': 'application/json' }
-        })
-        .then(response => {
-            if (response.ok) {
-                // Success: if paying online, go to Stripe first; otherwise redirect to your Thank You page
-                if (document.getElementById('paymentMethod').value === 'Pay Online (Stripe)' && window.startStripeCheckout) {
-                    submitBtn.innerText = "Taking you to payment...";
-                    window.startStripeCheckout();
-                } else {
-                    window.location.href = "https://gawyntgg.github.io/Gawynt-Services-Thankyou/";
-                }
-            } else {
-                alert("Oops! There was a problem. Please try again.");
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Complete Booking";
-            }
-        })
-        .catch(error => {
-            alert("Connection error. Please check your internet.");
-            submitBtn.disabled = false;
-            submitBtn.innerText = "Complete Booking";
-        });
-    });
+    }catch(error){
+        alert("Connection error. Please check your internet.");
+        submitBtn.disabled=false;submitBtn.innerText="Complete Booking";
+    }
+});
 </script>
 
-<!-- INJECTED FROM CODE 1: Firebase and Calendar Logic Script -->
+<!-- Firebase calendar -->
 <script type="module">
-    if ('scrollRestoration' in history) {
-        history.scrollRestoration = 'manual';
+if('scrollRestoration' in history){history.scrollRestoration='manual';}
+
+import{initializeApp}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import{getAnalytics}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+import{getAuth,signInAnonymously}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import{getDatabase,ref,onValue,set,remove}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+const firebaseConfig={
+    apiKey:"AIzaSyBuWWnqDX5mUra5pF3uuBxEVSKjcESifTk",
+    authDomain:"gawynt-hub.firebaseapp.com",
+    databaseURL:"https://gawynt-hub-default-rtdb.firebaseio.com",
+    projectId:"gawynt-hub",
+    storageBucket:"gawynt-hub.firebasestorage.app",
+    messagingSenderId:"330651852035",
+    appId:"1:330651852035:web:db931f867da21b6a519d36",
+    measurementId:"G-XLXGTVSPXT"
+};
+
+const app=initializeApp(firebaseConfig);
+let analytics;
+try{analytics=getAnalytics(app);}catch(e){console.warn("Analytics blocked by browser");}
+const auth=getAuth(app);
+const db=getDatabase(app);
+
+const AppState={isAdmin:false,currentDate:new Date(),scheduleData:{},selectedDateStr:null,unsubscribeDB:null,isLocalMode:false};
+
+const DOM={
+    calendarTitle:document.getElementById('calendar-title'),
+    calendarSection:document.getElementById('calendar'),
+    monthDisplay:document.getElementById('month-display'),
+    calendarGrid:document.getElementById('calendar-grid'),
+    btnPrevMonth:document.getElementById('btn-prev-month'),
+    btnNextMonth:document.getElementById('btn-next-month'),
+    adminModal:document.getElementById('admin-modal'),
+    adminPwdInput:document.getElementById('admin-password-input'),
+    btnVerifyAdmin:document.getElementById('btn-verify-admin'),
+    adminError:document.getElementById('admin-error'),
+    adminControls:document.getElementById('admin-controls'),
+    btnOpenDashboard:document.getElementById('btn-open-dashboard'),
+    btnLogout:document.getElementById('btn-logout'),
+    dayModal:document.getElementById('day-modal'),
+    modalDateTitle:document.getElementById('modal-date-title'),
+    slotsContainer:document.getElementById('slots-container'),
+    emptySlotsMsg:document.getElementById('empty-slots-msg'),
+    adminAddSection:document.getElementById('admin-add-section'),
+    newTimeInput:document.getElementById('new-time-input'),
+    btnAddTime:document.getElementById('btn-add-time'),
+    adminDashboardModal:document.getElementById('admin-dashboard-modal'),
+    dashDateInput:document.getElementById('dash-date-input'),
+    dashTimeInput:document.getElementById('dash-time-input'),
+    btnDashAddTime:document.getElementById('btn-dash-add-time'),
+    closeModals:document.querySelectorAll('.close-modal')
+};
+
+const getCollectionRef=()=>ref(db,'calendar_schedule');
+const getDocRef=(dateStr)=>ref(db,`calendar_schedule/${dateStr}`);
+
+async function initAuth(){
+    try{await signInAnonymously(auth);listenToSchedule();}
+    catch(error){console.error("Firebase Auth Error",error);listenToSchedule();}
+}
+
+function listenToSchedule(){
+    if(AppState.unsubscribeDB)AppState.unsubscribeDB();
+    const dbRef=getCollectionRef();
+    AppState.unsubscribeDB=onValue(dbRef,(snapshot)=>{
+        const newData={};
+        const data=snapshot.val();
+        if(data){Object.keys(data).forEach((key)=>{newData[key]=data[key].times||[];});}
+        AppState.scheduleData=newData;
+        AppState.isLocalMode=false;
+        renderCalendar();
+        if(AppState.selectedDateStr&&!DOM.dayModal.classList.contains('hidden')){renderDayModalContent(AppState.selectedDateStr);}
+    },(error)=>{
+        AppState.isLocalMode=true;
+        const localData=localStorage.getItem('premium_walks_schedule');
+        if(localData){try{AppState.scheduleData=JSON.parse(localData);}catch(e){AppState.scheduleData={};}}
+        renderCalendar();
+        if(AppState.selectedDateStr&&!DOM.dayModal.classList.contains('hidden')){renderDayModalContent(AppState.selectedDateStr);}
+    });
+}
+
+async function saveSlotToDB(dateStr,timeStr){
+    if(!AppState.isAdmin)return;
+    const currentTimes=AppState.scheduleData[dateStr]||[];
+    if(currentTimes.includes(timeStr)){showCalToast("Time slot already exists.","info");return;}
+    const newTimes=[...currentTimes,timeStr].sort();
+    AppState.scheduleData[dateStr]=newTimes;
+    renderCalendar();
+    if(AppState.selectedDateStr===dateStr)renderDayModalContent(dateStr);
+    try{
+        await set(getDocRef(dateStr),{times:newTimes});
+        showCalToast("Time slot saved to database.","success");
+    }catch(e){
+        if(AppState.unsubscribeDB){AppState.unsubscribeDB();AppState.unsubscribeDB=null;}
+        AppState.isLocalMode=true;
+        AppState.scheduleData[dateStr]=newTimes;
+        localStorage.setItem('premium_walks_schedule',JSON.stringify(AppState.scheduleData));
+        renderCalendar();
+        if(AppState.selectedDateStr===dateStr)renderDayModalContent(dateStr);
+        showCalToast("DB Error: Saved locally.","error");
+    }
+}
+
+async function deleteSlotFromDB(dateStr,timeStr){
+    if(!AppState.isAdmin)return;
+    const currentTimes=AppState.scheduleData[dateStr]||[];
+    const newTimes=currentTimes.filter(t=>t!==timeStr);
+    if(newTimes.length===0){delete AppState.scheduleData[dateStr];}else{AppState.scheduleData[dateStr]=newTimes;}
+    renderCalendar();
+    if(AppState.selectedDateStr===dateStr)renderDayModalContent(dateStr);
+    try{
+        if(newTimes.length===0){await remove(getDocRef(dateStr));}else{await set(getDocRef(dateStr),{times:newTimes});}
+        showCalToast("Time slot removed.","success");
+    }catch(e){
+        if(AppState.unsubscribeDB){AppState.unsubscribeDB();AppState.unsubscribeDB=null;}
+        AppState.isLocalMode=true;
+        if(newTimes.length===0){delete AppState.scheduleData[dateStr];}else{AppState.scheduleData[dateStr]=newTimes;}
+        localStorage.setItem('premium_walks_schedule',JSON.stringify(AppState.scheduleData));
+        renderCalendar();
+        if(AppState.selectedDateStr===dateStr)renderDayModalContent(dateStr);
+        showCalToast("Removed locally.","error");
+    }
+}
+
+// ADDED: booked time slots are checked and reserved (removed) so nobody can double-book
+window.slotIsFree=(d,t)=>AppState.isLocalMode||(AppState.scheduleData[d]||[]).includes(t);
+window.reserveSlot=async(d,t)=>{
+    const left=(AppState.scheduleData[d]||[]).filter(x=>x!==t);
+    if(left.length){AppState.scheduleData[d]=left;await set(getDocRef(d),{times:left});}
+    else{delete AppState.scheduleData[d];await remove(getDocRef(d));}
+    renderCalendar();
+};
+
+const monthNames=["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+function renderCalendar(){
+    const year=AppState.currentDate.getFullYear();
+    const month=AppState.currentDate.getMonth();
+    DOM.monthDisplay.textContent=`${monthNames[month]} ${year}`;
+    DOM.calendarGrid.innerHTML='';
+    const firstDay=new Date(year,month,1).getDay();
+    const daysInMonth=new Date(year,month+1,0).getDate();
+    const today=new Date();
+    const isCurrentMonth=year===today.getFullYear()&&month===today.getMonth();
+    const currentDay=today.getDate();
+
+    for(let i=0;i<firstDay;i++){
+        const emptyCell=document.createElement('div');
+        emptyCell.className='calendar-day empty-day rounded-2xl bg-transparent';
+        DOM.calendarGrid.appendChild(emptyCell);
     }
 
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
-    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBuWWnqDX5mUra5pF3uuBxEVSKjcESifTk",
-        authDomain: "gawynt-hub.firebaseapp.com",
-        databaseURL: "https://gawynt-hub-default-rtdb.firebaseio.com",
-        projectId: "gawynt-hub",
-        storageBucket: "gawynt-hub.firebasestorage.app",
-        messagingSenderId: "330651852035",
-        appId: "1:330651852035:web:db931f867da21b6a519d36",
-        measurementId: "G-XLXGTVSPXT"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    let analytics;
-    try { analytics = getAnalytics(app); } catch(e) { console.warn("Analytics blocked by browser"); }
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-
-    const AppState = {
-        isAdmin: false,
-        currentDate: new Date(),
-        scheduleData: {},
-        selectedDateStr: null, 
-        unsubscribeDB: null,
-        isLocalMode: false 
-    };
-
-    const DOM = {
-        calendarTitle: document.getElementById('calendar-title'),
-        calendarSection: document.getElementById('calendar'),
-        monthDisplay: document.getElementById('month-display'),
-        calendarGrid: document.getElementById('calendar-grid'),
-        btnPrevMonth: document.getElementById('btn-prev-month'),
-        btnNextMonth: document.getElementById('btn-next-month'),
-        
-        adminModal: document.getElementById('admin-modal'),
-        adminPwdInput: document.getElementById('admin-password-input'),
-        btnVerifyAdmin: document.getElementById('btn-verify-admin'),
-        adminError: document.getElementById('admin-error'),
-        adminControls: document.getElementById('admin-controls'),
-        btnOpenDashboard: document.getElementById('btn-open-dashboard'),
-        btnLogout: document.getElementById('btn-logout'),
-
-        dayModal: document.getElementById('day-modal'),
-        modalDateTitle: document.getElementById('modal-date-title'),
-        slotsContainer: document.getElementById('slots-container'),
-        emptySlotsMsg: document.getElementById('empty-slots-msg'),
-        adminAddSection: document.getElementById('admin-add-section'),
-        newTimeInput: document.getElementById('new-time-input'),
-        btnAddTime: document.getElementById('btn-add-time'),
-        
-        adminDashboardModal: document.getElementById('admin-dashboard-modal'),
-        dashDateInput: document.getElementById('dash-date-input'),
-        dashTimeInput: document.getElementById('dash-time-input'),
-        btnDashAddTime: document.getElementById('btn-dash-add-time'),
-
-        closeModals: document.querySelectorAll('.close-modal')
-    };
-
-    const getCollectionRef = () => ref(db, 'calendar_schedule');
-    const getDocRef = (dateStr) => ref(db, `calendar_schedule/${dateStr}`);
-
-    async function initAuth() {
-        try {
-            await signInAnonymously(auth);
-            listenToSchedule();
-        } catch (error) {
-            console.error("Firebase Auth Error", error);
-            listenToSchedule();
+    for(let day=1;day<=daysInMonth;day++){
+        const dateStr=`${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        const slots=AppState.scheduleData[dateStr]||[];
+        const hasSlots=slots.length>0;
+        const isPastMonth=year<today.getFullYear()||(year===today.getFullYear()&&month<today.getMonth());
+        const isPast=isPastMonth||(isCurrentMonth&&day<currentDay);
+        const isToday=year===today.getFullYear()&&month===today.getMonth()&&day===currentDay;
+        const dayCell=document.createElement('div');
+        let classes='calendar-day rounded-2xl flex flex-col items-center justify-center relative border border-transparent';
+        if(isPast){classes+=' text-gray-300 bg-gray-50/50 cursor-not-allowed';}
+        else{
+            classes+=' text-gray-700 font-medium hover:border-gray-200';
+            if(isToday){classes+=' bg-gray-900 text-white hover:bg-gray-800';}
+            else if(hasSlots){classes+=' bg-white shadow-sm border-gray-100';}
+            else{classes+=' bg-gray-50';}
         }
+        dayCell.className=classes;
+        const daySpan=document.createElement('span');
+        daySpan.textContent=day;
+        if(isToday){daySpan.className='font-bold text-lg';}
+        dayCell.appendChild(daySpan);
+        if(!isPast&&hasSlots&&!isToday){
+            const dot=document.createElement('div');
+            dot.className='absolute bottom-2 w-1.5 h-1.5 rounded-full bg-black';
+            dayCell.appendChild(dot);
+        }
+        if(!isPast){dayCell.addEventListener('click',()=>openDayModal(dateStr));}
+        DOM.calendarGrid.appendChild(dayCell);
     }
+}
 
-    function listenToSchedule() {
-        if (AppState.unsubscribeDB) AppState.unsubscribeDB();
+function formatTimeDisplay(time24){
+    const [h,m]=time24.split(':');
+    let hours=parseInt(h);
+    const ampm=hours>=12?'PM':'AM';
+    hours=hours%12;
+    hours=hours?hours:12;
+    return `${hours}:${m} ${ampm}`;
+}
 
-        const dbRef = getCollectionRef();
-        
-        AppState.unsubscribeDB = onValue(dbRef, (snapshot) => {
-            const newData = {};
-            const data = snapshot.val();
-            if (data) {
-                Object.keys(data).forEach((key) => {
-                    newData[key] = data[key].times || [];
-                });
+function openDayModal(dateStr){
+    AppState.selectedDateStr=dateStr;
+    const [y,m,d]=dateStr.split('-');
+    const dateObj=new Date(y,parseInt(m)-1,d);
+    const options={weekday:'long',year:'numeric',month:'long',day:'numeric'};
+    DOM.modalDateTitle.textContent=dateObj.toLocaleDateString('en-US',options);
+    renderDayModalContent(dateStr);
+    if(AppState.isAdmin){DOM.adminAddSection.classList.remove('hidden');DOM.newTimeInput.value='';}
+    else{DOM.adminAddSection.classList.add('hidden');}
+    DOM.dayModal.classList.remove('hidden');
+    setTimeout(()=>{
+        DOM.dayModal.querySelector('div').classList.add('scale-100');
+        DOM.dayModal.querySelector('div').classList.remove('scale-95','opacity-0');
+    },10);
+}
+
+function renderDayModalContent(dateStr){
+    const slots=AppState.scheduleData[dateStr]||[];
+    DOM.slotsContainer.innerHTML='';
+    if(slots.length===0){
+        DOM.emptySlotsMsg.classList.remove('hidden');
+    }else{
+        DOM.emptySlotsMsg.classList.add('hidden');
+        slots.sort();
+        slots.forEach(time=>{
+            const slotDiv=document.createElement('div');
+            slotDiv.className='flex justify-between items-center bg-gray-50 border border-gray-100 p-4 rounded-xl';
+            const timeSpan=document.createElement('span');
+            timeSpan.className='font-semibold text-gray-900 text-lg tracking-tight';
+            timeSpan.innerHTML=`<i class="fa-regular fa-clock text-gray-400 mr-2 text-sm"></i> ${formatTimeDisplay(time)}`;
+            slotDiv.appendChild(timeSpan);
+            if(AppState.isAdmin){
+                const delBtn=document.createElement('button');
+                delBtn.className='text-red-400 hover:text-red-600 p-2 rounded-full hover:bg-red-50 transition-colors border-none bg-transparent cursor-pointer';
+                delBtn.innerHTML='<i class="fa-solid fa-trash-can"></i>';
+                delBtn.onclick=()=>deleteSlotFromDB(dateStr,time);
+                slotDiv.appendChild(delBtn);
+            }else{
+                const bookBtn=document.createElement('button');
+                bookBtn.type='button';
+                bookBtn.className='text-sm font-semibold bg-white border border-gray-200 px-4 py-2 rounded-lg text-gray-900 hover:bg-gray-900 hover:text-white transition-colors cursor-pointer';
+                bookBtn.textContent='Select Time';
+                bookBtn.onclick=()=>{
+                    closeAllModals();
+                    const dateInput=document.getElementById('requestedDate');
+                    if(dateInput)dateInput.value=dateStr;
+                    const timeInput=document.getElementById('requestedTime');
+                    if(timeInput){timeInput.value=formatTimeDisplay(time);timeInput.dataset.raw=time;}
+                    document.getElementById('payment').scrollIntoView({behavior:'smooth'});
+                    showCalToast(`Time selected. Please choose a payment method.`,'info');
+                };
+                slotDiv.appendChild(bookBtn);
             }
-            AppState.scheduleData = newData;
-            AppState.isLocalMode = false;
-            renderCalendar();
-            
-            if (AppState.selectedDateStr && !DOM.dayModal.classList.contains('hidden')) {
-                renderDayModalContent(AppState.selectedDateStr);
-            }
-        }, (error) => {
-            AppState.isLocalMode = true;
-            const localData = localStorage.getItem('premium_walks_schedule');
-            if (localData) {
-                try {
-                    AppState.scheduleData = JSON.parse(localData);
-                } catch(e) {
-                    AppState.scheduleData = {};
-                }
-            }
-            renderCalendar();
-            if (AppState.selectedDateStr && !DOM.dayModal.classList.contains('hidden')) {
-                renderDayModalContent(AppState.selectedDateStr);
-            }
+            DOM.slotsContainer.appendChild(slotDiv);
         });
     }
+}
 
-    async function saveSlotToDB(dateStr, timeStr) {
-        if (!AppState.isAdmin) return;
-        
-        const currentTimes = AppState.scheduleData[dateStr] || [];
-        if (currentTimes.includes(timeStr)) {
-            showCalToast("Time slot already exists.", "info");
+function closeAllModals(){
+    [DOM.adminModal,DOM.dayModal,DOM.adminDashboardModal].forEach(modal=>{
+        if(!modal)return;
+        const inner=modal.querySelector('div');
+        if(inner){inner.classList.add('scale-95','opacity-0');inner.classList.remove('scale-100');}
+        setTimeout(()=>{modal.classList.add('hidden');},200);
+    });
+    AppState.selectedDateStr=null;
+}
+
+function showCalToast(message,type='info'){
+    const container=document.getElementById('cal-toast-container');
+    const toast=document.createElement('div');
+    toast.className='cal-toast flex items-center';
+    let icon='<i class="fa-solid fa-circle-info text-blue-400 mr-3"></i>';
+    if(type==='error')icon='<i class="fa-solid fa-circle-exclamation text-red-400 mr-3"></i>';
+    if(type==='success')icon='<i class="fa-solid fa-circle-check text-green-400 mr-3"></i>';
+    toast.innerHTML=`${icon} <span>${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(()=>{toast.style.opacity='1';},10);
+    setTimeout(()=>{toast.style.opacity='0';setTimeout(()=>{toast.remove();},300);},3000);
+}
+
+document.querySelectorAll('.payment-btn').forEach(btn=>{
+    btn.addEventListener('click',(e)=>{
+        const method=e.currentTarget.getAttribute('data-payment');
+        document.getElementById('paymentMethod').value=method;
+        if(method==='Pay Online (Stripe)'&&window.SHOW_STRIPE_PANEL){
+            if(window.renderStripePanel)window.renderStripePanel();
+            const stripePanel=document.getElementById('stripe-panel');
+            if(stripePanel)stripePanel.scrollIntoView({behavior:'smooth',block:'nearest'});
+            showCalToast(`Pay online selected. Use the Pay Now link(s), then finalize your details.`,'info');
             return;
         }
-
-        const newTimes = [...currentTimes, timeStr].sort();
-        
-        AppState.scheduleData[dateStr] = newTimes;
-        renderCalendar();
-        if (AppState.selectedDateStr === dateStr) renderDayModalContent(dateStr);
-        
-        try {
-            await set(getDocRef(dateStr), { times: newTimes });
-            showCalToast("Time slot saved to database.", "success");
-        } catch (e) {
-            if(AppState.unsubscribeDB) {
-                AppState.unsubscribeDB();
-                AppState.unsubscribeDB = null;
-            }
-            AppState.isLocalMode = true;
-            AppState.scheduleData[dateStr] = newTimes;
-            localStorage.setItem('premium_walks_schedule', JSON.stringify(AppState.scheduleData));
-            
-            renderCalendar();
-            if (AppState.selectedDateStr === dateStr) renderDayModalContent(dateStr);
-            showCalToast("DB Error: Saved locally.", "error");
-        }
-    }
-
-    async function deleteSlotFromDB(dateStr, timeStr) {
-        if (!AppState.isAdmin) return;
-
-        const currentTimes = AppState.scheduleData[dateStr] || [];
-        const newTimes = currentTimes.filter(t => t !== timeStr);
-
-        if (newTimes.length === 0) {
-            delete AppState.scheduleData[dateStr];
-        } else {
-            AppState.scheduleData[dateStr] = newTimes;
-        }
-        renderCalendar();
-        if (AppState.selectedDateStr === dateStr) renderDayModalContent(dateStr);
-
-        try {
-            if (newTimes.length === 0) {
-                await remove(getDocRef(dateStr));
-            } else {
-                await set(getDocRef(dateStr), { times: newTimes });
-            }
-            showCalToast("Time slot removed.", "success");
-        } catch (e) {
-            if(AppState.unsubscribeDB) {
-                AppState.unsubscribeDB();
-                AppState.unsubscribeDB = null;
-            }
-            AppState.isLocalMode = true;
-            if (newTimes.length === 0) {
-                delete AppState.scheduleData[dateStr];
-            } else {
-                AppState.scheduleData[dateStr] = newTimes;
-            }
-            localStorage.setItem('premium_walks_schedule', JSON.stringify(AppState.scheduleData));
-            renderCalendar();
-            if (AppState.selectedDateStr === dateStr) renderDayModalContent(dateStr);
-            showCalToast("Removed locally.", "error");
-        }
-    }
-
-    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-    function renderCalendar() {
-        const year = AppState.currentDate.getFullYear();
-        const month = AppState.currentDate.getMonth();
-        
-        DOM.monthDisplay.textContent = `${monthNames[month]} ${year}`;
-        DOM.calendarGrid.innerHTML = '';
-
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-        const today = new Date();
-        const isCurrentMonth = year === today.getFullYear() && month === today.getMonth();
-        const currentDay = today.getDate();
-
-        for (let i = 0; i < firstDay; i++) {
-            const emptyCell = document.createElement('div');
-            emptyCell.className = 'calendar-day empty-day rounded-2xl bg-transparent';
-            DOM.calendarGrid.appendChild(emptyCell);
-        }
-
-        for (let day = 1; day <= daysInMonth; day++) {
-            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            const slots = AppState.scheduleData[dateStr] || [];
-            const hasSlots = slots.length > 0;
-            
-            const isPastMonth = year < today.getFullYear() || (year === today.getFullYear() && month < today.getMonth());
-            const isPast = isPastMonth || (isCurrentMonth && day < currentDay);
-
-            const dayCell = document.createElement('div');
-            
-            let classes = 'calendar-day rounded-2xl flex flex-col items-center justify-center relative border border-transparent';
-            
-            if (isPast) {
-                classes += ' text-gray-300 bg-gray-50/50 cursor-not-allowed';
-            } else {
-                classes += ' text-gray-700 font-medium hover:border-gray-200';
-                if (year === today.getFullYear() && month === today.getMonth() && day === currentDay) {
-                    classes += ' bg-gray-900 text-white hover:bg-gray-800';
-                } else if (hasSlots) {
-                    classes += ' bg-white shadow-sm border-gray-100';
-                } else {
-                    classes += ' bg-gray-50';
-                }
-            }
-
-            dayCell.className = classes;
-            
-            const daySpan = document.createElement('span');
-            daySpan.textContent = day;
-            if (year === today.getFullYear() && month === today.getMonth() && day === currentDay) {
-                daySpan.className = 'font-bold text-lg';
-            }
-            dayCell.appendChild(daySpan);
-
-            if (!isPast && hasSlots && !(year === today.getFullYear() && month === today.getMonth() && day === currentDay)) {
-                const dot = document.createElement('div');
-                dot.className = 'absolute bottom-2 w-1.5 h-1.5 rounded-full bg-black';
-                dayCell.appendChild(dot);
-            }
-
-            if (!isPast) {
-                dayCell.addEventListener('click', () => openDayModal(dateStr));
-            }
-
-            DOM.calendarGrid.appendChild(dayCell);
-        }
-    }
-
-    function formatTimeDisplay(time24) {
-        const [h, m] = time24.split(':');
-        let hours = parseInt(h);
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12;
-        hours = hours ? hours : 12; 
-        return `${hours}:${m} ${ampm}`;
-    }
-
-    function openDayModal(dateStr) {
-        AppState.selectedDateStr = dateStr;
-        const [y, m, d] = dateStr.split('-');
-        const dateObj = new Date(y, parseInt(m)-1, d);
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        
-        DOM.modalDateTitle.textContent = dateObj.toLocaleDateString('en-US', options);
-        renderDayModalContent(dateStr);
-        
-        if (AppState.isAdmin) {
-            DOM.adminAddSection.classList.remove('hidden');
-            DOM.newTimeInput.value = ''; 
-        } else {
-            DOM.adminAddSection.classList.add('hidden');
-        }
-
-        DOM.dayModal.classList.remove('hidden');
-        setTimeout(() => {
-            DOM.dayModal.querySelector('div').classList.add('scale-100');
-            DOM.dayModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
-        }, 10);
-    }
-
-    function renderDayModalContent(dateStr) {
-        const slots = AppState.scheduleData[dateStr] || [];
-        DOM.slotsContainer.innerHTML = '';
-
-        if (slots.length === 0) {
-            DOM.emptySlotsMsg.classList.remove('hidden');
-        } else {
-            DOM.emptySlotsMsg.classList.add('hidden');
-            slots.sort();
-            slots.forEach(time => {
-                const slotDiv = document.createElement('div');
-                slotDiv.className = 'flex justify-between items-center bg-gray-50 border border-gray-100 p-4 rounded-xl';
-                
-                const timeSpan = document.createElement('span');
-                timeSpan.className = 'font-semibold text-gray-900 text-lg tracking-tight';
-                timeSpan.innerHTML = `<i class="fa-regular fa-clock text-gray-400 mr-2 text-sm"></i> ${formatTimeDisplay(time)}`;
-                slotDiv.appendChild(timeSpan);
-
-                if (AppState.isAdmin) {
-                    const delBtn = document.createElement('button');
-                    delBtn.className = 'text-red-400 hover:text-red-600 p-2 rounded-full hover:bg-red-50 transition-colors border-none bg-transparent cursor-pointer';
-                    delBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-                    delBtn.onclick = () => deleteSlotFromDB(dateStr, time);
-                    slotDiv.appendChild(delBtn);
-                } else {
-                    const bookBtn = document.createElement('button');
-                    bookBtn.type = 'button';
-                    bookBtn.className = 'text-sm font-semibold bg-white border border-gray-200 px-4 py-2 rounded-lg text-gray-900 hover:bg-gray-900 hover:text-white transition-colors cursor-pointer';
-                    bookBtn.textContent = 'Select Time';
-                    
-                    bookBtn.onclick = () => {
-                        closeAllModals();
-                        const dateInput = document.getElementById('requestedDate');
-                        if(dateInput) dateInput.value = dateStr;
-                        const timeInput = document.getElementById('requestedTime');
-                        if(timeInput) timeInput.value = formatTimeDisplay(time);
-
-                        document.getElementById('payment').scrollIntoView({behavior: 'smooth'});
-                        showCalToast(`Time selected. Please choose a payment method.`, 'info');
-                    };
-                    slotDiv.appendChild(bookBtn);
-                }
-                DOM.slotsContainer.appendChild(slotDiv);
-            });
-        }
-    }
-
-    function closeAllModals() {
-        [DOM.adminModal, DOM.dayModal, DOM.adminDashboardModal].forEach(modal => {
-            if(!modal) return;
-            const inner = modal.querySelector('div');
-            if(inner) {
-                inner.classList.add('scale-95', 'opacity-0');
-                inner.classList.remove('scale-100');
-            }
-            setTimeout(() => { modal.classList.add('hidden'); }, 200);
-        });
-        AppState.selectedDateStr = null;
-    }
-
-    function showCalToast(message, type = 'info') {
-        const container = document.getElementById('cal-toast-container');
-        const toast = document.createElement('div');
-        toast.className = 'cal-toast flex items-center';
-        
-        let icon = '<i class="fa-solid fa-circle-info text-blue-400 mr-3"></i>';
-        if (type === 'error') icon = '<i class="fa-solid fa-circle-exclamation text-red-400 mr-3"></i>';
-        if (type === 'success') icon = '<i class="fa-solid fa-circle-check text-green-400 mr-3"></i>';
-
-        toast.innerHTML = `${icon} <span>${message}</span>`;
-        container.appendChild(toast);
-        
-        setTimeout(() => { toast.style.opacity = '1'; }, 10);
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            setTimeout(() => { toast.remove(); }, 300);
-        }, 3000);
-    }
-
-    // Payment Selection Listeners
-    document.querySelectorAll('.payment-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const method = e.currentTarget.getAttribute('data-payment');
-            document.getElementById('paymentMethod').value = method;
-
-            // ADDED: Stripe option shows its pay links and stays in the payment section
-            if (method === 'Pay Online (Stripe)' && window.SHOW_STRIPE_PANEL) {
-                if (window.renderStripePanel) window.renderStripePanel();
-                const stripePanel = document.getElementById('stripe-panel');
-                if (stripePanel) stripePanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                showCalToast(`Pay online selected. Use the Pay Now link(s), then finalize your details.`, 'info');
-                return;
-            }
-            if (window.hideStripePanel) window.hideStripePanel();
-
-            document.getElementById('booking-section').scrollIntoView({ behavior: 'smooth' });
-            showCalToast(`${method} payment selected. Please finalize your details.`, 'info');
-        });
+        if(window.hideStripePanel)window.hideStripePanel();
+        document.getElementById('booking-section').scrollIntoView({behavior:'smooth'});
+        showCalToast(`${method} payment selected. Please finalize your details.`,'info');
     });
+});
 
-    DOM.btnPrevMonth.addEventListener('click', () => {
-        AppState.currentDate.setMonth(AppState.currentDate.getMonth() - 1);
-        renderCalendar();
-    });
-    
-    DOM.btnNextMonth.addEventListener('click', () => {
-        AppState.currentDate.setMonth(AppState.currentDate.getMonth() + 1);
-        renderCalendar();
-    });
+DOM.btnPrevMonth.addEventListener('click',()=>{AppState.currentDate.setMonth(AppState.currentDate.getMonth()-1);renderCalendar();});
+DOM.btnNextMonth.addEventListener('click',()=>{AppState.currentDate.setMonth(AppState.currentDate.getMonth()+1);renderCalendar();});
+DOM.closeModals.forEach(btn=>{btn.addEventListener('click',closeAllModals);});
 
-    DOM.closeModals.forEach(btn => {
-        btn.addEventListener('click', closeAllModals);
-    });
+window.addEventListener('click',(e)=>{
+    if(e.target===DOM.adminModal||e.target===DOM.dayModal||e.target===DOM.adminDashboardModal){closeAllModals();}
+});
 
-    window.addEventListener('click', (e) => {
-        if (e.target === DOM.adminModal || e.target === DOM.dayModal || e.target === DOM.adminDashboardModal) {
-            closeAllModals();
-        }
-    });
+DOM.adminPwdInput.addEventListener('keydown',(e)=>{if(e.key==='Enter')DOM.btnVerifyAdmin.click();});
 
-    DOM.adminPwdInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') DOM.btnVerifyAdmin.click();
-    });
-
-    let calTitleClicks = 0;
-    let calClickTimer;
-    if (DOM.calendarTitle) {
-        DOM.calendarTitle.addEventListener('click', (e) => {
-            calTitleClicks++;
-            clearTimeout(calClickTimer);
-            if (calTitleClicks >= 2) {
-                if (AppState.isAdmin) {
-                    DOM.adminDashboardModal.classList.remove('hidden');
-                    setTimeout(() => {
-                        DOM.adminDashboardModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
-                        DOM.adminDashboardModal.querySelector('div').classList.add('scale-100');
-                    }, 10);
-                } else {
-                    DOM.adminModal.classList.remove('hidden');
-                    DOM.adminError.classList.add('hidden');
-                    DOM.adminPwdInput.value = '';
-                    setTimeout(() => {
-                        DOM.adminModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
-                        DOM.adminModal.querySelector('div').classList.add('scale-100');
-                        DOM.adminPwdInput.focus();
-                    }, 10);
-                }
-                calTitleClicks = 0;
-            }
-            calClickTimer = setTimeout(() => { calTitleClicks = 0; }, 400);
-        });
-    }
-
-    DOM.btnVerifyAdmin.addEventListener('click', () => {
-        const pwd = DOM.adminPwdInput.value;
-        if (pwd === 'walksdog99' || pwd === 'Kikeew24') {
-            AppState.isAdmin = true;
-            DOM.adminControls.classList.remove('hidden');
-            closeAllModals();
-            showCalToast("Admin access granted", "success");
-
-            setTimeout(() => {
+let calTitleClicks=0;
+let calClickTimer;
+if(DOM.calendarTitle){
+    DOM.calendarTitle.addEventListener('click',()=>{
+        calTitleClicks++;
+        clearTimeout(calClickTimer);
+        if(calTitleClicks>=2){
+            if(AppState.isAdmin){
                 DOM.adminDashboardModal.classList.remove('hidden');
-                setTimeout(() => {
-                    DOM.adminDashboardModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
+                setTimeout(()=>{
+                    DOM.adminDashboardModal.querySelector('div').classList.remove('scale-95','opacity-0');
                     DOM.adminDashboardModal.querySelector('div').classList.add('scale-100');
-                }, 10);
-            }, 250);
-        } else {
-            DOM.adminError.classList.remove('hidden');
+                },10);
+            }else{
+                DOM.adminModal.classList.remove('hidden');
+                DOM.adminError.classList.add('hidden');
+                DOM.adminPwdInput.value='';
+                setTimeout(()=>{
+                    DOM.adminModal.querySelector('div').classList.remove('scale-95','opacity-0');
+                    DOM.adminModal.querySelector('div').classList.add('scale-100');
+                    DOM.adminPwdInput.focus();
+                },10);
+            }
+            calTitleClicks=0;
         }
+        calClickTimer=setTimeout(()=>{calTitleClicks=0;},400);
     });
+}
 
-    DOM.btnLogout.addEventListener('click', () => {
-        AppState.isAdmin = false;
-        DOM.adminControls.classList.add('hidden');
-        showCalToast("Logged out of admin mode");
-        if (AppState.selectedDateStr) {
-            renderDayModalContent(AppState.selectedDateStr); 
-            DOM.adminAddSection.classList.add('hidden');
-        }
-    });
-
-    if (DOM.btnOpenDashboard) {
-        DOM.btnOpenDashboard.addEventListener('click', () => {
+DOM.btnVerifyAdmin.addEventListener('click',()=>{
+    const pwd=DOM.adminPwdInput.value;
+    if(pwd==='walksdog99'||pwd==='Kikeew24'){
+        AppState.isAdmin=true;
+        DOM.adminControls.classList.remove('hidden');
+        closeAllModals();
+        showCalToast("Admin access granted","success");
+        setTimeout(()=>{
             DOM.adminDashboardModal.classList.remove('hidden');
-            setTimeout(() => {
-                DOM.adminDashboardModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
+            setTimeout(()=>{
+                DOM.adminDashboardModal.querySelector('div').classList.remove('scale-95','opacity-0');
                 DOM.adminDashboardModal.querySelector('div').classList.add('scale-100');
-            }, 10);
-        });
+            },10);
+        },250);
+    }else{
+        DOM.adminError.classList.remove('hidden');
     }
+});
 
-    if (DOM.btnDashAddTime) {
-        DOM.btnDashAddTime.addEventListener('click', () => {
-            const dateStr = DOM.dashDateInput.value;
-            const timeStr = DOM.dashTimeInput.value;
-            if (!dateStr || !timeStr) {
-                showCalToast("Please select both date and time", "error");
-                return;
-            }
-            saveSlotToDB(dateStr, timeStr);
-            DOM.dashTimeInput.value = ''; 
-        });
+DOM.btnLogout.addEventListener('click',()=>{
+    AppState.isAdmin=false;
+    DOM.adminControls.classList.add('hidden');
+    showCalToast("Logged out of admin mode");
+    if(AppState.selectedDateStr){
+        renderDayModalContent(AppState.selectedDateStr);
+        DOM.adminAddSection.classList.add('hidden');
     }
+});
 
-    DOM.btnAddTime.addEventListener('click', () => {
-        const time = DOM.newTimeInput.value;
-        if (!time) {
-            showCalToast("Please select a time", "error");
-            return;
-        }
-        if (AppState.selectedDateStr) {
-            saveSlotToDB(AppState.selectedDateStr, time);
-            DOM.newTimeInput.value = ''; 
-        }
+if(DOM.btnOpenDashboard){
+    DOM.btnOpenDashboard.addEventListener('click',()=>{
+        DOM.adminDashboardModal.classList.remove('hidden');
+        setTimeout(()=>{
+            DOM.adminDashboardModal.querySelector('div').classList.remove('scale-95','opacity-0');
+            DOM.adminDashboardModal.querySelector('div').classList.add('scale-100');
+        },10);
     });
+}
 
-    document.addEventListener('DOMContentLoaded', () => {
-        DOM.adminModal.querySelector('div').classList.add('scale-95', 'opacity-0', 'transition-all', 'duration-200');
-        DOM.dayModal.querySelector('div').classList.add('scale-95', 'opacity-0', 'transition-all', 'duration-200');
-        if(DOM.adminDashboardModal) DOM.adminDashboardModal.querySelector('div').classList.add('scale-95', 'opacity-0', 'transition-all', 'duration-200');
-        
-        renderCalendar();
-        initAuth();
+if(DOM.btnDashAddTime){
+    DOM.btnDashAddTime.addEventListener('click',()=>{
+        const dateStr=DOM.dashDateInput.value;
+        const timeStr=DOM.dashTimeInput.value;
+        if(!dateStr||!timeStr){showCalToast("Please select both date and time","error");return;}
+        saveSlotToDB(dateStr,timeStr);
+        DOM.dashTimeInput.value='';
     });
+}
+
+DOM.btnAddTime.addEventListener('click',()=>{
+    const time=DOM.newTimeInput.value;
+    if(!time){showCalToast("Please select a time","error");return;}
+    if(AppState.selectedDateStr){saveSlotToDB(AppState.selectedDateStr,time);DOM.newTimeInput.value='';}
+});
+
+document.addEventListener('DOMContentLoaded',()=>{
+    DOM.adminModal.querySelector('div').classList.add('scale-95','opacity-0','transition-all','duration-200');
+    DOM.dayModal.querySelector('div').classList.add('scale-95','opacity-0','transition-all','duration-200');
+    if(DOM.adminDashboardModal)DOM.adminDashboardModal.querySelector('div').classList.add('scale-95','opacity-0','transition-all','duration-200');
+    renderCalendar();
+    initAuth();
+});
 </script>
 
-<!-- ADDED: Live goal progress (reads from your Firebase; you change it in admin-chat.html) -->
+<!-- Live goal progress -->
 <script type="module">
-    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+import{initializeApp,getApps,getApp}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import{getDatabase,ref,onValue}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-    const goalFirebaseConfig = {
-        apiKey: "AIzaSyBuWWnqDX5mUra5pF3uuBxEVSKjcESifTk",
-        authDomain: "gawynt-hub.firebaseapp.com",
-        databaseURL: "https://gawynt-hub-default-rtdb.firebaseio.com",
-        projectId: "gawynt-hub",
-        storageBucket: "gawynt-hub.firebasestorage.app",
-        messagingSenderId: "330651852035",
-        appId: "1:330651852035:web:db931f867da21b6a519d36",
-        measurementId: "G-XLXGTVSPXT"
-    };
+const goalFirebaseConfig={
+    apiKey:"AIzaSyBuWWnqDX5mUra5pF3uuBxEVSKjcESifTk",
+    authDomain:"gawynt-hub.firebaseapp.com",
+    databaseURL:"https://gawynt-hub-default-rtdb.firebaseio.com",
+    projectId:"gawynt-hub",
+    storageBucket:"gawynt-hub.firebasestorage.app",
+    messagingSenderId:"330651852035",
+    appId:"1:330651852035:web:db931f867da21b6a519d36",
+    measurementId:"G-XLXGTVSPXT"
+};
 
-    try {
-        const goalApp = getApps().length ? getApp() : initializeApp(goalFirebaseConfig);
-        const goalDb = getDatabase(goalApp);
-
-        onValue(ref(goalDb, 'settings/goal'), function(snap) {
-            const g = snap.val();
-            if (!g) return; // nothing saved yet: keep the numbers already on the page
-            const cur = Number(g.current);
-            const tgt = Number(g.target);
-            if (!isFinite(cur) || !isFinite(tgt) || tgt <= 0 || cur < 0) return;
-
-            const fmt = function(n) { return '$' + n.toLocaleString('en-CA'); };
-            const pct = Math.min(100, Math.max(0, (cur / tgt) * 100));
-
-            const fill = document.getElementById('goalFill');
-            const text = document.getElementById('goalText');
-            const inline = document.getElementById('goalTargetInline');
-
-            if (fill) {
-                fill.style.width = pct + '%';
-                fill.textContent = fmt(cur);
-            }
-            if (text) {
-                text.textContent = cur >= tgt
-                    ? '🎉 Goal reached! ' + fmt(cur) + ' / ' + fmt(tgt) + ' - thank you, neighbours!'
-                    : 'Current Goal Progress: ' + fmt(cur) + ' / ' + fmt(tgt);
-            }
-            if (inline) inline.textContent = fmt(tgt);
-        }, function() { /* if it can't load, the page keeps its default numbers */ });
-    } catch (e) {
-        console.warn('Goal progress could not load', e);
-    }
+try{
+    const goalApp=getApps().length?getApp():initializeApp(goalFirebaseConfig);
+    const goalDb=getDatabase(goalApp);
+    onValue(ref(goalDb,'settings/goal'),function(snap){
+        const g=snap.val();
+        if(!g)return;
+        const cur=Number(g.current);
+        const tgt=Number(g.target);
+        if(!isFinite(cur)||!isFinite(tgt)||tgt<=0||cur<0)return;
+        const fmt=function(n){return '$'+n.toLocaleString('en-CA');};
+        const pct=Math.min(100,Math.max(0,(cur/tgt)*100));
+        const fill=document.getElementById('goalFill');
+        const text=document.getElementById('goalText');
+        const inline=document.getElementById('goalTargetInline');
+        if(fill){fill.style.width=pct+'%';fill.textContent=fmt(cur);}
+        if(text){
+            text.textContent=cur>=tgt
+                ?'🎉 Goal reached! '+fmt(cur)+' / '+fmt(tgt)+' - thank you, neighbours!'
+                :'Current Goal Progress: '+fmt(cur)+' / '+fmt(tgt);
+        }
+        if(inline)inline.textContent=fmt(tgt);
+    },function(){});
+}catch(e){console.warn('Goal progress could not load',e);}
 </script>
 
-<!-- ADDED: Live snow forecast logic (free Open-Meteo API, no key needed) -->
+<!-- Live snow forecast (free Open-Meteo API) -->
 <script>
-(function() {
-    const banner = document.getElementById('snow-banner');
-    if (!banner) return;
-    const textEl = document.getElementById('snow-banner-text');
-    const tempEl = document.getElementById('snow-banner-temp');
-    const daysEl = document.getElementById('snow-banner-days');
+(function(){
+    const banner=document.getElementById('snow-banner');
+    if(!banner)return;
+    const textEl=document.getElementById('snow-banner-text');
+    const tempEl=document.getElementById('snow-banner-temp');
+    const daysEl=document.getElementById('snow-banner-days');
+    const url='https://api.open-meteo.com/v1/forecast?latitude=51.0447&longitude=-114.0719&current=temperature_2m&daily=snowfall_sum,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=America%2FEdmonton&forecast_days=4';
 
-    const url = 'https://api.open-meteo.com/v1/forecast?latitude=51.0447&longitude=-114.0719'
-        + '&current=temperature_2m'
-        + '&daily=snowfall_sum,temperature_2m_max,temperature_2m_min,precipitation_probability_max'
-        + '&timezone=America%2FEdmonton&forecast_days=4';
-
-    function dayName(dateStr, i) {
-        if (i === 0) return 'Today';
-        if (i === 1) return 'Tomorrow';
-        const p = dateStr.split('-');
-        return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2])).toLocaleDateString('en-CA', { weekday: 'long' });
+    function dayName(dateStr,i){
+        if(i===0)return 'Today';
+        if(i===1)return 'Tomorrow';
+        const p=dateStr.split('-');
+        return new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2])).toLocaleDateString('en-CA',{weekday:'long'});
     }
-
-    function fmtCm(n) {
-        return (Math.round(n * 10) / 10) + ' cm';
-    }
+    function fmtCm(n){return (Math.round(n*10)/10)+' cm';}
 
     fetch(url)
-        .then(function(r) { if (!r.ok) throw new Error('bad'); return r.json(); })
-        .then(function(d) {
-            const daily = d.daily;
-            const snow = daily.snowfall_sum;
-            const SNOW_MIN = 0.5; // cm
+    .then(function(r){if(!r.ok)throw new Error('bad');return r.json();})
+    .then(function(d){
+        const daily=d.daily;
+        const snow=daily.snowfall_sum;
+        const SNOW_MIN=0.5;
+        let firstSnow=-1;
+        for(let i=0;i<3;i++){if(snow[i]>=SNOW_MIN){firstSnow=i;break;}}
+        if(firstSnow===0){textEl.textContent='❄️ Snow today in Calgary: about '+fmtCm(snow[0])+' expected. Book your shoveling now!';}
+        else if(firstSnow===1){textEl.textContent='❄️ Snow expected tomorrow: about '+fmtCm(snow[1])+'. Book now to get a spot!';}
+        else if(firstSnow===2){textEl.textContent='❄️ Snow coming '+dayName(daily.time[2],2)+': about '+fmtCm(snow[2])+'. Book ahead!';}
+        else{banner.classList.add('no-snow');textEl.textContent='☀️ No snow in the 3-day forecast. Book ahead to be first in line for the next storm!';}
 
-            // Find the first day in the next 3 days with real snow
-            let firstSnow = -1;
-            for (let i = 0; i < 3; i++) {
-                if (snow[i] >= SNOW_MIN) { firstSnow = i; break; }
-            }
+        if(d.current&&typeof d.current.temperature_2m==='number'){
+            tempEl.textContent='Now in Calgary: '+Math.round(d.current.temperature_2m)+'°C';
+            tempEl.style.display='inline-block';
+        }
 
-            if (firstSnow === 0) {
-                textEl.textContent = '❄️ Snow today in Calgary: about ' + fmtCm(snow[0]) + ' expected. Book your shoveling now!';
-            } else if (firstSnow === 1) {
-                textEl.textContent = '❄️ Snow expected tomorrow: about ' + fmtCm(snow[1]) + '. Book now to get a spot!';
-            } else if (firstSnow === 2) {
-                textEl.textContent = '❄️ Snow coming ' + dayName(daily.time[2], 2) + ': about ' + fmtCm(snow[2]) + '. Book ahead!';
-            } else {
-                banner.classList.add('no-snow');
-                textEl.textContent = '☀️ No snow in the 3-day forecast. Book ahead to be first in line for the next storm!';
-            }
-
-            if (d.current && typeof d.current.temperature_2m === 'number') {
-                tempEl.textContent = 'Now in Calgary: ' + Math.round(d.current.temperature_2m) + '°C';
-                tempEl.style.display = 'inline-block';
-            }
-
-            daysEl.innerHTML = '';
-            for (let i = 0; i < 4; i++) {
-                const chip = document.createElement('div');
-                chip.className = 'snow-day';
-                const name = document.createElement('span');
-                name.className = 'snow-day-name';
-                name.textContent = dayName(daily.time[i], i);
-                chip.appendChild(name);
-
-                const icon = snow[i] >= SNOW_MIN ? '❄️' : (daily.precipitation_probability_max[i] >= 50 ? '🌧️' : '☀️');
-                const line1 = document.createElement('span');
-                line1.style.display = 'block';
-                line1.textContent = icon + ' ' + (snow[i] >= SNOW_MIN ? fmtCm(snow[i]) : 'No snow');
-                chip.appendChild(line1);
-
-                const line2 = document.createElement('span');
-                line2.style.display = 'block';
-                line2.textContent = Math.round(daily.temperature_2m_max[i]) + '° / ' + Math.round(daily.temperature_2m_min[i]) + '°';
-                chip.appendChild(line2);
-
-                daysEl.appendChild(chip);
-            }
-        })
-        .catch(function() {
-            // If the forecast can't load, quietly hide the banner so the site still looks clean
-            banner.style.display = 'none';
-        });
+        daysEl.innerHTML='';
+        for(let i=0;i<4;i++){
+            const chip=document.createElement('div');
+            chip.className='snow-day';
+            const name=document.createElement('span');
+            name.className='snow-day-name';
+            name.textContent=dayName(daily.time[i],i);
+            chip.appendChild(name);
+            const icon=snow[i]>=SNOW_MIN?'❄️':(daily.precipitation_probability_max[i]>=50?'🌧️':'☀️');
+            const line1=document.createElement('span');
+            line1.style.display='block';
+            line1.textContent=icon+' '+(snow[i]>=SNOW_MIN?fmtCm(snow[i]):'No snow');
+            chip.appendChild(line1);
+            const line2=document.createElement('span');
+            line2.style.display='block';
+            line2.textContent=Math.round(daily.temperature_2m_max[i])+'° / '+Math.round(daily.temperature_2m_min[i])+'°';
+            chip.appendChild(line2);
+            daysEl.appendChild(chip);
+        }
+    })
+    .catch(function(){banner.style.display='none';});
 })();
 </script>
 
-<!-- ADDED: Live chat <-> your Firebase connection -->
+<!-- Live chat <-> Firebase -->
 <script type="module">
-    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getDatabase, ref, push, set, update, onChildAdded } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+import{initializeApp,getApps,getApp}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import{getAuth,signInAnonymously}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import{getDatabase,ref,push,set,update,onChildAdded}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-    const chatFirebaseConfig = {
-        apiKey: "AIzaSyBuWWnqDX5mUra5pF3uuBxEVSKjcESifTk",
-        authDomain: "gawynt-hub.firebaseapp.com",
-        databaseURL: "https://gawynt-hub-default-rtdb.firebaseio.com",
-        projectId: "gawynt-hub",
-        storageBucket: "gawynt-hub.firebasestorage.app",
-        messagingSenderId: "330651852035",
-        appId: "1:330651852035:web:db931f867da21b6a519d36",
-        measurementId: "G-XLXGTVSPXT"
-    };
+const chatFirebaseConfig={
+    apiKey:"AIzaSyBuWWnqDX5mUra5pF3uuBxEVSKjcESifTk",
+    authDomain:"gawynt-hub.firebaseapp.com",
+    databaseURL:"https://gawynt-hub-default-rtdb.firebaseio.com",
+    projectId:"gawynt-hub",
+    storageBucket:"gawynt-hub.firebasestorage.app",
+    messagingSenderId:"330651852035",
+    appId:"1:330651852035:web:db931f867da21b6a519d36",
+    measurementId:"G-XLXGTVSPXT"
+};
 
-    const chatApp = getApps().length ? getApp() : initializeApp(chatFirebaseConfig);
-    const chatAuth = getAuth(chatApp);
-    const chatDb = getDatabase(chatApp);
+const chatApp=getApps().length?getApp():initializeApp(chatFirebaseConfig);
+const chatAuth=getAuth(chatApp);
+const chatDb=getDatabase(chatApp);
 
-    const chatAuthReady = (async () => {
-        if (!chatAuth.currentUser) await signInAnonymously(chatAuth);
-    })();
+const chatAuthReady=(async()=>{if(!chatAuth.currentUser)await signInAnonymously(chatAuth);})();
 
-    window.chatFB = {
-        start: async function(id, name) {
-            await chatAuthReady;
-            await set(ref(chatDb, 'chats/' + id + '/meta'), {
-                name: name, startedAt: Date.now(), updatedAt: Date.now(), unread: true, lastText: '(opened the chat)'
-            });
-        },
-        send: async function(id, name, sid, text) {
-            await chatAuthReady;
-            await push(ref(chatDb, 'chats/' + id + '/messages'), { from: 'customer', text: text, ts: Date.now(), sid: sid });
-            await update(ref(chatDb, 'chats/' + id + '/meta'), { name: name, updatedAt: Date.now(), unread: true, lastText: text });
-        },
-        listen: function(id, cb) {
-            chatAuthReady.then(function() {
-                onChildAdded(ref(chatDb, 'chats/' + id + '/messages'), function(snap) { cb(snap.val()); });
-            }).catch(function() {});
-        }
-    };
+window.chatFB={
+    start:async function(id,name){
+        await chatAuthReady;
+        await set(ref(chatDb,'chats/'+id+'/meta'),{name:name,startedAt:Date.now(),updatedAt:Date.now(),unread:true,lastText:'(opened the chat)'});
+    },
+    send:async function(id,name,sid,text){
+        await chatAuthReady;
+        await push(ref(chatDb,'chats/'+id+'/messages'),{from:'customer',text:text,ts:Date.now(),sid:sid});
+        await update(ref(chatDb,'chats/'+id+'/meta'),{name:name,updatedAt:Date.now(),unread:true,lastText:text});
+    },
+    listen:function(id,cb){
+        chatAuthReady.then(function(){
+            onChildAdded(ref(chatDb,'chats/'+id+'/messages'),function(snap){cb(snap.val());});
+        }).catch(function(){});
+    }
+};
 </script>
 
-<!-- ADDED: Live chat logic -->
+<!-- Live chat logic -->
 <script>
-(function() {
-    const launcher = document.getElementById('chat-launcher');
-    const panel = document.getElementById('chat-panel');
-    const closeBtn = document.getElementById('chat-close');
-    const messages = document.getElementById('chat-messages');
-    const form = document.getElementById('chat-form');
-    const input = document.getElementById('chat-input');
+(function(){
+    const launcher=document.getElementById('chat-launcher');
+    const panel=document.getElementById('chat-panel');
+    const closeBtn=document.getElementById('chat-close');
+    const messages=document.getElementById('chat-messages');
+    const form=document.getElementById('chat-form');
+    const input=document.getElementById('chat-input');
 
-    let started = false;
-    let step = null; // null | 'name' | 'contact' | 'message'
-    const lead = {};
-    let chatId = null;
-    let liveConfirmed = false;
-    const sid = Math.random().toString(36).slice(2);
+    let started=false;
+    let step=null;
+    const lead={};
+    let chatId=null;
+    let liveConfirmed=false;
+    const sid=Math.random().toString(36).slice(2);
 
-    function scrollDown() { messages.scrollTop = messages.scrollHeight; }
+    function scrollDown(){messages.scrollTop=messages.scrollHeight;}
 
-    function addMsg(text, who) {
-        const div = document.createElement('div');
-        div.className = 'chat-msg ' + who;
-        div.textContent = text;
+    function addMsg(text,who){
+        const div=document.createElement('div');
+        div.className='chat-msg '+who;
+        div.textContent=text;
         messages.appendChild(div);
         scrollDown();
     }
 
-    function clearOptions() {
-        messages.querySelectorAll('.chat-options').forEach(function(el) { el.remove(); });
-    }
+    function clearOptions(){messages.querySelectorAll('.chat-options').forEach(function(el){el.remove();});}
 
-    function showOptions(list) {
+    function showOptions(list){
         clearOptions();
-        const wrap = document.createElement('div');
-        wrap.className = 'chat-options';
-        list.forEach(function(opt) {
-            const b = document.createElement('button');
-            b.type = 'button';
-            b.className = 'chat-opt';
-            b.textContent = opt.label;
-            b.addEventListener('click', function() {
+        const wrap=document.createElement('div');
+        wrap.className='chat-options';
+        list.forEach(function(opt){
+            const b=document.createElement('button');
+            b.type='button';
+            b.className='chat-opt';
+            b.textContent=opt.label;
+            b.addEventListener('click',function(){
                 clearOptions();
-                addMsg(opt.label, 'user');
-                setTimeout(opt.fn, 300);
+                addMsg(opt.label,'user');
+                setTimeout(opt.fn,300);
             });
             wrap.appendChild(b);
         });
@@ -1854,267 +1371,305 @@
         scrollDown();
     }
 
-    function mainOptions() {
+    function mainOptions(){
         showOptions([
-            { label: '🙋 Connect me to someone', fn: startConnect },
-            { label: '💰 Services & prices', fn: showPrices },
-            { label: '💳 Payment options', fn: showPayment },
-            { label: '📍 Where do you shovel?', fn: showArea },
-            { label: '📅 How do I book?', fn: showBooking }
+            {label:'🙋 Connect me to someone',fn:startConnect},
+            {label:'💰 Services & prices',fn:showPrices},
+            {label:'💳 Payment options',fn:showPayment},
+            {label:'📍 Where do you shovel?',fn:showArea},
+            {label:'📅 How do I book?',fn:showBooking}
         ]);
     }
 
-    function backOptions() {
+    function backOptions(){
+        showOptions([{label:'⬅️ Back to options',fn:function(){addMsg('What else can I help you with?','bot');mainOptions();}}]);
+    }
+
+    function showPrices(){
+        addMsg("Here are our services:\n\nINDIVIDUAL\n• Walkway Only: $10\n• Sidewalk Only: $10\n• Corner Lot Sidewalks: $20\n• Driveway Only: $15\n\nBUNDLES (save money!)\n• Sidewalk & Walkway: $15\n• Driveway & Walkway: $20\n• Walkway & Corner Sidewalk: $25\n• Driveway & Corner Sidewalk: $30\n• Full Regular Package: $30\n• Full Corner Package: $40\n\n⚠️ Shoveling only, no salt service.",'bot');
+        backOptions();
+    }
+
+    function showPayment(){
+        addMsg("You can pay 3 ways:\n• E-transfer\n• Tap to Pay\n• Pay Online (secure Stripe checkout)\n\nWe take payment 0-2 hours before the service.",'bot');
+        backOptions();
+    }
+
+    function showArea(){
+        addMsg("📍 We serve Lower and Upper Mount Royal, Scarboro, Bankview and Marda Loop. Use the Address Check on the page to make sure you're in our area.",'bot');
+        backOptions();
+    }
+
+    function showBooking(){
+        addMsg("Booking is easy:\n1. Check your address in the Service Area section\n2. Tap the services you want\n3. Pick a date and time on the calendar\n4. Choose a payment method\n5. Fill in your details and tap Complete Booking",'bot');
         showOptions([
-            { label: '⬅️ Back to options', fn: function() { addMsg('What else can I help you with?', 'bot'); mainOptions(); } }
-        ]);
-    }
-
-    function showPrices() {
-        addMsg("Here are our services:\n\nINDIVIDUAL\n• Walkway Only: $10\n• Sidewalk Only: $10\n• Corner Lot Sidewalks: $20\n• Driveway Only: $15\n\nBUNDLES (save money!)\n• Sidewalk & Walkway: $15\n• Driveway & Walkway: $20\n• Walkway & Corner Sidewalk: $25\n• Driveway & Corner Sidewalk: $30\n• Full Regular Package: $30\n• Full Corner Package: $40\n\n⚠️ Shoveling only, no salt service.", 'bot');
-        backOptions();
-    }
-
-    function showPayment() {
-        addMsg("You can pay 3 ways:\n• E-transfer\n• Tap to Pay\n• Pay Online (secure Stripe checkout)\n\nWe take payment 0-2 hours before the service.", 'bot');
-        backOptions();
-    }
-
-    function showArea() {
-        addMsg("📍 We serve Lower and Upper Mount Royal, Sunalta, Scarboro, Bankview and Marda Loop.", 'bot');
-        backOptions();
-    }
-
-    function showBooking() {
-        addMsg("Booking is easy:\n1. Tap the services you want\n2. Pick a date and time on the calendar\n3. Choose a payment method\n4. Fill in your details and tap Complete Booking", 'bot');
-        showOptions([
-            { label: '❄️ Take me to the services', fn: function() {
+            {label:'❄️ Take me to the services',fn:function(){
                 panel.classList.remove('open');
-                const s = document.getElementById('services');
-                if (s) s.scrollIntoView({ behavior: 'smooth' });
-            } },
-            { label: '⬅️ Back to options', fn: function() { addMsg('What else can I help you with?', 'bot'); mainOptions(); } }
+                const s=document.getElementById('services');
+                if(s)s.scrollIntoView({behavior:'smooth'});
+            }},
+            {label:'⬅️ Back to options',fn:function(){addMsg('What else can I help you with?','bot');mainOptions();}}
         ]);
     }
 
-    // Phone alert settings: install the free "ntfy" app and subscribe to this topic to get a ping on your phone.
-    // (Change the topic to any new secret word if you ever want to reset it.)
-    const NTFY_TOPIC = 'gawynt-snow-chat-x7k2m9q4';
+    const NTFY_TOPIC='gawynt-snow-chat-x7k2m9q4';
 
-    function notifyOwner(title, text) {
-        if (!NTFY_TOPIC) return;
-        try {
-            fetch('https://ntfy.sh/' + NTFY_TOPIC, {
-                method: 'POST',
-                headers: { 'Title': title, 'Priority': 'high', 'Tags': 'speech_balloon', 'Click': new URL('admin-chat.html', location.href).href },
-                body: text
-            }).catch(function() {});
-        } catch (err) {}
+    function notifyOwner(title,text){
+        if(!NTFY_TOPIC)return;
+        try{
+            fetch('https://ntfy.sh/'+NTFY_TOPIC,{
+                method:'POST',
+                headers:{'Title':title,'Priority':'high','Tags':'speech_balloon','Click':new URL('admin-chat.html',location.href).href},
+                body:text
+            }).catch(function(){});
+        }catch(err){}
     }
 
-    function pingChatStarted() {
-        notifyOwner('New chat on your snow site', lead.name + ' just opened the live chat and is waiting for you.');
-        fetch('https://formspree.io/f/xjgydwzk', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({
-                _subject: 'LIVE CHAT STARTED: ' + lead.name + ' is waiting',
-                Name: lead.name,
-                Source: 'Website live chat (chat opened)'
-            })
-        }).catch(function() {});
+    function pingChatStarted(){
+        notifyOwner('New chat on your snow site',lead.name+' just opened the live chat and is waiting for you.');
+        fetch('https://formspree.io/f/xjgydwzk',{
+            method:'POST',
+            headers:{'Content-Type':'application/json','Accept':'application/json'},
+            body:JSON.stringify({_subject:'LIVE CHAT STARTED: '+lead.name+' is waiting',Name:lead.name,Source:'Website live chat (chat opened)'})
+        }).catch(function(){});
     }
 
-    // --- Live chat (Firebase) helpers ---
-    function saveSession() {
-        try { localStorage.setItem('gawynt_chat', JSON.stringify({ id: chatId, name: lead.name })); } catch (e) {}
+    function saveSession(){try{localStorage.setItem('gawynt_chat',JSON.stringify({id:chatId,name:lead.name}));}catch(e){}}
+    function loadSession(){
+        try{
+            const s=JSON.parse(localStorage.getItem('gawynt_chat')||'null');
+            return(s&&s.id&&s.name)?s:null;
+        }catch(e){return null;}
     }
-    function loadSession() {
-        try {
-            const s = JSON.parse(localStorage.getItem('gawynt_chat') || 'null');
-            return (s && s.id && s.name) ? s : null;
-        } catch (e) { return null; }
-    }
-    function newChatId() {
-        const a = new Uint8Array(12);
+    function newChatId(){
+        const a=new Uint8Array(12);
         crypto.getRandomValues(a);
-        return Array.from(a).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+        return Array.from(a).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
     }
-    function withFB(fn, tries) {
-        tries = tries || 0;
-        if (window.chatFB) { fn(window.chatFB); return; }
-        if (tries < 20) setTimeout(function() { withFB(fn, tries + 1); }, 500);
+    function withFB(fn,tries){
+        tries=tries||0;
+        if(window.chatFB){fn(window.chatFB);return;}
+        if(tries<20)setTimeout(function(){withFB(fn,tries+1);},500);
     }
-    function attachChat() {
-        withFB(function(fb) {
-            fb.listen(chatId, function(m) {
-                if (!m || !m.text) return;
-                if (m.from === 'admin') addMsg('Gawynt: ' + m.text, 'bot');
-                else if (m.from === 'customer' && m.sid !== sid) addMsg(m.text, 'user');
+    function attachChat(){
+        withFB(function(fb){
+            fb.listen(chatId,function(m){
+                if(!m||!m.text)return;
+                if(m.from==='admin')addMsg('Gawynt: '+m.text,'bot');
+                else if(m.from==='customer'&&m.sid!==sid)addMsg(m.text,'user');
             });
         });
     }
-    function startLiveChat() {
-        chatId = newChatId();
+    function startLiveChat(){
+        chatId=newChatId();
         saveSession();
-        withFB(function(fb) { fb.start(chatId, lead.name).catch(function() {}); });
+        withFB(function(fb){fb.start(chatId,lead.name).catch(function(){});});
         attachChat();
     }
-    function fallbackEmail(text) {
-        fetch('https://formspree.io/f/xjgydwzk', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({
-                _subject: 'Live Chat message from ' + lead.name,
-                Name: lead.name,
-                Message: text,
-                Source: 'Website live chat (backup email)'
-            })
-        }).catch(function() {});
+    function fallbackEmail(text){
+        fetch('https://formspree.io/f/xjgydwzk',{
+            method:'POST',
+            headers:{'Content-Type':'application/json','Accept':'application/json'},
+            body:JSON.stringify({_subject:'Live Chat message from '+lead.name,Name:lead.name,Message:text,Source:'Website live chat (backup email)'})
+        }).catch(function(){});
     }
-    function sendLive(text) {
-        if (!window.chatFB) {
-            addMsg("Live chat isn't available right now, so I emailed your message instead.", 'bot');
+    function sendLive(text){
+        if(!window.chatFB){
+            addMsg("Live chat isn't available right now, so I emailed your message instead.",'bot');
             fallbackEmail(text);
-            notifyOwner('Chat message from ' + lead.name, text);
+            notifyOwner('Chat message from '+lead.name,text);
             return;
         }
-        window.chatFB.send(chatId, lead.name, sid, text).then(function() {
-            notifyOwner('Chat message from ' + lead.name, text);
-            if (!liveConfirmed) {
-                liveConfirmed = true;
-                addMsg("Message sent! Gawynt will reply right here, so please keep this page open. 💬", 'bot');
+        window.chatFB.send(chatId,lead.name,sid,text).then(function(){
+            notifyOwner('Chat message from '+lead.name,text);
+            if(!liveConfirmed){
+                liveConfirmed=true;
+                addMsg("Message sent! Gawynt will reply right here, so please keep this page open. 💬",'bot');
             }
-        }).catch(function() {
-            addMsg("Live chat isn't available right now, so I emailed your message instead.", 'bot');
+        }).catch(function(){
+            addMsg("Live chat isn't available right now, so I emailed your message instead.",'bot');
             fallbackEmail(text);
-            notifyOwner('Chat message from ' + lead.name, text);
+            notifyOwner('Chat message from '+lead.name,text);
         });
     }
 
-    function startConnect() {
-        if (window.chatFB && chatId) {
-            addMsg("You're connected! Type your message below and Gawynt will reply right here in the chat. Please keep this page open.", 'bot');
+    function startConnect(){
+        if(window.chatFB&&chatId){
+            addMsg("You're connected! Type your message below and Gawynt will reply right here in the chat. Please keep this page open.",'bot');
             input.focus();
             return;
         }
-        if (!lead.contact) {
-            step = 'contact';
-            addMsg("Happy to connect you with someone who can help, " + lead.name + "! What's the best email or phone number to reach you?", 'bot');
-        } else {
-            step = 'message';
-            addMsg("What would you like help with?", 'bot');
+        if(!lead.contact){
+            step='contact';
+            addMsg("Happy to connect you with someone who can help, "+lead.name+"! What's the best email or phone number to reach you?",'bot');
+        }else{
+            step='message';
+            addMsg("What would you like help with?",'bot');
         }
         input.focus();
     }
 
-    function sendLead() {
-        addMsg('Sending your message...', 'bot');
-        fetch('https://formspree.io/f/xjgydwzk', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({
-                _subject: 'Live Chat Request from ' + lead.name,
-                Name: lead.name,
-                Contact: lead.contact,
-                Message: lead.message,
-                Source: 'Website live chat'
-            })
+    function sendLead(){
+        addMsg('Sending your message...','bot');
+        fetch('https://formspree.io/f/xjgydwzk',{
+            method:'POST',
+            headers:{'Content-Type':'application/json','Accept':'application/json'},
+            body:JSON.stringify({_subject:'Live Chat Request from '+lead.name,Name:lead.name,Contact:lead.contact,Message:lead.message,Source:'Website live chat'})
         })
-        .then(function(res) {
-            if (res.ok) {
-                step = null;
-                notifyOwner('Chat message from ' + lead.name, lead.name + ' (' + lead.contact + '): ' + lead.message);
-                addMsg("✅ Thanks, " + lead.name + "! Your message was sent. Someone will get back to you as soon as possible.", 'bot');
+        .then(function(res){
+            if(res.ok){
+                step=null;
+                notifyOwner('Chat message from '+lead.name,lead.name+' ('+lead.contact+'): '+lead.message);
+                addMsg("✅ Thanks, "+lead.name+"! Your message was sent. Someone will get back to you as soon as possible.",'bot');
                 backOptions();
-            } else {
-                throw new Error('bad response');
-            }
+            }else{throw new Error('bad response');}
         })
-        .catch(function() {
-            step = 'message';
-            addMsg("Sorry, that didn't send. Please type your message again to retry.", 'bot');
+        .catch(function(){
+            step='message';
+            addMsg("Sorry, that didn't send. Please type your message again to retry.",'bot');
         });
     }
 
-    function openChat() {
+    function openChat(){
         panel.classList.add('open');
-        if (!started) {
-            started = true;
-            const saved = loadSession();
-            if (saved) {
-                lead.name = saved.name;
-                chatId = saved.id;
+        if(!started){
+            started=true;
+            const saved=loadSession();
+            if(saved){
+                lead.name=saved.name;
+                chatId=saved.id;
                 attachChat();
-                setTimeout(function() {
-                    addMsg("Welcome back, " + saved.name + "! 👋 Type a message any time, or pick an option:", 'bot');
+                setTimeout(function(){
+                    addMsg("Welcome back, "+saved.name+"! 👋 Type a message any time, or pick an option:",'bot');
                     mainOptions();
-                }, 500);
+                },500);
                 return;
             }
-            setTimeout(function() { addMsg("Welcome! 👋", 'bot'); }, 300);
-            setTimeout(function() {
-                step = 'name';
-                addMsg("What's your name?", 'bot');
+            setTimeout(function(){addMsg("Welcome! 👋",'bot');},300);
+            setTimeout(function(){
+                step='name';
+                addMsg("What's your name?",'bot');
                 input.focus();
-            }, 900);
+            },900);
         }
     }
 
-    launcher.addEventListener('click', function() {
-        if (panel.classList.contains('open')) {
-            panel.classList.remove('open');
-        } else {
-            openChat();
-        }
+    launcher.addEventListener('click',function(){
+        if(panel.classList.contains('open')){panel.classList.remove('open');}else{openChat();}
     });
-    closeBtn.addEventListener('click', function() { panel.classList.remove('open'); });
+    closeBtn.addEventListener('click',function(){panel.classList.remove('open');});
 
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit',function(e){
         e.preventDefault();
-        const text = input.value.trim();
-        if (!text) return;
-        input.value = '';
-        addMsg(text, 'user');
-
-        if (step === 'name') {
-            lead.name = text;
-            step = null;
+        const text=input.value.trim();
+        if(!text)return;
+        input.value='';
+        addMsg(text,'user');
+        if(step==='name'){
+            lead.name=text;
+            step=null;
             startLiveChat();
             pingChatStarted();
-            setTimeout(function() {
-                addMsg("Nice to meet you, " + text + "! I've let Gawynt know you're here. Do you want me to connect you to someone who can help? Here are your options:", 'bot');
+            setTimeout(function(){
+                addMsg("Nice to meet you, "+text+"! I've let Gawynt know you're here. Do you want me to connect you to someone who can help? Here are your options:",'bot');
                 mainOptions();
-            }, 300);
-        } else if (step === 'contact') {
-            lead.contact = text;
-            step = 'message';
-            setTimeout(function() { addMsg("Got it. What would you like help with?", 'bot'); }, 300);
-        } else if (step === 'message') {
-            lead.message = text;
+            },300);
+        }else if(step==='contact'){
+            lead.contact=text;
+            step='message';
+            setTimeout(function(){addMsg("Got it. What would you like help with?",'bot');},300);
+        }else if(step==='message'){
+            lead.message=text;
             sendLead();
-        } else if (chatId) {
+        }else if(chatId){
             clearOptions();
             sendLive(text);
-        } else {
-            setTimeout(function() {
-                addMsg("I'm not sure I understood that, but here's what I can help with:", 'bot');
+        }else{
+            setTimeout(function(){
+                addMsg("I'm not sure I understood that, but here's what I can help with:",'bot');
                 mainOptions();
-            }, 300);
+            },300);
         }
     });
 })();
 </script>
 
+<!-- ADDED: Service area map + address check (Sunalta is not served) -->
+<script>
+(function(){
+    // Service area traced from your Google Maps drawing (approximate - edit these points to fine-tune)
+    const SERVICE=[[51.0374,-114.1073],[51.0379,-114.1074],[51.0379,-114.0899],[51.0328,-114.0895],[51.0319,-114.0899],[51.0323,-114.0826],[51.0323,-114.0805],[51.0305,-114.0805],[51.0305,-114.0775],[51.0273,-114.0784],[51.0258,-114.0809],[51.0230,-114.0803],[51.0195,-114.0802],[51.0199,-114.0947],[51.0157,-114.0953],[51.0153,-114.1053],[51.0232,-114.1045],[51.0232,-114.1143],[51.0230,-114.1099],[51.0283,-114.1092],[51.0311,-114.1122],[51.0330,-114.1106],[51.0330,-114.1078],[51.0374,-114.1073]];
+    // Sunalta is NOT served: addresses there are rejected
+    const SUNALTA=[[51.0450,-114.1090],[51.0450,-114.0910],[51.0380,-114.0910],[51.0380,-114.1090]];
+    const OK_NAMES=['mount royal','scarboro','bankview','marda loop'];
+
+    function inside(pt,poly){
+        let c=false;
+        for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+            const yi=poly[i][0],xi=poly[i][1],yj=poly[j][0],xj=poly[j][1];
+            if(((yi>pt[0])!==(yj>pt[0]))&&(pt[1]<(xj-xi)*(pt[0]-yi)/(yj-yi)+xi))c=!c;
+        }
+        return c;
+    }
+
+    const map=L.map('area-map',{scrollWheelZoom:false}).setView([51.030,-114.095],13);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
+    L.polygon(SERVICE,{color:'#059669',fillOpacity:0.2}).addTo(map).bindTooltip('Service area');
+    window.addEventListener('load',function(){setTimeout(function(){map.invalidateSize();},1600);});
+    let pin=null;
+
+    function setZone(zone){
+        window.areaZone=zone;
+        document.getElementById('areaZone').value=zone||'';
+        updatePriceDisplay();
+    }
+
+    async function check(){
+        const addr=document.getElementById('areaAddress').value.trim();
+        const out=document.getElementById('area-result');
+        if(!addr){out.textContent='Please type your address.';out.className='area-no';return;}
+        out.textContent='Checking...';out.className='';
+        try{
+            const url='https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=1&countrycodes=ca&viewbox=-114.3,51.15,-113.85,50.9&bounded=1&q='+encodeURIComponent(addr+', Calgary, Alberta');
+            const r=await(await fetch(url)).json();
+            if(!r.length){out.textContent='Could not find that address. Please check the spelling.';out.className='area-no';setZone(null);return;}
+            const lat=+r[0].lat,lon=+r[0].lon,a=r[0].address||{};
+            const sub=(a.suburb||a.neighbourhood||a.quarter||'').toLowerCase();
+            const sun=inside([lat,lon],SUNALTA)||sub==='sunalta';
+            const ok=!sun&&(inside([lat,lon],SERVICE)||OK_NAMES.includes(sub));
+            if(pin)map.removeLayer(pin);
+            pin=L.marker([lat,lon]).addTo(map);
+            map.setView([lat,lon],15);
+            if(ok){
+                setZone('in');
+                out.textContent='✅ Great, you are in our service area!';
+                out.className='area-ok';
+            }else{
+                setZone('out');
+                out.textContent='❌ Sorry, that address is outside our service area.';
+                out.className='area-no';
+            }
+            if(ok)document.getElementById('bookAddress').value=addr;
+        }catch(e){
+            out.textContent='Could not check right now. Please try again.';
+            out.className='area-no';
+        }
+    }
+
+    document.getElementById('areaBtn').addEventListener('click',check);
+    document.getElementById('areaAddress').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();check();}});
+})();
+</script>
+
 <!-- FIX: measures the real menu height so the banner is never covered -->
 <script>
-(function () {
-    function fixNavSpacing() {
-        var nav = document.querySelector('.top-nav');
-        if (nav) document.body.style.paddingTop = nav.offsetHeight + 'px';
+(function(){
+    function fixNavSpacing(){
+        var nav=document.querySelector('.top-nav');
+        if(nav)document.body.style.paddingTop=nav.offsetHeight+'px';
     }
-    window.addEventListener('load', fixNavSpacing);
-    window.addEventListener('resize', fixNavSpacing);
+    window.addEventListener('load',fixNavSpacing);
+    window.addEventListener('resize',fixNavSpacing);
     fixNavSpacing();
 })();
 </script>
