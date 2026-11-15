@@ -1,244 +1,315 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow">
-<title>Member Points Admin</title>
-<style>
-  :root { --blue:#0284c7; --text:#1e293b; --muted:#64748b; --danger:#dc2626; --green:#059669; }
-  * { box-sizing:border-box; }
-  body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:#f0f9ff; color:var(--text); padding:16px; }
-  .wrap { max-width:720px; margin:0 auto; }
-  h1 { font-size:1.5rem; margin:8px 0 16px; }
-  .card { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:16px; margin-bottom:14px; box-shadow:0 2px 10px rgba(0,0,0,.04); }
-  input { width:100%; padding:12px; font-size:16px; border:2px solid #e2e8f0; border-radius:10px; margin-bottom:10px; }
-  input:focus { outline:none; border-color:var(--blue); }
-  button { font-size:15px; font-weight:700; border:none; border-radius:10px; padding:10px 14px; cursor:pointer; color:#fff; background:var(--blue); }
-  button.add { background:var(--green); } button.remove { background:var(--danger); } button.set { background:#475569; }
-  button.ghost { background:#e2e8f0; color:var(--text); }
-  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-  .member-top { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; }
-  .name { font-weight:800; } .email { color:var(--muted); font-size:.9rem; word-break:break-all; }
-  .pts { font-size:1.6rem; font-weight:800; color:var(--blue); white-space:nowrap; }
-  .amount { width:110px; margin:0; }
-  #msg { min-height:20px; font-weight:600; margin:0 0 10px; }
-  #msg.err { color:var(--danger); } #msg.ok { color:var(--green); }
-  .hidden { display:none; }
-  code { background:#f1f5f9; padding:2px 6px; border-radius:6px; word-break:break-all; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Inbox - Gawynt's Snow Shoveling</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f0f9ff; color: #1e293b; }
+        .hidden { display: none !important; }
+        .topbar { background: linear-gradient(45deg, #0284c7, #3b82f6); color: #fff; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
+        .topbar h1 { margin: 0; font-size: 1.15rem; }
+        .topbar button { background: rgba(255,255,255,0.2); color: #fff; border: none; border-radius: 8px; padding: 8px 14px; cursor: pointer; font-weight: 600; }
+
+        #login { max-width: 360px; margin: 60px auto; background: #fff; padding: 28px; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+        #login h2 { margin-top: 0; }
+        #login input { width: 100%; padding: 12px; margin-bottom: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; }
+        #login button { width: 100%; padding: 12px; border: none; border-radius: 10px; background: #0284c7; color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; }
+        .error { color: #b91c1c; font-size: 0.9rem; margin: 8px 0 0; }
+
+        #app { display: grid; grid-template-columns: 300px 1fr; height: calc(100vh - 52px); }
+        #chat-list { background: #fff; border-right: 1px solid #e2e8f0; overflow-y: auto; }
+        .chat-item { width: 100%; text-align: left; background: #fff; border: none; border-bottom: 1px solid #f1f5f9; padding: 14px 16px; cursor: pointer; display: block; }
+        .chat-item:hover, .chat-item.active { background: #e0f2fe; }
+        .chat-item .name { font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+        .chat-item .last { font-size: 0.85rem; color: #64748b; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #ef4444; display: inline-block; }
+        .empty { padding: 24px; color: #64748b; text-align: center; }
+
+        #convo { display: flex; flex-direction: column; min-width: 0; }
+        #convo-title { padding: 14px 18px; background: #fff; border-bottom: 1px solid #e2e8f0; font-weight: 700; }
+        #messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 75%; padding: 10px 14px; border-radius: 16px; line-height: 1.45; white-space: pre-wrap; word-wrap: break-word; }
+        .msg.customer { background: #fff; border: 1px solid #e2e8f0; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .msg.admin { background: #0284c7; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .msg .time { display: block; font-size: 0.7rem; opacity: 0.6; margin-top: 4px; }
+        #reply-form { display: flex; gap: 8px; padding: 12px; background: #fff; border-top: 1px solid #e2e8f0; }
+        #reply-input { flex: 1; padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 16px; }
+        #reply-form button { padding: 0 20px; border: none; border-radius: 12px; background: #0284c7; color: #fff; font-weight: 700; cursor: pointer; }
+
+        @media (max-width: 720px) {
+            #app { grid-template-columns: 1fr; grid-template-rows: 190px 1fr; }
+            #chat-list { border-right: none; border-bottom: 1px solid #e2e8f0; }
+            .msg { max-width: 90%; }
+        }
+
+        #goal-panel { position: fixed; top: 60px; right: 12px; width: 300px; max-width: calc(100vw - 24px); background: #fff; border-radius: 16px; padding: 18px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); z-index: 50; }
+        #goal-panel h3 { margin: 0 0 12px; }
+        #goal-panel label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: #475569; }
+        #goal-panel input { width: 100%; padding: 10px; margin-bottom: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; }
+        #goal-panel button { width: 100%; padding: 11px; border: none; border-radius: 10px; background: #0284c7; color: #fff; font-weight: 700; cursor: pointer; font-size: 1rem; }
+        #goal-status { font-size: 0.85rem; margin: 8px 0 0; min-height: 1em; }
+    </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>❄️ Member Points Admin</h1>
-  <p id="msg"></p>
 
-  <div id="login-card" class="card">
-    <h3 style="margin-top:0">Admin login</h3>
-    <input type="email" id="email" placeholder="Admin email" autocomplete="username">
-    <input type="password" id="pass" placeholder="Password" autocomplete="current-password">
-    <button id="login-btn">Log In</button>
-  </div>
-
-  <div id="app" class="hidden">
-    <div class="card row" style="justify-content:space-between">
-      <span id="who" class="email"></span>
-      <button class="ghost" id="logout-btn">Log Out</button>
+<div class="topbar">
+    <h1>❄️ Chat Inbox</h1>
+    <div style="display:flex; gap:8px;">
+        <button id="btn-goal" class="hidden">🎯 Goal</button>
+        <button id="btn-logout" class="hidden">Log out</button>
     </div>
-    <div class="card">
-      <h3 style="margin-top:0">🎁 Verify reward code</h3>
-      <div class="row">
-        <input type="text" id="code-input" placeholder="GWY-XXXXXX" autocomplete="off" style="flex:1;margin:0;text-transform:uppercase;">
-        <button id="code-check">Check</button>
-      </div>
-      <div id="code-result" style="margin-top:12px"></div>
-    </div>
-    <input type="text" id="search" placeholder="Search members by name or email...">
-    <div id="list"></div>
-  </div>
+</div>
 
-  <div id="uid-card" class="card hidden">
-    <b>Permission denied.</b> Your admin UID is:<br><code id="uid"></code><br><br>
-    Put this UID into your Firebase Realtime Database rules (see instructions), then refresh this page.
-  </div>
+<div id="goal-panel" class="hidden">
+    <h3>🎯 Update goal progress</h3>
+    <label for="goal-current">Money saved so far ($)</label>
+    <input type="number" id="goal-current" min="0" step="1" inputmode="decimal">
+    <label for="goal-target">Goal amount ($)</label>
+    <input type="number" id="goal-target" min="1" step="1" inputmode="decimal">
+    <button type="button" id="goal-save">Save to website</button>
+    <p id="goal-status"></p>
+</div>
+
+<div id="login">
+    <h2>Admin login</h2>
+    <input type="email" id="login-email" placeholder="Email" autocomplete="username">
+    <input type="password" id="login-password" placeholder="Password" autocomplete="current-password">
+    <button id="btn-login">Log in</button>
+    <p id="login-error" class="error hidden"></p>
+</div>
+
+<div id="app" class="hidden">
+    <div id="chat-list"></div>
+    <div id="convo">
+        <div id="convo-title">Select a chat</div>
+        <div id="messages"></div>
+        <form id="reply-form" autocomplete="off" class="hidden">
+            <input type="text" id="reply-input" placeholder="Type your reply..." maxlength="500">
+            <button type="submit">Send</button>
+        </form>
+    </div>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getDatabase, ref, onValue, set, update, remove, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getDatabase, ref, onValue, push, update, set } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-const app = initializeApp({
-  apiKey: "AIzaSyBuWWnqDX5mUra5pF3uuBxEVSKjcESifTk",
-  authDomain: "gawynt-hub.firebaseapp.com",
-  databaseURL: "https://gawynt-hub-default-rtdb.firebaseio.com",
-  projectId: "gawynt-hub",
-  appId: "1:330651852035:web:db931f867da21b6a519d36"
-}, 'points-admin');
-const auth = getAuth(app), db = getDatabase(app);
-const $ = id => document.getElementById(id);
-
-const REWARD_AT = 100;
-let members = {};
-let stop = null, stopRed = null;
-let redemptions = {};
-
-function say(text, kind) { const m = $('msg'); m.textContent = text || ''; m.className = kind || ''; }
-const friendly = c => ({
-  'auth/invalid-credential': 'Wrong email or password.',
-  'auth/invalid-email': 'Please enter a valid email.',
-  'auth/too-many-requests': 'Too many tries. Please wait and retry.'
-})[c] || 'Something went wrong. Please try again.';
-
-$('login-btn').onclick = async () => {
-  say('');
-  try { await signInWithEmailAndPassword(auth, $('email').value.trim(), $('pass').value); }
-  catch (e) { say(friendly(e.code), 'err'); }
-};
-$('pass').addEventListener('keydown', e => { if (e.key === 'Enter') $('login-btn').click(); });
-$('logout-btn').onclick = () => signOut(auth);
-$('search').addEventListener('input', render);
-
-onAuthStateChanged(auth, user => {
-  if (stop) { stop(); stop = null; }
-  if (stopRed) { stopRed(); stopRed = null; }
-  members = {}; redemptions = {}; render();
-  $('uid-card').classList.add('hidden');
-  if (!user) { $('login-card').classList.remove('hidden'); $('app').classList.add('hidden'); return; }
-  $('login-card').classList.add('hidden'); $('app').classList.remove('hidden');
-  $('who').textContent = 'Logged in as ' + user.email;
-  $('uid').textContent = user.uid;
-  stopRed = onValue(ref(db, 'redemptions'), snap => { redemptions = snap.val() || {}; render(); if ($('code-input').value.trim()) checkCode(); }, () => {});
-  stop = onValue(ref(db, 'members'), snap => {
-    members = snap.val() || {};
-    $('uid-card').classList.add('hidden');
-    render();
-  }, () => {
-    $('uid-card').classList.remove('hidden');
-    say('Could not load members.', 'err');
-  });
-});
-
-function checkCode() {
-  const code = $('code-input').value.trim().toUpperCase();
-  const out = $('code-result'); out.innerHTML = '';
-  if (!code) return;
-  const line = (text, style) => { const d = document.createElement('div'); d.textContent = text; if (style) d.style.cssText = style; out.appendChild(d); };
-  let found = null;
-  Object.keys(redemptions).forEach(uid => {
-    const r = redemptions[uid];
-    if (r && r.code && String(r.code).toUpperCase() === code) found = Object.assign({ uid }, r);
-  });
-  if (!found) { line('❌ Code not found.', 'color:#dc2626;font-weight:800'); return; }
-  const m = members[found.uid] || {};
-  const pts = Number(m.points) || 0;
-  const name = found.name || (m.profile && m.profile.name) || '(no name)';
-  line(name, 'font-weight:800;font-size:1.1rem');
-  line(found.email || '', 'color:#64748b;font-size:.9rem;word-break:break-all');
-  line('Current points: ' + pts, 'margin:6px 0');
-  line('Created: ' + new Date(found.createdAt || 0).toLocaleString(), 'color:#64748b;font-size:.9rem');
-  if (found.status === 'used') {
-    line('⚠️ ALREADY USED' + (found.usedAt ? ' on ' + new Date(found.usedAt).toLocaleString() : ''), 'color:#dc2626;font-weight:800;margin-top:8px');
-    return;
-  }
-  line('✅ Valid code: worth $5 off', 'color:#059669;font-weight:800;margin:8px 0');
-  if (pts < REWARD_AT) line('Member has fewer than ' + REWARD_AT + ' points now, so this code cannot be used.', 'color:#dc2626;font-weight:700;margin-bottom:8px');
-  const row = document.createElement('div'); row.className = 'row';
-  const use = document.createElement('button'); use.type = 'button'; use.className = 'add';
-  use.textContent = '✅ Mark used (-' + REWARD_AT + ' pts)'; use.disabled = pts < REWARD_AT;
-  use.onclick = async () => {
-    if (!confirm('Mark this code as used and remove ' + REWARD_AT + ' points from ' + name + '?')) return;
-    use.disabled = true;
-    try {
-      const res = await runTransaction(ref(db, 'members/' + found.uid + '/points'), cur => ((Number(cur) || 0) >= REWARD_AT ? (Number(cur) || 0) - REWARD_AT : undefined));
-      if (!res.committed) { say('Not enough points. Code was not used.', 'err'); use.disabled = false; return; }
-      await update(ref(db, 'redemptions/' + found.uid), { status: 'used', usedAt: Date.now() });
-      say('Code used. ' + REWARD_AT + ' points removed from ' + name + '.', 'ok');
-    } catch (err) { say('Could not save. Check your database rules.', 'err'); use.disabled = false; }
-  };
-  const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'remove';
-  cancel.textContent = 'Cancel code';
-  cancel.onclick = async () => {
-    if (!confirm('Cancel this code? The member keeps their points and can make a new one.')) return;
-    try { await remove(ref(db, 'redemptions/' + found.uid)); say('Code cancelled.', 'ok'); }
-    catch (err) { say('Could not cancel. Check your database rules.', 'err'); }
-  };
-  row.appendChild(use); row.appendChild(cancel); out.appendChild(row);
-}
-$('code-check').onclick = checkCode;
-$('code-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkCode(); });
-
-function render() {
-  const list = $('list'); list.innerHTML = '';
-  const q = $('search').value.trim().toLowerCase();
-  const rows = Object.keys(members).map(uid => ({
-    uid,
-    name: (members[uid].profile && members[uid].profile.name) || '',
-    email: (members[uid].profile && members[uid].profile.email) || '',
-    points: Number(members[uid].points) || 0
-  })).filter(r => !q || r.name.toLowerCase().includes(q) || r.email.toLowerCase().includes(q))
-     .sort((a, b) => (a.name || a.email).localeCompare(b.name || b.email));
-
-  if (!rows.length) {
-    const p = document.createElement('p'); p.className = 'email';
-    p.textContent = Object.keys(members).length ? 'No members match your search.' : 'No members yet.';
-    list.appendChild(p); return;
-  }
-
-  rows.forEach(r => {
-    const card = document.createElement('div'); card.className = 'card';
-
-    const top = document.createElement('div'); top.className = 'member-top';
-    const info = document.createElement('div');
-    const n = document.createElement('div'); n.className = 'name'; n.textContent = r.name || '(no name)';
-    const e = document.createElement('div'); e.className = 'email'; e.textContent = r.email;
-    info.appendChild(n); info.appendChild(e);
-    const red = redemptions[r.uid];
-    if (red && red.status === 'active') {
-      const tag = document.createElement('div');
-      tag.style.cssText = 'color:#059669;font-weight:800;font-size:.9rem;margin-top:4px';
-      tag.textContent = '🎁 Active code: ' + red.code;
-      info.appendChild(tag);
-    }
-    const pts = document.createElement('div'); pts.className = 'pts'; pts.textContent = '⭐ ' + r.points;
-    top.appendChild(info); top.appendChild(pts);
-    card.appendChild(top);
-
-    const row = document.createElement('div'); row.className = 'row';
-    const amt = document.createElement('input');
-    amt.type = 'number'; amt.min = '0'; amt.step = '1'; amt.placeholder = 'Points'; amt.className = 'amount';
-    row.appendChild(amt);
-
-    const mk = (label, cls, fn) => {
-      const b = document.createElement('button'); b.type = 'button'; b.className = cls; b.textContent = label;
-      b.onclick = async () => {
-        const v = parseInt(amt.value, 10);
-        if (!Number.isFinite(v) || v < 0) { say('Enter a whole number of points (0 or more).', 'err'); return; }
-        b.disabled = true;
-        try { await fn(r, v); amt.value = ''; }
-        catch (err) { say('Could not save. Check your database rules.', 'err'); }
-        b.disabled = false;
-      };
-      row.appendChild(b);
+    const firebaseConfig = {
+        apiKey: "AIzaSyBuWWnqDX5mUra5pF3uuBxEVSKjcESifTk",
+        authDomain: "gawynt-hub.firebaseapp.com",
+        databaseURL: "https://gawynt-hub-default-rtdb.firebaseio.com",
+        projectId: "gawynt-hub",
+        storageBucket: "gawynt-hub.firebasestorage.app",
+        messagingSenderId: "330651852035",
+        appId: "1:330651852035:web:db931f867da21b6a519d36",
+        measurementId: "G-XLXGTVSPXT"
     };
 
-    mk('+ Add', 'add', async (m, v) => {
-      await runTransaction(ref(db, 'members/' + m.uid + '/points'), cur => (Number(cur) || 0) + v);
-      say('Added ' + v + ' points to ' + (m.name || m.email) + '.', 'ok');
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    const el = {
+        login: document.getElementById('login'),
+        app: document.getElementById('app'),
+        email: document.getElementById('login-email'),
+        password: document.getElementById('login-password'),
+        btnLogin: document.getElementById('btn-login'),
+        btnLogout: document.getElementById('btn-logout'),
+        loginError: document.getElementById('login-error'),
+        list: document.getElementById('chat-list'),
+        title: document.getElementById('convo-title'),
+        messages: document.getElementById('messages'),
+        form: document.getElementById('reply-form'),
+        input: document.getElementById('reply-input')
+    };
+
+    let chats = {};
+    let selectedId = null;
+    let listening = false;
+
+    function showLoginError(msg) {
+        el.loginError.textContent = msg;
+        el.loginError.classList.remove('hidden');
+    }
+
+    el.btnLogin.addEventListener('click', function() {
+        el.loginError.classList.add('hidden');
+        signInWithEmailAndPassword(auth, el.email.value.trim(), el.password.value)
+            .catch(function() { showLoginError('Wrong email or password.'); });
     });
-    mk('− Remove', 'remove', async (m, v) => {
-      await runTransaction(ref(db, 'members/' + m.uid + '/points'), cur => Math.max(0, (Number(cur) || 0) - v));
-      say('Removed ' + v + ' points from ' + (m.name || m.email) + '.', 'ok');
-    });
-    mk('Set exactly', 'set', async (m, v) => {
-      await set(ref(db, 'members/' + m.uid + '/points'), v);
-      say('Set ' + (m.name || m.email) + ' to ' + v + ' points.', 'ok');
+    el.password.addEventListener('keydown', function(e) { if (e.key === 'Enter') el.btnLogin.click(); });
+    el.btnLogout.addEventListener('click', function() { signOut(auth); });
+
+    onAuthStateChanged(auth, function(user) {
+        if (user && user.email) {
+            el.login.classList.add('hidden');
+            el.app.classList.remove('hidden');
+            el.btnLogout.classList.remove('hidden');
+            startListening();
+        } else {
+            el.login.classList.remove('hidden');
+            el.app.classList.add('hidden');
+            el.btnLogout.classList.add('hidden');
+        }
     });
 
-    card.appendChild(row);
-    list.appendChild(card);
-  });
-}
+    function startListening() {
+        if (listening) return;
+        listening = true;
+        onValue(ref(db, 'chats'), function(snap) {
+            chats = snap.val() || {};
+            renderList();
+            renderConvo();
+        }, function() {
+            el.list.innerHTML = '';
+            const d = document.createElement('div');
+            d.className = 'empty';
+            d.textContent = 'Permission denied. Check your Firebase database rules and that you are logged in with the admin account.';
+            el.list.appendChild(d);
+        });
+    }
+
+    function renderList() {
+        el.list.innerHTML = '';
+        const ids = Object.keys(chats).sort(function(a, b) {
+            return ((chats[b].meta && chats[b].meta.updatedAt) || 0) - ((chats[a].meta && chats[a].meta.updatedAt) || 0);
+        });
+        if (ids.length === 0) {
+            const d = document.createElement('div');
+            d.className = 'empty';
+            d.textContent = 'No chats yet.';
+            el.list.appendChild(d);
+            return;
+        }
+        ids.forEach(function(id) {
+            const meta = chats[id].meta || {};
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'chat-item' + (id === selectedId ? ' active' : '');
+            const name = document.createElement('div');
+            name.className = 'name';
+            const n = document.createElement('span');
+            n.textContent = meta.name || 'Visitor';
+            name.appendChild(n);
+            if (meta.unread) {
+                const dot = document.createElement('span');
+                dot.className = 'dot';
+                name.appendChild(dot);
+            }
+            const last = document.createElement('div');
+            last.className = 'last';
+            last.textContent = meta.lastText || '';
+            b.appendChild(name);
+            b.appendChild(last);
+            b.addEventListener('click', function() { selectChat(id); });
+            el.list.appendChild(b);
+        });
+    }
+
+    function selectChat(id) {
+        selectedId = id;
+        const meta = (chats[id] && chats[id].meta) || {};
+        if (meta.unread) update(ref(db, 'chats/' + id + '/meta'), { unread: false }).catch(function() {});
+        renderList();
+        renderConvo();
+        el.input.focus();
+    }
+
+    function renderConvo() {
+        if (!selectedId || !chats[selectedId]) {
+            el.title.textContent = 'Select a chat';
+            el.messages.innerHTML = '';
+            el.form.classList.add('hidden');
+            return;
+        }
+        const chat = chats[selectedId];
+        el.title.textContent = 'Chat with ' + ((chat.meta && chat.meta.name) || 'Visitor');
+        el.form.classList.remove('hidden');
+        const list = Object.values(chat.messages || {}).sort(function(a, b) { return (a.ts || 0) - (b.ts || 0); });
+        el.messages.innerHTML = '';
+        list.forEach(function(m) {
+            const d = document.createElement('div');
+            d.className = 'msg ' + (m.from === 'admin' ? 'admin' : 'customer');
+            d.textContent = m.text;
+            const t = document.createElement('span');
+            t.className = 'time';
+            t.textContent = m.ts ? new Date(m.ts).toLocaleString() : '';
+            d.appendChild(t);
+            el.messages.appendChild(d);
+        });
+        el.messages.scrollTop = el.messages.scrollHeight;
+    }
+
+    el.form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const text = el.input.value.trim();
+        if (!text || !selectedId) return;
+        el.input.value = '';
+        push(ref(db, 'chats/' + selectedId + '/messages'), { from: 'admin', text: text, ts: Date.now() })
+            .then(function() {
+                return update(ref(db, 'chats/' + selectedId + '/meta'), { updatedAt: Date.now(), lastText: 'You: ' + text, unread: false });
+            })
+            .catch(function() { alert('Could not send. Check your connection and database rules.'); });
+    });
+
+    // --- Goal progress controls ---
+    const goalEl = {
+        btn: document.getElementById('btn-goal'),
+        panel: document.getElementById('goal-panel'),
+        current: document.getElementById('goal-current'),
+        target: document.getElementById('goal-target'),
+        save: document.getElementById('goal-save'),
+        status: document.getElementById('goal-status')
+    };
+    let goalLoaded = false;
+
+    onAuthStateChanged(auth, function(user) {
+        if (user && user.email) {
+            goalEl.btn.classList.remove('hidden');
+            if (!goalLoaded) {
+                goalLoaded = true;
+                onValue(ref(db, 'settings/goal'), function(snap) {
+                    const g = snap.val();
+                    if (g && document.activeElement !== goalEl.current && document.activeElement !== goalEl.target) {
+                        goalEl.current.value = g.current;
+                        goalEl.target.value = g.target;
+                    }
+                });
+            }
+        } else {
+            goalEl.btn.classList.add('hidden');
+            goalEl.panel.classList.add('hidden');
+        }
+    });
+
+    goalEl.btn.addEventListener('click', function() {
+        goalEl.panel.classList.toggle('hidden');
+        goalEl.status.textContent = '';
+    });
+
+    goalEl.save.addEventListener('click', function() {
+        const cur = Number(goalEl.current.value);
+        const tgt = Number(goalEl.target.value);
+        if (goalEl.current.value === '' || !isFinite(cur) || cur < 0 || !isFinite(tgt) || tgt <= 0) {
+            goalEl.status.style.color = '#b91c1c';
+            goalEl.status.textContent = 'Enter a saved amount (0 or more) and a goal above 0.';
+            return;
+        }
+        set(ref(db, 'settings/goal'), { current: cur, target: tgt, updatedAt: Date.now() })
+            .then(function() {
+                goalEl.status.style.color = '#047857';
+                goalEl.status.textContent = 'Saved! Your website is updated.';
+            })
+            .catch(function() {
+                goalEl.status.style.color = '#b91c1c';
+                goalEl.status.textContent = "Couldn't save. Check your database rules.";
+            });
+    });
 </script>
+
 </body>
 </html>
