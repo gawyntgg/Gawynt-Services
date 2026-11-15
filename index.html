@@ -360,9 +360,6 @@
         #cal-toast-container { position: fixed; bottom: 2rem; right: 2rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; }
         .cal-toast { background: #111827; color: white; padding: 1rem 1.5rem; border-radius: 0.75rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); animation: slideUp 0.3s forwards; opacity: 0; transition: opacity 0.3s ease; font-family: 'Inter', sans-serif;}
 
-        /* --- LOYALTY POINTS --- */
-        .pts-chip { display:inline-block; align-self:center; background:rgba(217,119,6,.12); color:#b45309; border:1px solid rgba(217,119,6,.35); font-weight:800; font-size:.85rem; padding:5px 12px; border-radius:20px; margin:0 auto 12px; }
-
         /* --- ADDED: LIVE SNOW FORECAST BANNER --- */
         #snow-banner {
             position: relative; z-index: 5; padding: 14px 20px; text-align: center; color: #ffffff;
@@ -543,23 +540,6 @@
         <p><strong id="goalText">Current Goal Progress: $200 / $1,000</strong></p>
     </section>
 
-    <section id="member-card" class="about-section" data-aos="fade-up">
-        <h2>⭐ My Rewards</h2>
-        <div id="member-points" style="font-size:4rem;font-weight:800;color:var(--winter-blue);line-height:1.1;">—</div>
-        <div style="font-weight:700;color:var(--text-muted);margin-bottom:5px;">points</div>
-        <div class="goal-bar"><div class="progress-fill" id="member-fill" style="width:0%;min-width:0;"></div></div>
-        <p id="member-msg" style="margin:0 0 8px;">Log in or sign up to see your reward points.</p>
-        <p id="member-how" style="margin:0 0 15px;font-size:.95rem;"></p>
-        <button type="button" id="member-redeem-btn" class="submit-btn" style="display:none;max-width:320px;font-size:1.1rem;padding:14px;margin:0 auto 10px;background:linear-gradient(45deg,#059669,#10b981);">🎁 Redeem $5 Reward</button>
-        <div id="member-code-box" style="display:none;background:#ffffff;border:2px dashed #059669;border-radius:16px;padding:16px;max-width:420px;margin:0 auto 15px;">
-            <div style="font-weight:700;">Your reward code</div>
-            <div id="member-code" style="font-size:2rem;font-weight:800;letter-spacing:2px;color:#059669;margin:6px 0;user-select:all;">-</div>
-            <button type="button" id="member-code-copy" style="background:#e0f2fe;border:1px solid #0284c7;color:#0284c7;border-radius:10px;padding:8px 18px;font-weight:700;cursor:pointer;font-family:inherit;">Copy code</button>
-            <p style="font-size:.9rem;margin:10px 0 0;">Paste it in the "Reward code" box in the booking form at the bottom. Gawynt will verify it.</p>
-        </div>
-        <button type="button" id="member-login-btn" class="submit-btn" style="max-width:280px;font-size:1.1rem;padding:14px;">Log In / Sign Up</button>
-    </section>
-
     <div class="alert-box" data-aos="shake">⚠️ NO SALT SERVICE — Shoveling only! ⚠️</div>
 
     <h2 id="services" class="section-title" data-aos="fade-right">Individual Services</h2>
@@ -733,7 +713,6 @@
             <div class="estimated-price-box">
                 <h4>Your Estimated Price</h4>
                 <div class="price-display" id="visualPriceDisplay">$0</div>
-                <div id="earn-line" style="margin-top:10px;color:#ffffff;font-weight:700;font-size:1.05rem;"></div>
             </div>
 
             <input type="text" name="Service" id="planInput" readonly required placeholder="Click services above to build your custom package">
@@ -754,10 +733,6 @@
             <input type="text" name="Neighbor_Address" placeholder="Neighbor's Address (If gifting a service)" style="display:none;">
             <input type="email" name="Email" required placeholder="Email Address">
             <input type="tel" name="Phone" required placeholder="Phone Number">
-            <input type="email" name="Reward_Email" id="rewardEmail" placeholder="Rewards account email (optional) - to earn points">
-            <p id="reward-hint" style="margin:-10px 0 20px;font-size:.9rem;"></p>
-            <input type="text" name="Reward_Code" id="rewardCode" placeholder="Reward code (optional) e.g. GWY-AB12CD" autocomplete="off" style="text-transform:uppercase;">
-            <p id="reward-code-status" style="margin:-10px 0 20px;font-size:.9rem;font-weight:700;"></p>
             
             <textarea name="Comments" rows="4" placeholder="Any special instructions or comments?"></textarea>
             
@@ -893,76 +868,10 @@
     let total = 0;
     let selectedServices = [];
 
-    // --- LOYALTY POINTS (edit the numbers here) ---
-    const LOYALTY = window.LOYALTY = {
-        rewardAt: 100,   // points needed for a reward
-        rewardValue: 5,  // dollars off
-        fallback: 25,
-        points: {
-            'Walkway Only': 25, 'Sidewalk Only': 25,
-            'Driveway Only': 30, 'Corner Lot Sidewalks': 30, 'Sidewalk & Walkway': 30,
-            'Driveway & Walkway': 35, 'Walkway & Corner Sidewalk': 35,
-            'Driveway & Corner Sidewalk': 40, 'Full Regular Package': 40,
-            'Full Corner Package': 45,
-            'Gift: Neighbour One-Time': 0
-        }
-    };
-    function pointsFor(name) { return Object.prototype.hasOwnProperty.call(LOYALTY.points, name) ? LOYALTY.points[name] : LOYALTY.fallback; }
-    function totalPoints() { return selectedServices.reduce(function(a, n) { return a + pointsFor(n); }, 0); }
-    function codeEntered() {
-        const el = document.getElementById('rewardCode');
-        return el ? el.value.trim().toUpperCase() : '';
-    }
-    function codeApplied() {
-        const c = codeEntered();
-        return !!(c && total > 0 && window.activeCode && String(window.activeCode).toUpperCase() === c);
-    }
-    function finalPrice() { return codeApplied() ? Math.max(0, total - LOYALTY.rewardValue) : total; }
-    function setStatus(text, color) {
-        const st = document.getElementById('reward-code-status');
-        if (!st) return;
-        st.textContent = text;
-        st.style.setProperty('color', color, 'important');
-    }
+    // Shows the current total in the price box
     function updatePriceDisplay() {
-        document.getElementById('visualPriceDisplay').innerText = '$' + finalPrice();
-        const line = document.getElementById('earn-line');
-        if (line) {
-            if (total > 0) {
-                line.textContent = '⭐ You\'ll earn ' + totalPoints() + ' points' + (codeApplied() ? ' • 🎁 $' + LOYALTY.rewardValue + ' off applied' : '');
-            } else {
-                line.textContent = 'Pick a service to see the points you\'ll earn';
-            }
-        }
-        const c = codeEntered();
-        if (!c) setStatus('', '#475569');
-        else if (codeApplied()) setStatus('✅ Code accepted: $' + LOYALTY.rewardValue + ' off applied', '#059669');
-        else if (window.memberLoggedIn && window.activeCode && String(window.activeCode).toUpperCase() === c) setStatus('Pick a service first to apply your code.', '#475569');
-        else if (window.memberLoggedIn) setStatus('❌ This code does not match an active code on your account.', '#dc2626');
-        else setStatus('Gawynt will verify your code when confirming your booking.', '#475569');
+        document.getElementById('visualPriceDisplay').innerText = '$' + total;
     }
-    window.refreshRewardBox = function() { updatePriceDisplay(); };
-    document.getElementById('rewardCode').addEventListener('input', updatePriceDisplay);
-
-    // Show the points you earn on every service card
-    document.querySelectorAll('.card[onclick^="sel("]').forEach(function(card) {
-        const m = /sel\('([^']+)'/.exec(card.getAttribute('onclick'));
-        const price = card.querySelector('.price');
-        if (!m || !price) return;
-        const chip = document.createElement('span');
-        chip.className = 'pts-chip';
-        chip.textContent = '⭐ Earn ' + pointsFor(m[1]) + ' points';
-        card.insertBefore(chip, price);
-    });
-
-    // Explain the program
-    (function() {
-        const how = document.getElementById('member-how');
-        if (how) how.textContent = 'How it works: earn points every time you book (see the ⭐ on each service). Collect ' + LOYALTY.rewardAt + ' points, about every 3-4 shovelings, and get $' + LOYALTY.rewardValue + ' off!';
-        const hint = document.getElementById('reward-hint');
-        if (hint) hint.textContent = 'Optional: enter the email of your rewards account (Log In / Sign Up at the top) so we can add your points.';
-        updatePriceDisplay();
-    })();
 
     function sel(serviceName, price) {
         selectedServices.push(serviceName);
@@ -1157,14 +1066,6 @@
         const formData = new FormData(form);
         // ADDED: make the Formspree email clearly show the payment method the customer chose
         const chosenPayment = document.getElementById('paymentMethod').value || 'Not selected';
-        const rewardUsed = codeApplied();
-        if (codeEntered() && chosenPayment === 'Pay Online (Stripe)') {
-            alert('Reward codes cannot be used with online checkout. Please choose E-transfer or Tap to Pay, or clear the code.');
-            return;
-        }
-        formData.append('Points_To_Add', totalPoints());
-        formData.append('Reward_Used', rewardUsed ? 'YES - code accepted on site, verify it in the admin page' : (codeEntered() ? 'Code entered - verify it in the admin page' : 'No'));
-        formData.append('Price_To_Pay', '$' + finalPrice());
         formData.append('_subject', 'New Snow Shoveling Booking - Payment: ' + chosenPayment);
         formData.append('Payment_Note', chosenPayment === 'Pay Online (Stripe)'
             ? 'Customer chose to pay ONLINE with STRIPE (sent to Stripe after booking)'
@@ -2203,173 +2104,6 @@
         }
     });
 })();
-</script>
-<style>
-.auth-tabs{display:flex;gap:8px;margin-bottom:20px}
-.auth-tab{flex:1;padding:12px;border:2px solid var(--winter-blue);background:#fff;color:var(--winter-blue);border-radius:12px;font-weight:700;cursor:pointer;font-family:'Fredoka',sans-serif}
-.auth-tab.active{background:var(--winter-blue);color:#fff}
-#authModal input{margin-bottom:12px;padding:14px}
-#auth-msg{min-height:20px;font-size:.9rem;margin:0 0 12px;color:#b91c1c !important}
-.auth-link{background:none;border:none;color:var(--winter-blue);cursor:pointer;margin-top:12px;font-family:inherit;font-size:.95rem}
-</style>
-<div id="authModal" class="custom-modal-backdrop">
-  <div class="custom-modal-window">
-    <h3 id="auth-title">Welcome Back ❄️</h3>
-    <div class="auth-tabs">
-      <button type="button" class="auth-tab active" id="tab-login">Log In</button>
-      <button type="button" class="auth-tab" id="tab-signup">Sign Up</button>
-    </div>
-    <form id="auth-form">
-      <input type="text" id="auth-name" placeholder="Your Name" style="display:none">
-      <input type="email" id="auth-email" placeholder="Email" required>
-      <input type="password" id="auth-pass" placeholder="Password (6+ characters)" required minlength="6">
-      <p id="auth-msg"></p>
-      <button type="submit" class="submit-btn" id="auth-submit" style="font-size:1.1rem;padding:16px">Log In</button>
-    </form>
-    <button type="button" class="auth-link" id="auth-forgot">Forgot password?</button><br>
-    <button type="button" class="auth-link" id="auth-close">Close</button>
-  </div>
-</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
-
-const mApp = initializeApp({
-  apiKey: "AIzaSyBuWWnqDX5mUra5pF3uuBxEVSKjcESifTk",
-  authDomain: "gawynt-hub.firebaseapp.com",
-  databaseURL: "https://gawynt-hub-default-rtdb.firebaseio.com",
-  projectId: "gawynt-hub",
-  appId: "1:330651852035:web:db931f867da21b6a519d36"
-}, 'members');
-const auth = getAuth(mApp), db = getDatabase(mApp);
-const $ = id => document.getElementById(id);
-const REWARD_AT = (window.LOYALTY && window.LOYALTY.rewardAt) || 100;
-let mode = 'login', stopPts = null, stopCode = null, lastP = null;
-
-const navLinks = document.querySelector('.nav-links');
-const cta = navLinks.querySelector('.nav-cta');
-const nav = document.createElement('a'); nav.id = 'nav-account'; nav.textContent = 'Log In / Sign Up';
-const badge = document.createElement('a'); badge.style.cssText = 'display:none;font-weight:700;color:#d97706 !important;cursor:default';
-navLinks.insertBefore(nav, cta); navLinks.insertBefore(badge, cta);
-
-function setMode(m) {
-  mode = m; const s = m === 'signup';
-  $('tab-login').classList.toggle('active', !s); $('tab-signup').classList.toggle('active', s);
-  $('auth-name').style.display = s ? 'block' : 'none'; $('auth-name').required = s;
-  $('auth-submit').textContent = s ? 'Create Account' : 'Log In';
-  $('auth-title').textContent = s ? 'Join Gawynt’s Neighbours ❄️' : 'Welcome Back ❄️';
-  $('auth-msg').textContent = '';
-}
-const openModal = () => { setMode('login'); $('authModal').classList.add('open'); };
-const closeModal = () => $('authModal').classList.remove('open');
-const friendly = c => ({
-  'auth/email-already-in-use': 'That email already has an account. Try logging in.',
-  'auth/invalid-credential': 'Wrong email or password.',
-  'auth/invalid-email': 'Please enter a valid email.',
-  'auth/weak-password': 'Password must be at least 6 characters.',
-  'auth/too-many-requests': 'Too many tries. Please wait and retry.'
-})[c] || 'Something went wrong. Please try again.';
-
-$('tab-login').onclick = () => setMode('login');
-$('tab-signup').onclick = () => setMode('signup');
-$('auth-close').onclick = closeModal;
-$('authModal').addEventListener('click', e => { if (e.target.id === 'authModal') closeModal(); });
-
-$('auth-form').addEventListener('submit', async e => {
-  e.preventDefault();
-  const btn = $('auth-submit'); btn.disabled = true; $('auth-msg').style.color = '#b91c1c'; $('auth-msg').textContent = '';
-  try {
-    const email = $('auth-email').value.trim(), pass = $('auth-pass').value;
-    if (mode === 'signup') {
-      const c = await createUserWithEmailAndPassword(auth, email, pass);
-      await updateProfile(c.user, { displayName: $('auth-name').value.trim() });
-    } else await signInWithEmailAndPassword(auth, email, pass);
-    $('auth-form').reset(); closeModal();
-  } catch (err) { $('auth-msg').textContent = friendly(err.code); }
-  btn.disabled = false;
-});
-
-$('auth-forgot').onclick = async () => {
-  const email = $('auth-email').value.trim();
-  if (!email) { $('auth-msg').textContent = 'Type your email above first.'; return; }
-  try { await sendPasswordResetEmail(auth, email); $('auth-msg').style.color = '#059669'; $('auth-msg').textContent = 'Reset email sent!'; }
-  catch (err) { $('auth-msg').style.color = '#b91c1c'; $('auth-msg').textContent = friendly(err.code); }
-};
-
-function renderCard(p) {
-  const ptsEl = $('member-points'), fill = $('member-fill'), msg = $('member-msg'), btn = $('member-login-btn');
-  const redeem = $('member-redeem-btn'), box = $('member-code-box'), codeEl = $('member-code');
-  if (!ptsEl) return;
-  if (p === null) {
-    ptsEl.textContent = '—'; fill.style.width = '0%'; fill.textContent = '';
-    msg.textContent = 'Log in or sign up to see your reward points.'; btn.style.display = 'inline-block';
-    redeem.style.display = 'none'; box.style.display = 'none';
-    return;
-  }
-  ptsEl.textContent = p; btn.style.display = 'none';
-  fill.style.width = Math.min(100, Math.max(0, p / REWARD_AT * 100)) + '%';
-  fill.style.minWidth = p > 0 ? '60px' : '0';
-  fill.textContent = p > 0 ? p + ' / ' + REWARD_AT : '';
-  if (window.activeCode) {
-    box.style.display = 'block'; codeEl.textContent = window.activeCode; redeem.style.display = 'none';
-    msg.textContent = '🎁 Reward code ready! Paste it in the booking form below.';
-  } else {
-    box.style.display = 'none';
-    if (p >= REWARD_AT) { redeem.style.display = 'inline-block'; msg.textContent = '🎁 You have enough points for $5 off!'; }
-    else { redeem.style.display = 'none'; msg.textContent = (REWARD_AT - p) + ' points to your next reward'; }
-  }
-}
-const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-function genCode() {
-  const a = new Uint8Array(6); crypto.getRandomValues(a);
-  return 'GWY-' + Array.from(a).map(b => CODE_CHARS[b % CODE_CHARS.length]).join('');
-}
-$('member-login-btn').onclick = () => openModal();
-$('member-redeem-btn').onclick = async () => {
-  const user = auth.currentUser; if (!user) return;
-  const b = $('member-redeem-btn'); b.disabled = true;
-  try {
-    await set(ref(db, 'redemptions/' + user.uid), { code: genCode(), status: 'active', name: user.displayName || '', email: user.email, createdAt: Date.now() });
-  } catch (err) { alert('Could not create your code. Please try again.'); }
-  b.disabled = false;
-};
-$('member-code-copy').onclick = async () => {
-  const code = $('member-code').textContent;
-  try { await navigator.clipboard.writeText(code); $('member-code-copy').textContent = 'Copied!'; }
-  catch (err) { window.prompt('Copy your code:', code); }
-  setTimeout(() => { $('member-code-copy').textContent = 'Copy code'; }, 1500);
-};
-
-onAuthStateChanged(auth, user => {
-  if (stopPts) { stopPts(); stopPts = null; }
-  if (stopCode) { stopCode(); stopCode = null; }
-  const member = user && !user.isAnonymous;
-  if (!member) { nav.textContent = 'Log In / Sign Up'; nav.onclick = openModal; badge.style.display = 'none'; window.activeCode = null; window.memberLoggedIn = false; lastP = null; renderCard(null); window.memberPoints = 0; if (window.refreshRewardBox) window.refreshRewardBox(); return; }
-  nav.textContent = 'Hi, ' + (user.displayName || user.email.split('@')[0]) + ' · Log Out';
-  nav.onclick = () => signOut(auth);
-  const n = document.querySelector('#orderForm [name="Name"]'), m = document.querySelector('#orderForm [name="Email"]');
-  if (n && !n.value) n.value = user.displayName || '';
-  if (m && !m.value) m.value = user.email;
-  const re = document.getElementById('rewardEmail'); if (re && !re.value) re.value = user.email;
-  set(ref(db, 'members/' + user.uid + '/profile'), { name: user.displayName || '', email: user.email }).catch(() => {});
-  window.memberLoggedIn = true;
-  stopCode = onValue(ref(db, 'redemptions/' + user.uid), s => {
-    const v = s.val();
-    window.activeCode = (v && v.status === 'active' && v.code) ? v.code : null;
-    if (lastP !== null) renderCard(lastP);
-    if (window.refreshRewardBox) window.refreshRewardBox();
-  }, () => {});
-  stopPts = onValue(ref(db, 'members/' + user.uid + '/points'), s => {
-    const p = s.val() || 0;
-    badge.textContent = '⭐ ' + p + ' pts' + (p >= REWARD_AT ? ' 🎁' : '');
-    badge.title = p >= REWARD_AT ? 'Reward ready! Redeem it in the My Rewards card.' : (REWARD_AT - p) + ' points to your next reward';
-    badge.style.display = 'inline';
-    lastP = p; renderCard(p);
-    window.memberPoints = p; if (window.refreshRewardBox) window.refreshRewardBox();
-  }, () => {});
-});
 </script>
 
 <!-- FIX: measures the real menu height so the banner is never covered -->
