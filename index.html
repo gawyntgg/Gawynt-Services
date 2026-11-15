@@ -11,8 +11,6 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 tailwind.config={corePlugins:{preflight:false},theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{brand:{50:'#f9fafb',100:'#f3f4f6',900:'#111827'}},animation:{'fade-in':'fadeIn 0.3s ease-out','slide-up':'slideUp 0.4s ease-out'},keyframes:{fadeIn:{'0%':{opacity:'0'},'100%':{opacity:'1'}},slideUp:{'0%':{opacity:'0',transform:'translateY(20px)'},'100%':{opacity:'1',transform:'translateY(0)'}}}}}}
 </script>
@@ -38,13 +36,11 @@ body{font-family:'Fredoka',sans-serif;margin:0;background:var(--bg-gradient);col
 h1,h2,h3,h4,h5,h6{color:var(--snow-white)!important;font-weight:700;text-shadow:0 2px 5px rgba(0,0,0,0.05)}
 p,strong,b,label,.section-title{color:var(--text-main)!important}
 .container{max-width:1050px;margin:auto;padding:20px;position:relative;z-index:10;box-sizing:border-box}
-.about-section,.area-section,.form-container,.review-section{background:var(--glass-bg);padding:40px;border-radius:24px;margin-bottom:40px;box-shadow:var(--glass-shadow);border:1px solid var(--glass-border);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:transform 0.3s ease}
+.about-section,.form-container,.review-section{background:var(--glass-bg);padding:40px;border-radius:24px;margin-bottom:40px;box-shadow:var(--glass-shadow);border:1px solid var(--glass-border);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:transform 0.3s ease}
 .about-section:hover,.form-container:hover{transform:translateY(-5px)}
 @keyframes highlightFormPulse{0%{transform:scale(1);border-color:var(--glass-border)}50%{transform:scale(1.02);border-color:var(--winter-blue);box-shadow:0 0 60px rgba(2,132,199,0.2)}100%{transform:scale(1);border-color:var(--glass-border)}}
 .highlight-pulse{animation:highlightFormPulse 1s ease-out}
 .about-section{border-top:5px solid var(--winter-blue);text-align:center;line-height:1.8;font-size:1.1rem}
-.goal-bar{background:rgba(0,0,0,0.05);border-radius:30px;height:50px;width:100%;max-width:650px;margin:25px auto;overflow:hidden;border:2px solid rgba(0,0,0,0.1);box-shadow:inset 0 0 10px rgba(0,0,0,0.05);display:block!important}
-.progress-fill{height:100%;width:7.5%;display:flex;align-items:center;justify-content:center;color:#fff!important;font-weight:700;font-size:1.2rem;background:linear-gradient(90deg,var(--danger),var(--orange));min-width:60px;box-shadow:0 0 15px rgba(234,88,12,0.6)}
 .alert-box{background:rgba(239,68,68,0.15);border:2px solid var(--danger);color:#b91c1c!important;padding:20px;border-radius:15px;text-align:center;font-weight:bold;margin-bottom:40px;backdrop-filter:blur(5px);box-shadow:0 0 20px rgba(239,68,68,0.1)}
 .section-title{text-align:center;font-size:2.5rem;margin-top:60px;margin-bottom:30px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:30px;margin-bottom:40px}
@@ -72,9 +68,8 @@ p,strong,b,label,.section-title{color:var(--text-main)!important}
 header{padding:160px 15px 80px!important}
 header h1{font-size:2.2rem!important;word-wrap:break-word}
 header p{font-size:1rem!important}
-.about-section,.area-section,.form-container,.review-section{padding:25px 15px}
-.section-title{font-size:2rem}
-.picker-wrapper{flex-direction:column;gap:15px}}
+.about-section,.form-container,.review-section{padding:25px 15px}
+.section-title{font-size:2rem}}
 header{position:relative;background:radial-gradient(circle at center,rgba(14,165,233,0.1) 0%,#f0f9ff 100%),url('https://images.unsplash.com/photo-1477601263568-180e2c6d046e?auto=format&fit=crop&w=1500&q=80') center/cover;padding:140px 20px 100px;text-align:center}
 header::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(to bottom,rgba(255,255,255,0.7),#f0f9ff);z-index:1}
 header>*{position:relative;z-index:2}
@@ -158,19 +153,30 @@ footer{background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);border-top:1
 #chat-send{background:var(--winter-blue);color:#fff;border:none;border-radius:12px;padding:0 16px;font-weight:700;cursor:pointer;font-family:'Fredoka',sans-serif}
 #chat-send:hover{background:#0369a1}
 @media(max-width:768px){#chat-launcher{bottom:20px;right:15px;width:58px;height:58px}#chat-panel{right:15px;bottom:90px}#toast-container,#cal-toast-container{right:15px;bottom:90px}}
-/* ADDED: service area map + address check */
-#area-map{height:380px;border-radius:18px;margin:20px 0;z-index:1}
-.area-row{display:flex;gap:10px;flex-wrap:wrap}
-.area-row input{flex:1;min-width:220px;margin:0}
-.area-row button{padding:0 24px;border:none;border-radius:15px;background:var(--winter-blue);color:#fff;font-weight:700;font-size:1rem;cursor:pointer;font-family:'Fredoka',sans-serif;min-height:56px}
-.area-row button:hover{background:#0369a1}
-#area-result{margin-top:15px;font-weight:700;text-align:center}
-.area-ok{color:#059669!important}
-.area-no{color:#ef4444!important}
-/* ADDED: tip section */
 .tip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:15px;max-width:640px;margin:25px auto 0}
 .tip-btn{display:block;text-decoration:none;text-align:center;padding:20px 10px;border-radius:18px;background:#fff;border:2px solid var(--winter-blue);color:var(--winter-blue)!important;font-size:1.8rem;font-weight:800;transition:all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);box-shadow:0 6px 18px rgba(2,132,199,0.12)}
 .tip-btn:hover{background:var(--winter-blue);color:#fff!important;transform:translateY(-6px) scale(1.05);box-shadow:0 12px 25px rgba(2,132,199,0.3)}
+/* NEW: big pick buttons on the home page */
+.pick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin:0 0 40px}
+.pick-btn{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;padding:26px 24px;border:none;border-radius:22px;background:linear-gradient(45deg,var(--winter-blue),#3b82f6);color:#fff;font-family:'Fredoka',sans-serif;font-size:1.6rem;font-weight:700;text-align:left;cursor:pointer;box-shadow:0 12px 25px rgba(2,132,199,0.3);transition:transform 0.2s ease,box-shadow 0.2s ease}
+.pick-btn:hover{transform:translateY(-4px);box-shadow:0 16px 30px rgba(2,132,199,0.4)}
+.pick-btn.alt{background:linear-gradient(45deg,#d97706,#ea580c);box-shadow:0 12px 25px rgba(234,88,12,0.3)}
+.pick-btn small{display:block;font-size:0.95rem;font-weight:400;color:rgba(255,255,255,0.92);margin-top:4px}
+.pick-btn .arrow{font-size:1.8rem}
+/* NEW: plan page */
+.back-btn{display:inline-block;margin:25px 0 0;padding:12px 22px;border-radius:50px;border:2px solid var(--winter-blue);background:#fff;color:var(--winter-blue);font-family:'Fredoka',sans-serif;font-weight:700;font-size:1rem;cursor:pointer}
+#plan-bar{position:fixed;left:0;bottom:0;width:100%;box-sizing:border-box;padding:12px 90px 12px 15px;background:#fff;border-top:1px solid #e2e8f0;box-shadow:0 -6px 20px rgba(0,0,0,0.08);z-index:8500;display:none;align-items:center;justify-content:space-between;gap:10px;font-family:'Fredoka',sans-serif}
+#plan-bar span{font-weight:700;color:var(--text-main);font-size:1rem}
+#plan-bar button{background:var(--success-green);color:#fff;border:none;border-radius:50px;padding:12px 20px;font-weight:800;font-size:1rem;cursor:pointer;font-family:'Fredoka',sans-serif;white-space:nowrap}
+/* hide menu + weather on plan/visitor pages */
+.hide-chrome .top-nav,.hide-chrome #snow-banner{display:none!important}
+.vis-card{background:rgba(255,255,255,0.85);border-radius:18px;padding:18px;border:1px solid rgba(0,0,0,0.06);box-shadow:0 4px 14px rgba(0,0,0,0.05)}
+.vis-card h3{margin:0 0 8px;font-size:1.1rem}
+.vis-line{font-size:0.95rem;display:flex;justify-content:space-between;gap:10px;padding:2px 0;word-break:break-word}
+.vis-sess{background:#fff;border-radius:16px;padding:14px 16px;margin-bottom:12px;border:1px solid #e2e8f0;font-size:0.9rem;line-height:1.5;word-break:break-word}
+.vis-sess b{color:var(--snow-white)}
+.vis-ev{margin:6px 0 0;padding:8px 10px;border-radius:10px;background:#f1f5f9;font-size:0.85rem}
+.vis-google{background:#fff;color:#1e293b;border:2px solid #cbd5e1;border-radius:15px;padding:16px;width:100%;font-size:1.05rem;font-weight:700;cursor:pointer;font-family:'Fredoka',sans-serif;margin-top:12px}
 </style>
 </head>
 <body>
@@ -214,8 +220,7 @@ footer{background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);border-top:1
     <div class="nav-logo">❄️ Gawynt's Shoveling</div>
     <div class="nav-links">
         <a href="#about">About</a>
-        <a href="#area-check">Area</a>
-        <a href="#services">Services</a>
+        <a href="#individual">Services</a>
         <a href="#bundles">Bundles</a>
         <a href="#reviews">Reviews</a>
         <a href="#tip">Tip</a>
@@ -227,10 +232,13 @@ footer{background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);border-top:1
     <div class="snow-banner-main">
         <span id="snow-banner-text">❄️ Checking Calgary's snow forecast...</span>
         <span id="snow-banner-temp" style="display:none;"></span>
-        <button type="button" id="snow-banner-btn" onclick="var s=document.getElementById('services'); if(s) s.scrollIntoView({behavior:'smooth'});">Book Now</button>
+        <button type="button" id="snow-banner-btn" onclick="navTo('services')">Book Now</button>
     </div>
     <div id="snow-banner-days"></div>
 </div>
+
+<!-- ===== HOME PAGE ===== -->
+<div id="page-home">
 
 <header>
     <div class="profile-photo-container" data-aos="zoom-in" data-aos-duration="1500">
@@ -246,99 +254,29 @@ footer{background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);border-top:1
 <div class="container">
 
     <section id="about" class="about-section" data-aos="fade-up" data-aos-delay="100">
-        <h2>About Me & My Goal ❄️</h2>
+        <h2>About Me ❄️</h2>
         <p>Hi, I’m Gawynt! I’m a 12-year-old Grade 8 student living right here in Calgary. I started this shoveling business because I love being active outdoors and I want to learn the value of hard work.</p>
-        <p><strong>My Big Mission:</strong> I am saving up <strong id="goalTargetInline">$1,000</strong> to pay for my own <strong>ski lessons, gear, and hill passes</strong> this winter!</p>
-        <div class="goal-bar">
-            <div class="progress-fill" id="goalFill" style="width: 20%;">$200</div>
-        </div>
-        <p><strong id="goalText">Current Goal Progress: $200 / $1,000</strong></p>
+        <p><strong>My Big Mission:</strong> I am saving up to pay for my own <strong>ski lessons, gear, and hill passes</strong> this winter!</p>
     </section>
 
-    <!-- ADDED: Service area map + address checker -->
-    <section id="area-check" class="area-section" data-aos="fade-up">
-        <h2 style="text-align:center">Service Area & Address Check 📍</h2>
-        <p style="text-align:center">Green = our service area. Type your address to check that we serve you.</p>
-        <div id="area-map"></div>
-        <div class="area-row">
-            <input type="text" id="areaAddress" placeholder="Type your address (e.g. 1234 14 St SW)">
-            <button type="button" id="areaBtn">Check Address</button>
-        </div>
-        <p id="area-result"></p>
-    </section>
+    <div class="alert-box">⚠️ NO SALT SERVICE — Shoveling only! ⚠️</div>
 
-    <div class="alert-box" data-aos="shake">⚠️ NO SALT SERVICE — Shoveling only! ⚠️</div>
-
-    <h2 id="services" class="section-title" data-aos="fade-right">Individual Services</h2>
-    <div class="grid">
-        <div class="card" onclick="sel('Walkway Only', 10)" data-aos="fade-up" data-aos-delay="100">
-            <h3>Walkway Only</h3>
-            <p>The main path from the sidewalk to your front door.</p>
-            <span class="price">$10</span>
-        </div>
-        <div class="card" onclick="sel('Sidewalk Only', 10)" data-aos="fade-up" data-aos-delay="200">
-            <h3>Sidewalk Only</h3>
-            <p>The city sidewalk in front of a standard single lot.</p>
-            <span class="price">$10</span>
-        </div>
-        <div class="card" onclick="sel('Corner Lot Sidewalks', 20)" data-aos="fade-up" data-aos-delay="300">
-            <div class="badge badge-corner">CORNER</div>
-            <h3>Corner Lot Sidewalks</h3>
-            <p>Clearing both city sidewalks on a corner property.</p>
-            <span class="price">$20</span>
-        </div>
-        <div class="card" onclick="sel('Driveway Only', 15)" data-aos="fade-up" data-aos-delay="400">
-            <h3>Driveway Only</h3>
-            <p>Shoveling a standard 2-car driveway.</p>
-            <span class="price">$15</span>
-        </div>
-    </div>
-
-    <h2 id="bundles" class="section-title" data-aos="fade-left">Bundle & Save 💰</h2>
-    <div class="grid">
-        <div class="card" onclick="sel('Sidewalk & Walkway', 15)" data-aos="fade-up" data-aos-delay="100">
-            <div class="badge">VALUE</div>
-            <h3>Sidewalk & Walkway</h3>
-            <p>Front path plus standard city sidewalk.</p>
-            <span class="price">$15</span>
-        </div>
-        <div class="card" onclick="sel('Walkway & Corner Sidewalk', 25)" data-aos="fade-up" data-aos-delay="200">
-            <div class="badge badge-corner">CORNER</div>
-            <h3>Walkway & Corner Sidewalk</h3>
-            <p>Front path plus both corner city sidewalks.</p>
-            <span class="price">$25</span>
-        </div>
-        <div class="card" onclick="sel('Driveway & Walkway', 20)" data-aos="fade-up" data-aos-delay="300">
-            <div class="badge">VALUE</div>
-            <h3>Driveway & Walkway</h3>
-            <p>Shoveling your driveway and the path to the door.</p>
-            <span class="price">$20</span>
-        </div>
-        <div class="card" onclick="sel('Driveway & Corner Sidewalk', 30)" data-aos="fade-up" data-aos-delay="400">
-            <div class="badge badge-corner">CORNER</div>
-            <h3>Driveway & Corner Sidewalk</h3>
-            <p>Driveway plus both corner city sidewalks.</p>
-            <span class="price">$30</span>
-        </div>
-        <div class="card" onclick="sel('Full Regular Package', 30)" data-aos="fade-up" data-aos-delay="500">
-            <div class="badge badge-total">TOTAL CLEAR</div>
-            <h3>Full Regular Package</h3>
-            <p>Everything: Walkway, Sidewalk, and Driveway.</p>
-            <span class="price">$30</span>
-        </div>
-        <div class="card" onclick="sel('Full Corner Package', 40)" data-aos="fade-up" data-aos-delay="600">
-            <div class="badge badge-corner">CORNER TOTAL</div>
-            <h3>Full Corner Package</h3>
-            <p>The total works: Driveway, Walkway, and both Sidewalks.</p>
-            <span class="price">$40</span>
-        </div>
+    <h2 id="services" class="section-title">Choose Your Plan</h2>
+    <div class="pick-grid">
+        <button type="button" class="pick-btn" onclick="navTo('individual')">
+            <span>Individual Services<small>Walkway, sidewalk, driveway</small></span>
+            <span class="arrow">➜</span>
+        </button>
+        <button type="button" class="pick-btn alt" onclick="navTo('bundles')">
+            <span>Bundle & Save 💰<small>Combine services for less</small></span>
+            <span class="arrow">➜</span>
+        </button>
     </div>
 
     <h2 id="reviews" class="section-title" data-aos="fade-right">Happy Neighbors</h2>
     <section class="review-section" data-aos="fade-up">
         <div class="elfsight-app-7c582918-d760-4c75-b176-4b0d7a09ccb6" data-elfsight-app-lazy></div>
     </section>
-
 
     <section id="calendar" class="py-12 relative font-sans rounded-3xl" style="background: rgba(255, 255, 255, 0.65); border: 1px solid var(--glass-border); backdrop-filter: blur(12px); box-shadow: var(--glass-shadow); margin-bottom: 40px;">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -347,8 +285,9 @@ footer{background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);border-top:1
                     <h2 id="calendar-title" class="text-3xl font-extrabold text-gray-900 mb-2 select-none cursor-pointer" style="font-family: 'Fredoka', sans-serif;">Select Schedule Date & Time</h2>
                     <p class="text-gray-600 font-medium">Live availability. Tap any date to view open times.</p>
                 </div>
-                <div id="admin-controls" class="hidden mt-4 md:mt-0 flex items-center bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-2 rounded-lg text-sm font-medium">
+                <div id="admin-controls" class="hidden mt-4 md:mt-0 flex items-center flex-wrap bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-2 rounded-lg text-sm font-medium">
                     <i class="fa-solid fa-user-shield mr-2"></i> Admin Mode Active
+                    <span id="visit-stats" class="ml-4 font-bold">👥 Visitors: …</span>
                     <button id="btn-open-dashboard" class="ml-4 text-blue-600 hover:text-blue-800 underline font-bold">Dashboard</button>
                     <button id="btn-logout" class="ml-4 text-gray-500 hover:text-gray-900 underline">Exit</button>
                 </div>
@@ -420,7 +359,6 @@ footer{background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);border-top:1
     <div class="form-container" id="booking-section" data-aos="fade-up">
         <form id="orderForm" action="https://formspree.io/f/xjgydwzk" method="POST">
             <input type="hidden" name="_next" value="https://gawyntgg.github.io/Gawynt-Services-Thankyou/">
-            <input type="hidden" name="Area_Zone" id="areaZone">
             <input type="hidden" name="Total_Price" id="totalPrice">
 
             <h2 id="form-head" style="text-align:center; color: var(--winter-blue) !important; font-size: 2.2rem; margin-bottom: 30px;">Finalize Booking details</h2>
@@ -430,7 +368,7 @@ footer{background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);border-top:1
                 <div class="price-display" id="visualPriceDisplay">$0</div>
             </div>
 
-            <input type="text" name="Service" id="planInput" readonly required placeholder="Click services above to build your custom package">
+            <input type="text" name="Service" id="planInput" readonly required placeholder="Pick a plan above to build your package">
             <button type="button" class="reset-btn" onclick="clearSelection()">Start Over / Clear Selection</button>
 
             <label for="requestedDate" style="display:block; margin-bottom:10px; font-size: 1.1rem; font-weight: 700; color: var(--text-main);">Requested Date 📅</label>
@@ -450,7 +388,6 @@ footer{background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);border-top:1
 
             <textarea name="Comments" rows="4" placeholder="Any special instructions or comments?"></textarea>
 
-            <!-- ADDED: optional tip inside the booking form -->
             <div id="tip" style="text-align:center;margin:10px 0 25px;padding:22px 15px;border-radius:20px;background:rgba(255,255,255,0.7);border:1px solid rgba(2,132,199,0.2)">
                 <h3 style="margin:0 0 8px;font-size:1.5rem">Leave a Tip 💙 <span style="font-size:0.9rem;font-weight:600;color:var(--text-muted)">(optional)</span></h3>
                 <p style="margin:0;font-size:0.95rem">Tips help me get to my ski lessons faster! ⛷️ Opens Stripe in a new tab, so your booking stays here.</p>
@@ -467,6 +404,120 @@ footer{background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);border-top:1
     </div>
 
 </div>
+</div>
+<!-- ===== END HOME PAGE ===== -->
+
+<!-- ===== PLAN PAGE (Individual Services / Bundles) ===== -->
+<div id="page-plans" style="display:none;">
+<div class="container" style="padding-bottom:120px;">
+    <button type="button" class="back-btn" onclick="navTo('services')">⬅ Back</button>
+
+    <div id="set-individual">
+        <h2 class="section-title" style="margin-top:30px;">Individual Services</h2>
+        <div class="grid">
+            <div class="card" onclick="sel('Walkway Only', 10)">
+                <h3>Walkway Only</h3>
+                <p>The main path from the sidewalk to your front door.</p>
+                <span class="price">$10</span>
+            </div>
+            <div class="card" onclick="sel('Sidewalk Only', 10)">
+                <h3>Sidewalk Only</h3>
+                <p>The city sidewalk in front of a standard single lot.</p>
+                <span class="price">$10</span>
+            </div>
+            <div class="card" onclick="sel('Corner Lot Sidewalks', 20)">
+                <div class="badge badge-corner">CORNER</div>
+                <h3>Corner Lot Sidewalks</h3>
+                <p>Clearing both city sidewalks on a corner property.</p>
+                <span class="price">$20</span>
+            </div>
+            <div class="card" onclick="sel('Driveway Only', 15)">
+                <h3>Driveway Only</h3>
+                <p>Shoveling a standard 2-car driveway.</p>
+                <span class="price">$15</span>
+            </div>
+        </div>
+        <div style="text-align:center"><button type="button" class="back-btn" onclick="navTo('bundles')">See Bundle & Save 💰</button></div>
+    </div>
+
+    <div id="set-bundles" style="display:none;">
+        <h2 class="section-title" style="margin-top:30px;">Bundle & Save 💰</h2>
+        <div class="grid">
+            <div class="card" onclick="sel('Sidewalk & Walkway', 15)">
+                <div class="badge">VALUE</div>
+                <h3>Sidewalk & Walkway</h3>
+                <p>Front path plus standard city sidewalk.</p>
+                <span class="price">$15</span>
+            </div>
+            <div class="card" onclick="sel('Walkway & Corner Sidewalk', 25)">
+                <div class="badge badge-corner">CORNER</div>
+                <h3>Walkway & Corner Sidewalk</h3>
+                <p>Front path plus both corner city sidewalks.</p>
+                <span class="price">$25</span>
+            </div>
+            <div class="card" onclick="sel('Driveway & Walkway', 20)">
+                <div class="badge">VALUE</div>
+                <h3>Driveway & Walkway</h3>
+                <p>Shoveling your driveway and the path to the door.</p>
+                <span class="price">$20</span>
+            </div>
+            <div class="card" onclick="sel('Driveway & Corner Sidewalk', 30)">
+                <div class="badge badge-corner">CORNER</div>
+                <h3>Driveway & Corner Sidewalk</h3>
+                <p>Driveway plus both corner city sidewalks.</p>
+                <span class="price">$30</span>
+            </div>
+            <div class="card" onclick="sel('Full Regular Package', 30)">
+                <div class="badge badge-total">TOTAL CLEAR</div>
+                <h3>Full Regular Package</h3>
+                <p>Everything: Walkway, Sidewalk, and Driveway.</p>
+                <span class="price">$30</span>
+            </div>
+            <div class="card" onclick="sel('Full Corner Package', 40)">
+                <div class="badge badge-corner">CORNER TOTAL</div>
+                <h3>Full Corner Package</h3>
+                <p>The total works: Driveway, Walkway, and both Sidewalks.</p>
+                <span class="price">$40</span>
+            </div>
+        </div>
+        <div style="text-align:center"><button type="button" class="back-btn" onclick="navTo('individual')">See Individual Services</button></div>
+    </div>
+</div>
+</div>
+
+<!-- ===== VISITOR LOG PAGE (owner login) ===== -->
+<div id="page-visitors" style="display:none;">
+<div class="container" style="padding-bottom:80px;">
+    <button type="button" class="back-btn" onclick="navTo('')">⬅ Home</button>
+    <h2 class="section-title" style="margin-top:30px;">Visitor Log 🔒</h2>
+
+    <div id="vis-login" class="form-container">
+        <form id="vis-form" autocomplete="on">
+            <input type="email" id="vis-email" placeholder="Owner email" required autocomplete="username">
+            <input type="password" id="vis-pass" placeholder="Password" required autocomplete="current-password">
+            <button type="submit" class="submit-btn">Log In</button>
+            <button type="button" id="vis-google" class="vis-google">Sign in with Google</button>
+            <p id="vis-error" style="color:#b91c1c!important;text-align:center;margin:15px 0 0;font-weight:700"></p>
+        </form>
+    </div>
+
+    <div id="vis-panel" style="display:none;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+            <button type="button" id="vis-refresh" class="back-btn" style="margin:0">🔄 Refresh</button>
+            <button type="button" id="vis-signout" class="back-btn" style="margin:0">Log out</button>
+        </div>
+        <div id="vis-summary" class="grid" style="gap:15px"></div>
+        <h3 style="margin:10px 0 15px">Recent visits (newest first)</h3>
+        <div id="vis-list"></div>
+    </div>
+</div>
+</div>
+
+<div id="plan-bar">
+    <span id="plan-bar-text">Tap a plan to add it</span>
+    <button type="button" onclick="continueToCalendar()">Pick a Date ➜</button>
+</div>
+<!-- ===== END PLAN PAGE ===== -->
 
 <div class="font-sans">
     <div id="admin-modal" class="fixed inset-0 z-50 hidden bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -550,7 +601,6 @@ footer{background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);border-top:1
         <button type="submit" id="chat-send">Send</button>
     </form>
 </div>
-
 <script>
 AOS.init({once:true,duration:800});
 
@@ -566,15 +616,71 @@ window.addEventListener('scroll',function(){
     document.getElementById('scroll-progress-bar').style.width=p*100+'%';
 });
 
+// ---- Simple page switching inside the same website (#individual, #bundles, or home) ----
+function route(){
+    const h=location.hash.replace('#','');
+    const home=document.getElementById('page-home');
+    const plans=document.getElementById('page-plans');
+    const bar=document.getElementById('plan-bar');
+    const vis=document.getElementById('page-visitors');
+    const hideChrome=(h==='individual'||h==='bundles'||h==='visitors');
+    document.body.classList.toggle('hide-chrome',hideChrome);
+    vis.style.display=h==='visitors'?'block':'none';
+    if(window.fixNavSpacing)window.fixNavSpacing();
+    if(h==='visitors'){
+        home.style.display='none';plans.style.display='none';bar.style.display='none';
+        window.scrollTo(0,0);
+    }else if(h==='individual'||h==='bundles'){
+        if(window.logEvent)window.logEvent('page',h);
+        home.style.display='none';
+        plans.style.display='block';
+        document.getElementById('set-individual').style.display=h==='individual'?'block':'none';
+        document.getElementById('set-bundles').style.display=h==='bundles'?'block':'none';
+        bar.style.display='flex';
+        updatePlanBar();
+        window.scrollTo(0,0);
+    }else{
+        plans.style.display='none';
+        bar.style.display='none';
+        home.style.display='block';
+        if(window.AOS)AOS.refresh();
+        const el=h?document.getElementById(h):null;
+        if(el){setTimeout(function(){el.scrollIntoView({behavior:'smooth'});},60);}
+        else{window.scrollTo(0,0);}
+    }
+}
+function navTo(h){
+    if(location.hash.replace('#','')===h){route();}else{location.hash=h;}
+}
+window.addEventListener('hashchange',route);
+window.addEventListener('load',function(){setTimeout(route,50);});
+
+function continueToCalendar(){
+    if(selectedServices.length===0){showToast('Tap a plan first 👆');return;}
+    const bubble=document.getElementById('scroll-bubble');
+    if(bubble){bubble.classList.add('active');setTimeout(()=>{bubble.classList.remove('active');},3000);}
+    navTo('calendar');
+    setTimeout(function(){
+        const c=document.getElementById('calendar');
+        if(c){c.classList.add('highlight-pulse');setTimeout(()=>{c.classList.remove('highlight-pulse');},1000);}
+    },400);
+}
+
 // Neighbour gift add-on switch (off)
 const GIFT_ENABLED=false;
 let total=0;
 let selectedServices=[];
-window.areaZone=null;
+
+function updatePlanBar(){
+    const t=document.getElementById('plan-bar-text');
+    if(!t)return;
+    t.textContent=selectedServices.length?(selectedServices.length+' selected · $'+total):'Tap a plan to add it';
+}
 
 function updatePriceDisplay(){
     document.getElementById('visualPriceDisplay').innerText='$'+total;
     document.getElementById('totalPrice').value=total;
+    updatePlanBar();
 }
 
 function sel(serviceName,price){
@@ -582,10 +688,11 @@ function sel(serviceName,price){
     total+=price;
     document.getElementById('planInput').value=selectedServices.join(', ');
     updatePriceDisplay();
+    if(window.logEvent)window.logEvent('plan',serviceName+' ($'+price+')');
     if(GIFT_ENABLED&&!serviceName.includes('Gift')){
         document.getElementById('giftModal').classList.add('open');
     }else{
-        triggerAutoScroll();
+        showToast('✅ Added: '+serviceName);
     }
 }
 
@@ -598,30 +705,15 @@ function handleModalResponse(isYes){
         updatePriceDisplay();
         showToast('🎁 Neighbor gift added to your package!');
     }
-    triggerAutoScroll();
-}
-
-function triggerAutoScroll(){
-    const bubble=document.getElementById('scroll-bubble');
-    if(bubble){bubble.classList.add('active');setTimeout(()=>{bubble.classList.remove('active');},3000);}
-    scrollToCalendar();
 }
 
 function scrollToForm(){
+    if(location.hash.replace('#','')==='individual'||location.hash.replace('#','')==='bundles'){navTo('booking-section');}
     const form=document.getElementById('booking-section');
     if(form){
         form.scrollIntoView({behavior:'smooth'});
         form.classList.add('highlight-pulse');
         setTimeout(()=>{form.classList.remove('highlight-pulse');},1000);
-    }
-}
-
-function scrollToCalendar(){
-    const calendar=document.getElementById('calendar');
-    if(calendar){
-        calendar.scrollIntoView({behavior:'smooth'});
-        calendar.classList.add('highlight-pulse');
-        setTimeout(()=>{calendar.classList.remove('highlight-pulse');},1000);
     }
 }
 
@@ -729,16 +821,10 @@ window.startStripeCheckout=function(){
     document.getElementById('stripeMultiModal').classList.add('open');
 };
 
-// --- FORM SUBMIT: checks address zone, checks the time is still free, sends, then reserves the time slot ---
+// --- FORM SUBMIT: checks the time is still free, sends, then reserves the time slot ---
 document.getElementById('orderForm').addEventListener('submit',async function(event){
     event.preventDefault();
     const form=event.target;
-
-    if(!window.areaZone||window.areaZone==='out'){
-        alert('Please check your address in the Service Area section first. We need to confirm we serve your address.');
-        document.getElementById('area-check').scrollIntoView({behavior:'smooth'});
-        return;
-    }
 
     const dateStr=document.getElementById('requestedDate').value;
     const timeEl=document.getElementById('requestedTime');
@@ -765,7 +851,7 @@ document.getElementById('orderForm').addEventListener('submit',async function(ev
     try{
         const response=await fetch(form.action,{method:'POST',body:formData,headers:{'Accept':'application/json'}});
         if(response.ok){
-            // Reserve the time so nobody else can book it
+            if(window.logEvent)window.logEvent('booking','$'+total+' - '+selectedServices.join(', '));
             try{if(window.reserveSlot&&raw)await window.reserveSlot(dateStr,raw);}catch(e){console.warn('Could not reserve slot',e);}
             if(chosenPayment==='Pay Online (Stripe)'&&window.startStripeCheckout){
                 submitBtn.innerText="Taking you to payment...";
@@ -784,14 +870,14 @@ document.getElementById('orderForm').addEventListener('submit',async function(ev
 });
 </script>
 
-<!-- Firebase calendar -->
+<!-- Firebase calendar + visitor counter -->
 <script type="module">
 if('scrollRestoration' in history){history.scrollRestoration='manual';}
 
 import{initializeApp}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import{getAnalytics}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
-import{getAuth,signInAnonymously}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import{getDatabase,ref,onValue,set,remove}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+import{getAuth,signInAnonymously,signInWithEmailAndPassword,signInWithPopup,GoogleAuthProvider,signOut,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import{getDatabase,ref,onValue,set,remove,runTransaction,push,get,query,orderByChild,limitToLast,serverTimestamp}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
 const firebaseConfig={
     apiKey:"AIzaSyBuWWnqDX5mUra5pF3uuBxEVSKjcESifTk",
@@ -843,9 +929,190 @@ const DOM={
 const getCollectionRef=()=>ref(db,'calendar_schedule');
 const getDocRef=(dateStr)=>ref(db,`calendar_schedule/${dateStr}`);
 
+// ---- Visitor counter: counts every visit (once per browser session) and every new visitor (once per browser) ----
+async function trackVisit(){
+    logSession();
+    try{
+        if(!sessionStorage.getItem('gw_visit')){
+            await runTransaction(ref(db,'site_stats/visits'),(n)=>(n||0)+1);
+            sessionStorage.setItem('gw_visit','1');
+        }
+        if(!localStorage.getItem('gw_unique')){
+            await runTransaction(ref(db,'site_stats/unique'),(n)=>(n||0)+1);
+            localStorage.setItem('gw_unique','1');
+        }
+    }catch(e){console.warn('Visitor counter blocked (check database rules)',e);}
+}
+onValue(ref(db,'site_stats'),(snap)=>{
+    const s=snap.val()||{};
+    const el=document.getElementById('visit-stats');
+    if(el)el.textContent='👥 Visits: '+(s.visits||0)+' · Unique visitors: '+(s.unique||0);
+},()=>{
+    const el=document.getElementById('visit-stats');
+    if(el)el.textContent='👥 Visitors: not readable (check database rules)';
+});
+
+const OWNER_UID='EoR842bEMiMdLUZhI1ompZzgnWp2';
+let authReadyResolve;
+const authReady=new Promise((r)=>{authReadyResolve=r;});
+
 async function initAuth(){
-    try{await signInAnonymously(auth);listenToSchedule();}
-    catch(error){console.error("Firebase Auth Error",error);listenToSchedule();}
+    try{
+        await auth.authStateReady();
+        if(!auth.currentUser)await signInAnonymously(auth);
+    }catch(error){console.error("Firebase Auth Error",error);}
+    authReadyResolve();
+    listenToSchedule();
+    if(auth.currentUser&&auth.currentUser.uid===OWNER_UID)localStorage.setItem('gw_owner','1');
+    trackVisit();
+}
+
+// ---- Detailed visit log (technical info only: no name, no IP, no exact location) ----
+const sx=(v)=>String(v==null?'':v).slice(0,280);
+function parseUA(ua){
+    let browser='Other',os='Other',device='Desktop';
+    if(/Edg\//.test(ua))browser='Edge';
+    else if(/OPR\/|Opera/.test(ua))browser='Opera';
+    else if(/CriOS|Chrome\//.test(ua))browser='Chrome';
+    else if(/FxiOS|Firefox\//.test(ua))browser='Firefox';
+    else if(/Safari\//.test(ua))browser='Safari';
+    if(/iPhone|iPad|iPod/.test(ua))os='iOS';
+    else if(/Android/.test(ua))os='Android';
+    else if(/Windows/.test(ua))os='Windows';
+    else if(/Mac OS X|Macintosh/.test(ua))os='macOS';
+    else if(/Linux/.test(ua))os='Linux';
+    if(/iPad|Tablet/.test(ua))device='Tablet';
+    else if(/Mobi|iPhone|Android.*Mobile/.test(ua))device='Mobile';
+    return{browser,os,device};
+}
+function visitorId(){
+    let v=localStorage.getItem('gw_vid');
+    if(!v){v=Math.random().toString(36).slice(2,10)+Date.now().toString(36);localStorage.setItem('gw_vid',v);}
+    return v;
+}
+async function logSession(){
+    if(localStorage.getItem('gw_owner')||location.hash==='#visitors'||sessionStorage.getItem('gw_sid'))return;
+    const n=(parseInt(localStorage.getItem('gw_visits')||'0')||0)+1;
+    localStorage.setItem('gw_visits',String(n));
+    const ua=navigator.userAgent||'';
+    const p=parseUA(ua);
+    const c=navigator.connection||{};
+    const rec={
+        t:serverTimestamp(),vid:visitorId(),visitNo:n,
+        browser:p.browser,os:p.os,device:p.device,ua:sx(ua),
+        lang:sx(navigator.language),langs:sx((navigator.languages||[]).join(',')),
+        tz:sx(Intl.DateTimeFormat().resolvedOptions().timeZone),tzOffset:new Date().getTimezoneOffset(),
+        screen:screen.width+'x'+screen.height,viewport:innerWidth+'x'+innerHeight,
+        dpr:window.devicePixelRatio||1,touch:navigator.maxTouchPoints||0,
+        cores:navigator.hardwareConcurrency||0,mem:navigator.deviceMemory||0,
+        conn:sx(c.effectiveType||''),saveData:c.saveData?'yes':'no',
+        theme:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light',
+        referrer:sx(document.referrer||'(direct)'),landing:sx(location.pathname+location.search)
+    };
+    try{
+        const r=push(ref(db,'visitors'));
+        await set(r,rec);
+        sessionStorage.setItem('gw_sid',r.key);
+    }catch(e){console.warn('Visit log blocked (check database rules)',e);}
+}
+window.logEvent=async function(type,detail){
+    try{
+        if(localStorage.getItem('gw_owner')||location.hash==='#visitors')return;
+        await authReady;
+        const sid=sessionStorage.getItem('gw_sid');
+        if(!sid)return;
+        await set(push(ref(db,'visit_events')),{t:serverTimestamp(),sid:sid,type:sx(type),detail:sx(detail)});
+    }catch(e){}
+};
+
+// ---- Owner visitor page (#visitors): real Firebase login ----
+const V={login:document.getElementById('vis-login'),panel:document.getElementById('vis-panel'),err:document.getElementById('vis-error')};
+function visShow(isOwner){
+    V.login.style.display=isOwner?'none':'block';
+    V.panel.style.display=isOwner?'block':'none';
+    if(isOwner){localStorage.setItem('gw_owner','1');loadVisitors();}
+}
+onAuthStateChanged(auth,(u)=>{visShow(!!u&&u.uid===OWNER_UID);});
+async function ownerLogin(fn){
+    V.err.textContent='';
+    try{
+        const cred=await fn();
+        if(cred.user.uid!==OWNER_UID){
+            V.err.textContent='This account is not the owner account.';
+            await signOut(auth);await signInAnonymously(auth);
+        }
+    }catch(e){V.err.textContent='Login failed. Check your details.';console.warn(e);}
+}
+document.getElementById('vis-form').addEventListener('submit',(e)=>{
+    e.preventDefault();
+    ownerLogin(()=>signInWithEmailAndPassword(auth,document.getElementById('vis-email').value.trim(),document.getElementById('vis-pass').value));
+});
+document.getElementById('vis-google').addEventListener('click',()=>{
+    ownerLogin(()=>signInWithPopup(auth,new GoogleAuthProvider()));
+});
+document.getElementById('vis-signout').addEventListener('click',async()=>{
+    localStorage.removeItem('gw_owner');
+    await signOut(auth);await signInAnonymously(auth);
+    visShow(false);
+});
+document.getElementById('vis-refresh').addEventListener('click',loadVisitors);
+
+function el(tag,text,cls){const e=document.createElement(tag);if(text!=null)e.textContent=text;if(cls)e.className=cls;return e;}
+function tally(list){const m={};list.forEach((x)=>{const k=x||'(unknown)';m[k]=(m[k]||0)+1;});return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,6);}
+function statCard(title,rows){
+    const c=el('div',null,'vis-card');c.appendChild(el('h3',title));
+    if(!rows.length)c.appendChild(el('div','No data yet'));
+    rows.forEach((r)=>{const l=el('div',null,'vis-line');l.appendChild(el('span',r[0]));l.appendChild(el('b',String(r[1])));c.appendChild(l);});
+    return c;
+}
+async function loadVisitors(){
+    const sum=document.getElementById('vis-summary'),list=document.getElementById('vis-list');
+    sum.innerHTML='';list.innerHTML='';list.appendChild(el('p','Loading…'));
+    try{
+        const [vs,es]=await Promise.all([
+            get(query(ref(db,'visitors'),orderByChild('t'),limitToLast(300))),
+            get(query(ref(db,'visit_events'),orderByChild('t'),limitToLast(1500)))
+        ]);
+        const visits=[];vs.forEach((c)=>{visits.push(Object.assign({id:c.key},c.val()));});
+        visits.reverse();
+        const events=[];es.forEach((c)=>{events.push(c.val());});
+        const bySid={};events.forEach((ev)=>{(bySid[ev.sid]=bySid[ev.sid]||[]).push(ev);});
+        const uniq=new Set(visits.map((v)=>v.vid)).size;
+        const returning=visits.filter((v)=>v.visitNo>1).length;
+        sum.appendChild(statCard('Overview',[['Visits (last 300)',visits.length],['Unique visitors',uniq],['Returning visits',returning],['Plans tapped',events.filter((x)=>x.type==='plan').length],['Bookings sent',events.filter((x)=>x.type==='booking').length]]));
+        sum.appendChild(statCard('Devices',tally(visits.map((v)=>v.device))));
+        sum.appendChild(statCard('Browsers',tally(visits.map((v)=>v.browser))));
+        sum.appendChild(statCard('Operating systems',tally(visits.map((v)=>v.os))));
+        sum.appendChild(statCard('Where they came from',tally(visits.map((v)=>v.referrer))));
+        sum.appendChild(statCard('Languages',tally(visits.map((v)=>v.lang))));
+        sum.appendChild(statCard('Time zones',tally(visits.map((v)=>v.tz))));
+        sum.appendChild(statCard('Screens',tally(visits.map((v)=>v.screen))));
+        sum.appendChild(statCard('Pages opened',tally(events.filter((x)=>x.type==='page').map((x)=>x.detail))));
+        sum.appendChild(statCard('Most tapped plans',tally(events.filter((x)=>x.type==='plan').map((x)=>x.detail))));
+        list.innerHTML='';
+        if(!visits.length)list.appendChild(el('p','No visits recorded yet.'));
+        visits.forEach((v)=>{
+            const d=el('div',null,'vis-sess');
+            const when=v.t?new Date(v.t).toLocaleString():'?';
+            const head=el('div');head.appendChild(el('b',when+' · '+v.device+' · '+v.browser+' on '+v.os));d.appendChild(head);
+            [['Visitor ID',v.vid+(v.visitNo>1?' (visit #'+v.visitNo+')':' (first visit)')],
+             ['Came from',v.referrer],['Landing',v.landing],['Language',v.lang+(v.langs?' ('+v.langs+')':'')],
+             ['Time zone',v.tz],['Screen / window',v.screen+' / '+v.viewport+' @'+v.dpr+'x'],
+             ['Touch points',v.touch],['CPU cores / memory',v.cores+' / '+(v.mem?v.mem+' GB':'n/a')],
+             ['Connection',(v.conn||'n/a')+(v.saveData==='yes'?' (data saver)':'')],['Theme',v.theme],['Browser string',v.ua]
+            ].forEach((r)=>{d.appendChild(el('div',r[0]+': '+r[1]));});
+            const evs=(bySid[v.id]||[]).sort((a,b)=>a.t-b.t);
+            if(evs.length){
+                const box=el('div',null,'vis-ev');box.appendChild(el('b','Actions'));
+                evs.forEach((ev)=>{box.appendChild(el('div',new Date(ev.t).toLocaleTimeString()+' – '+ev.type+': '+ev.detail));});
+                d.appendChild(box);
+            }
+            list.appendChild(d);
+        });
+    }catch(e){
+        list.innerHTML='';
+        list.appendChild(el('p','Could not load the log. Check the database rules. ('+e.message+')'));
+    }
 }
 
 function listenToSchedule(){
@@ -911,7 +1178,7 @@ async function deleteSlotFromDB(dateStr,timeStr){
     }
 }
 
-// ADDED: booked time slots are checked and reserved (removed) so nobody can double-book
+// Booked time slots are checked and reserved (removed) so nobody can double-book
 window.slotIsFree=(d,t)=>AppState.isLocalMode||(AppState.scheduleData[d]||[]).includes(t);
 window.reserveSlot=async(d,t)=>{
     const left=(AppState.scheduleData[d]||[]).filter(x=>x!==t);
@@ -1180,47 +1447,6 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 </script>
 
-<!-- Live goal progress -->
-<script type="module">
-import{initializeApp,getApps,getApp}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import{getDatabase,ref,onValue}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
-
-const goalFirebaseConfig={
-    apiKey:"AIzaSyBuWWnqDX5mUra5pF3uuBxEVSKjcESifTk",
-    authDomain:"gawynt-hub.firebaseapp.com",
-    databaseURL:"https://gawynt-hub-default-rtdb.firebaseio.com",
-    projectId:"gawynt-hub",
-    storageBucket:"gawynt-hub.firebasestorage.app",
-    messagingSenderId:"330651852035",
-    appId:"1:330651852035:web:db931f867da21b6a519d36",
-    measurementId:"G-XLXGTVSPXT"
-};
-
-try{
-    const goalApp=getApps().length?getApp():initializeApp(goalFirebaseConfig);
-    const goalDb=getDatabase(goalApp);
-    onValue(ref(goalDb,'settings/goal'),function(snap){
-        const g=snap.val();
-        if(!g)return;
-        const cur=Number(g.current);
-        const tgt=Number(g.target);
-        if(!isFinite(cur)||!isFinite(tgt)||tgt<=0||cur<0)return;
-        const fmt=function(n){return '$'+n.toLocaleString('en-CA');};
-        const pct=Math.min(100,Math.max(0,(cur/tgt)*100));
-        const fill=document.getElementById('goalFill');
-        const text=document.getElementById('goalText');
-        const inline=document.getElementById('goalTargetInline');
-        if(fill){fill.style.width=pct+'%';fill.textContent=fmt(cur);}
-        if(text){
-            text.textContent=cur>=tgt
-                ?'🎉 Goal reached! '+fmt(cur)+' / '+fmt(tgt)+' - thank you, neighbours!'
-                :'Current Goal Progress: '+fmt(cur)+' / '+fmt(tgt);
-        }
-        if(inline)inline.textContent=fmt(tgt);
-    },function(){});
-}catch(e){console.warn('Goal progress could not load',e);}
-</script>
-
 <!-- Live snow forecast (free Open-Meteo API) -->
 <script>
 (function(){
@@ -1322,21 +1548,18 @@ try{
     }
     function goTo(id){
         panel.classList.remove('open');
-        const el=document.getElementById(id);
-        if(el)el.scrollIntoView({behavior:'smooth'});
+        navTo(id);
     }
 
-    // Frequently asked questions
     const FAQ={
         prices:{label:'💰 Services & prices',keys:['price','prices','cost','how much','services','bundle','rate','charge','$'],
             text:"Here are our services:\n\nINDIVIDUAL\n• Walkway Only: $10\n• Sidewalk Only: $10\n• Corner Lot Sidewalks: $20\n• Driveway Only: $15\n\nBUNDLES (save money!)\n• Sidewalk & Walkway: $15\n• Driveway & Walkway: $20\n• Walkway & Corner Sidewalk: $25\n• Driveway & Corner Sidewalk: $30\n• Full Regular Package: $30\n• Full Corner Package: $40",
-            extra:[{label:'❄️ Take me to the services',fn:function(){goTo('services');}}]},
-        area:{label:'📍 Where do you shovel?',keys:['where','area','location','neighbourhood','neighborhood','serve','mount royal','scarboro','bankview','marda','sunalta','altadore','address'],
-            text:"📍 We serve Lower and Upper Mount Royal, Scarboro, Bankview and Marda Loop. Type your address in the Service Area section to check that we serve you.",
-            extra:[{label:'🗺️ Take me to the map',fn:function(){goTo('area-check');}}]},
+            extra:[{label:'❄️ Take me to the services',fn:function(){goTo('individual');}},{label:'💰 Take me to the bundles',fn:function(){goTo('bundles');}}]},
+        area:{label:'📍 Where do you shovel?',keys:['where','area','location','neighbourhood','neighborhood','serve','mount royal','scarboro','bankview','marda','address'],
+            text:"📍 We serve Lower and Upper Mount Royal, Scarboro, Bankview and Marda Loop. Enter your address at the bottom of the booking form. If it is outside our area we will let you know."},
         book:{label:'📅 How do I book?',keys:['book','booking','schedule','appointment','reserve','sign up','order'],
-            text:"Booking is easy:\n1. Check your address in the Service Area section\n2. Tap the services you want\n3. Pick a date and time on the calendar\n4. Choose a payment method\n5. Fill in your details and tap Complete Booking",
-            extra:[{label:'📅 Take me to the calendar',fn:function(){goTo('calendar');}}]},
+            text:"Booking is easy:\n1. Tap Individual Services or Bundle & Save\n2. Tap the plan(s) you want, then tap Pick a Date\n3. Pick a date and time on the calendar\n4. Choose a payment method\n5. Fill in your details and tap Complete Booking",
+            extra:[{label:'❄️ Take me to the plans',fn:function(){goTo('services');}}]},
         pay:{label:'💳 Payment options',keys:['pay','payment','e-transfer','etransfer','interac','stripe','card','tap','cash','online'],
             text:"You can pay 3 ways:\n• E-transfer\n• Tap to Pay\n• Pay Online (secure Stripe checkout)\n\nWe take payment 0-2 hours before the service."},
         salt:{label:'🧂 Do you use salt?',keys:['salt','ice','icy','sand','melt'],
@@ -1349,7 +1572,7 @@ try{
             extra:[{label:'💙 Take me to the tip buttons',fn:function(){goTo('tip');}}]},
         about:{label:'⛷️ Who is Gawynt?',keys:['who','gawynt','about','goal','ski','saving','student','kid','age'],
             text:"Hi, I'm Gawynt! I'm a 12-year-old Grade 8 student in Calgary. I'm saving up for ski lessons, gear and hill passes this winter, and every shovel gets me closer. Thank you for your support! ❄️",
-            extra:[{label:'🎯 See my goal',fn:function(){goTo('about');}}]},
+            extra:[{label:'⛷️ Read about me',fn:function(){goTo('about');}}]},
         corner:{label:'🏠 What is a corner lot?',keys:['corner'],
             text:"A corner lot has city sidewalks on two sides of the property. The Corner packages clear both sidewalks, so they cost a bit more than regular lots."}
     };
@@ -1408,80 +1631,14 @@ try{
 })();
 </script>
 
-<!-- ADDED: Service area map + address check (Sunalta is not served) -->
-<script>
-(function(){
-    // Service area traced from your Google Maps drawing (approximate - edit these points to fine-tune)
-    const SERVICE=[[51.0374,-114.1073],[51.0379,-114.1074],[51.0379,-114.0899],[51.0328,-114.0895],[51.0319,-114.0899],[51.0323,-114.0826],[51.0323,-114.0805],[51.0305,-114.0805],[51.0305,-114.0775],[51.0273,-114.0784],[51.0258,-114.0809],[51.0230,-114.0803],[51.0195,-114.0802],[51.0199,-114.0947],[51.0157,-114.0953],[51.0153,-114.1053],[51.0232,-114.1045],[51.0232,-114.1143],[51.0230,-114.1099],[51.0283,-114.1092],[51.0311,-114.1122],[51.0330,-114.1106],[51.0330,-114.1078],[51.0374,-114.1073]];
-    // Sunalta is NOT served: addresses there are rejected
-    const SUNALTA=[[51.0450,-114.1090],[51.0450,-114.0910],[51.0380,-114.0910],[51.0380,-114.1090]];
-    const OK_NAMES=['mount royal','scarboro','bankview','marda loop'];
-
-    function inside(pt,poly){
-        let c=false;
-        for(let i=0,j=poly.length-1;i<poly.length;j=i++){
-            const yi=poly[i][0],xi=poly[i][1],yj=poly[j][0],xj=poly[j][1];
-            if(((yi>pt[0])!==(yj>pt[0]))&&(pt[1]<(xj-xi)*(pt[0]-yi)/(yj-yi)+xi))c=!c;
-        }
-        return c;
-    }
-
-    const map=L.map('area-map',{scrollWheelZoom:false}).setView([51.030,-114.095],13);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
-    L.polygon(SERVICE,{color:'#059669',fillOpacity:0.2}).addTo(map).bindTooltip('Service area');
-    window.addEventListener('load',function(){setTimeout(function(){map.invalidateSize();},1600);});
-    let pin=null;
-
-    function setZone(zone){
-        window.areaZone=zone;
-        document.getElementById('areaZone').value=zone||'';
-        updatePriceDisplay();
-    }
-
-    async function check(){
-        const addr=document.getElementById('areaAddress').value.trim();
-        const out=document.getElementById('area-result');
-        if(!addr){out.textContent='Please type your address.';out.className='area-no';return;}
-        out.textContent='Checking...';out.className='';
-        try{
-            const url='https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=1&countrycodes=ca&viewbox=-114.3,51.15,-113.85,50.9&bounded=1&q='+encodeURIComponent(addr+', Calgary, Alberta');
-            const r=await(await fetch(url)).json();
-            if(!r.length){out.textContent='Could not find that address. Please check the spelling.';out.className='area-no';setZone(null);return;}
-            const lat=+r[0].lat,lon=+r[0].lon,a=r[0].address||{};
-            const sub=(a.suburb||a.neighbourhood||a.quarter||'').toLowerCase();
-            const sun=inside([lat,lon],SUNALTA)||sub==='sunalta';
-            const ok=!sun&&(inside([lat,lon],SERVICE)||OK_NAMES.includes(sub));
-            if(pin)map.removeLayer(pin);
-            pin=L.marker([lat,lon]).addTo(map);
-            map.setView([lat,lon],15);
-            if(ok){
-                setZone('in');
-                out.textContent='✅ Great, you are in our service area!';
-                out.className='area-ok';
-            }else{
-                setZone('out');
-                out.textContent='❌ Sorry, that address is outside our service area.';
-                out.className='area-no';
-            }
-            if(ok)document.getElementById('bookAddress').value=addr;
-        }catch(e){
-            out.textContent='Could not check right now. Please try again.';
-            out.className='area-no';
-        }
-    }
-
-    document.getElementById('areaBtn').addEventListener('click',check);
-    document.getElementById('areaAddress').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();check();}});
-})();
-</script>
-
-<!-- FIX: measures the real menu height so the banner is never covered -->
+<!-- Measures the real menu height so the banner is never covered -->
 <script>
 (function(){
     function fixNavSpacing(){
         var nav=document.querySelector('.top-nav');
         if(nav)document.body.style.paddingTop=nav.offsetHeight+'px';
     }
+    window.fixNavSpacing=fixNavSpacing;
     window.addEventListener('load',fixNavSpacing);
     window.addEventListener('resize',fixNavSpacing);
     fixNavSpacing();
