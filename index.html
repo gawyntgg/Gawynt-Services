@@ -535,18 +535,18 @@ footer{background:rgba(255,255,255,0.85);backdrop-filter:blur(10px);border-top:1
     <p>&copy; 2026 Gawynt's Snow Shoveling. All Rights Reserved.</p>
 </footer>
 
-<button id="chat-launcher" type="button" aria-label="Open live chat">💬</button>
-<div id="chat-panel" role="dialog" aria-label="Live chat">
+<button id="chat-launcher" type="button" aria-label="Open help chat">💬</button>
+<div id="chat-panel" role="dialog" aria-label="Help chat">
     <div class="chat-header">
         <div>
-            <div class="chat-header-title">❄️ Gawynt's Help Chat</div>
-            <div class="chat-header-sub">We're here to help!</div>
+            <div class="chat-header-title">❄️ Help Chat</div>
+            <div class="chat-header-sub">Instant answers to common questions</div>
         </div>
         <button type="button" class="chat-close" id="chat-close" aria-label="Close chat">✕</button>
     </div>
     <div id="chat-messages"></div>
     <form id="chat-form" autocomplete="off">
-        <input type="text" id="chat-input" placeholder="Type a message..." maxlength="500">
+        <input type="text" id="chat-input" placeholder="Ask a question..." maxlength="500">
         <button type="submit" id="chat-send">Send</button>
     </form>
 </div>
@@ -1281,48 +1281,7 @@ try{
 })();
 </script>
 
-<!-- Live chat <-> Firebase -->
-<script type="module">
-import{initializeApp,getApps,getApp}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import{getAuth,signInAnonymously}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import{getDatabase,ref,push,set,update,onChildAdded}from"https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
-
-const chatFirebaseConfig={
-    apiKey:"AIzaSyBuWWnqDX5mUra5pF3uuBxEVSKjcESifTk",
-    authDomain:"gawynt-hub.firebaseapp.com",
-    databaseURL:"https://gawynt-hub-default-rtdb.firebaseio.com",
-    projectId:"gawynt-hub",
-    storageBucket:"gawynt-hub.firebasestorage.app",
-    messagingSenderId:"330651852035",
-    appId:"1:330651852035:web:db931f867da21b6a519d36",
-    measurementId:"G-XLXGTVSPXT"
-};
-
-const chatApp=getApps().length?getApp():initializeApp(chatFirebaseConfig);
-const chatAuth=getAuth(chatApp);
-const chatDb=getDatabase(chatApp);
-
-const chatAuthReady=(async()=>{if(!chatAuth.currentUser)await signInAnonymously(chatAuth);})();
-
-window.chatFB={
-    start:async function(id,name){
-        await chatAuthReady;
-        await set(ref(chatDb,'chats/'+id+'/meta'),{name:name,startedAt:Date.now(),updatedAt:Date.now(),unread:true,lastText:'(opened the chat)'});
-    },
-    send:async function(id,name,sid,text){
-        await chatAuthReady;
-        await push(ref(chatDb,'chats/'+id+'/messages'),{from:'customer',text:text,ts:Date.now(),sid:sid});
-        await update(ref(chatDb,'chats/'+id+'/meta'),{name:name,updatedAt:Date.now(),unread:true,lastText:text});
-    },
-    listen:function(id,cb){
-        chatAuthReady.then(function(){
-            onChildAdded(ref(chatDb,'chats/'+id+'/messages'),function(snap){cb(snap.val());});
-        }).catch(function(){});
-    }
-};
-</script>
-
-<!-- Live chat logic -->
+<!-- Automated FAQ chat (no live agent) -->
 <script>
 (function(){
     const launcher=document.getElementById('chat-launcher');
@@ -1331,16 +1290,9 @@ window.chatFB={
     const messages=document.getElementById('chat-messages');
     const form=document.getElementById('chat-form');
     const input=document.getElementById('chat-input');
-
     let started=false;
-    let step=null;
-    const lead={};
-    let chatId=null;
-    let liveConfirmed=false;
-    const sid=Math.random().toString(36).slice(2);
 
     function scrollDown(){messages.scrollTop=messages.scrollHeight;}
-
     function addMsg(text,who){
         const div=document.createElement('div');
         div.className='chat-msg '+who;
@@ -1348,9 +1300,7 @@ window.chatFB={
         messages.appendChild(div);
         scrollDown();
     }
-
     function clearOptions(){messages.querySelectorAll('.chat-options').forEach(function(el){el.remove();});}
-
     function showOptions(list){
         clearOptions();
         const wrap=document.createElement('div');
@@ -1370,187 +1320,67 @@ window.chatFB={
         messages.appendChild(wrap);
         scrollDown();
     }
+    function goTo(id){
+        panel.classList.remove('open');
+        const el=document.getElementById(id);
+        if(el)el.scrollIntoView({behavior:'smooth'});
+    }
+
+    // Frequently asked questions
+    const FAQ={
+        prices:{label:'💰 Services & prices',keys:['price','prices','cost','how much','services','bundle','rate','charge','$'],
+            text:"Here are our services:\n\nINDIVIDUAL\n• Walkway Only: $10\n• Sidewalk Only: $10\n• Corner Lot Sidewalks: $20\n• Driveway Only: $15\n\nBUNDLES (save money!)\n• Sidewalk & Walkway: $15\n• Driveway & Walkway: $20\n• Walkway & Corner Sidewalk: $25\n• Driveway & Corner Sidewalk: $30\n• Full Regular Package: $30\n• Full Corner Package: $40",
+            extra:[{label:'❄️ Take me to the services',fn:function(){goTo('services');}}]},
+        area:{label:'📍 Where do you shovel?',keys:['where','area','location','neighbourhood','neighborhood','serve','mount royal','scarboro','bankview','marda','sunalta','altadore','address'],
+            text:"📍 We serve Lower and Upper Mount Royal, Scarboro, Bankview and Marda Loop. Type your address in the Service Area section to check that we serve you.",
+            extra:[{label:'🗺️ Take me to the map',fn:function(){goTo('area-check');}}]},
+        book:{label:'📅 How do I book?',keys:['book','booking','schedule','appointment','reserve','sign up','order'],
+            text:"Booking is easy:\n1. Check your address in the Service Area section\n2. Tap the services you want\n3. Pick a date and time on the calendar\n4. Choose a payment method\n5. Fill in your details and tap Complete Booking",
+            extra:[{label:'📅 Take me to the calendar',fn:function(){goTo('calendar');}}]},
+        pay:{label:'💳 Payment options',keys:['pay','payment','e-transfer','etransfer','interac','stripe','card','tap','cash','online'],
+            text:"You can pay 3 ways:\n• E-transfer\n• Tap to Pay\n• Pay Online (secure Stripe checkout)\n\nWe take payment 0-2 hours before the service."},
+        salt:{label:'🧂 Do you use salt?',keys:['salt','ice','icy','sand','melt'],
+            text:"No, this is a shoveling-only service. We don't offer salt or ice melt."},
+        times:{label:'⏰ What times are open?',keys:['time','times','available','availability','open','when','date','full','booked'],
+            text:"The calendar shows live availability. Tap any date to see the open times, then tap Select Time. If a day has no dots, it is fully booked, so try another day.",
+            extra:[{label:'📅 Take me to the calendar',fn:function(){goTo('calendar');}}]},
+        tip:{label:'💙 Can I leave a tip?',keys:['tip','tips','tipping','gratuity','extra'],
+            text:"Tips are totally optional and really appreciated! You'll find $3, $5, $7 and $10 tip buttons in the Finalize Booking Details section.",
+            extra:[{label:'💙 Take me to the tip buttons',fn:function(){goTo('tip');}}]},
+        about:{label:'⛷️ Who is Gawynt?',keys:['who','gawynt','about','goal','ski','saving','student','kid','age'],
+            text:"Hi, I'm Gawynt! I'm a 12-year-old Grade 8 student in Calgary. I'm saving up for ski lessons, gear and hill passes this winter, and every shovel gets me closer. Thank you for your support! ❄️",
+            extra:[{label:'🎯 See my goal',fn:function(){goTo('about');}}]},
+        corner:{label:'🏠 What is a corner lot?',keys:['corner'],
+            text:"A corner lot has city sidewalks on two sides of the property. The Corner packages clear both sidewalks, so they cost a bit more than regular lots."}
+    };
+    const MENU=['prices','area','book','pay','times','salt','tip','corner','about'];
 
     function mainOptions(){
-        showOptions([
-            {label:'🙋 Connect me to someone',fn:startConnect},
-            {label:'💰 Services & prices',fn:showPrices},
-            {label:'💳 Payment options',fn:showPayment},
-            {label:'📍 Where do you shovel?',fn:showArea},
-            {label:'📅 How do I book?',fn:showBooking}
-        ]);
+        showOptions(MENU.map(function(k){return {label:FAQ[k].label,fn:function(){answer(k);}};}));
     }
-
-    function backOptions(){
-        showOptions([{label:'⬅️ Back to options',fn:function(){addMsg('What else can I help you with?','bot');mainOptions();}}]);
+    function answer(key){
+        const f=FAQ[key];
+        addMsg(f.text,'bot');
+        const opts=(f.extra||[]).concat([{label:'⬅️ More questions',fn:function(){addMsg('What else would you like to know?','bot');mainOptions();}}]);
+        showOptions(opts);
     }
-
-    function showPrices(){
-        addMsg("Here are our services:\n\nINDIVIDUAL\n• Walkway Only: $10\n• Sidewalk Only: $10\n• Corner Lot Sidewalks: $20\n• Driveway Only: $15\n\nBUNDLES (save money!)\n• Sidewalk & Walkway: $15\n• Driveway & Walkway: $20\n• Walkway & Corner Sidewalk: $25\n• Driveway & Corner Sidewalk: $30\n• Full Regular Package: $30\n• Full Corner Package: $40\n\n⚠️ Shoveling only, no salt service.",'bot');
-        backOptions();
-    }
-
-    function showPayment(){
-        addMsg("You can pay 3 ways:\n• E-transfer\n• Tap to Pay\n• Pay Online (secure Stripe checkout)\n\nWe take payment 0-2 hours before the service.",'bot');
-        backOptions();
-    }
-
-    function showArea(){
-        addMsg("📍 We serve Lower and Upper Mount Royal, Scarboro, Bankview and Marda Loop. Use the Address Check on the page to make sure you're in our area.",'bot');
-        backOptions();
-    }
-
-    function showBooking(){
-        addMsg("Booking is easy:\n1. Check your address in the Service Area section\n2. Tap the services you want\n3. Pick a date and time on the calendar\n4. Choose a payment method\n5. Fill in your details and tap Complete Booking",'bot');
-        showOptions([
-            {label:'❄️ Take me to the services',fn:function(){
-                panel.classList.remove('open');
-                const s=document.getElementById('services');
-                if(s)s.scrollIntoView({behavior:'smooth'});
-            }},
-            {label:'⬅️ Back to options',fn:function(){addMsg('What else can I help you with?','bot');mainOptions();}}
-        ]);
-    }
-
-    const NTFY_TOPIC='gawynt-snow-chat-x7k2m9q4';
-
-    function notifyOwner(title,text){
-        if(!NTFY_TOPIC)return;
-        try{
-            fetch('https://ntfy.sh/'+NTFY_TOPIC,{
-                method:'POST',
-                headers:{'Title':title,'Priority':'high','Tags':'speech_balloon','Click':new URL('admin-chat.html',location.href).href},
-                body:text
-            }).catch(function(){});
-        }catch(err){}
-    }
-
-    function pingChatStarted(){
-        notifyOwner('New chat on your snow site',lead.name+' just opened the live chat and is waiting for you.');
-        fetch('https://formspree.io/f/xjgydwzk',{
-            method:'POST',
-            headers:{'Content-Type':'application/json','Accept':'application/json'},
-            body:JSON.stringify({_subject:'LIVE CHAT STARTED: '+lead.name+' is waiting',Name:lead.name,Source:'Website live chat (chat opened)'})
-        }).catch(function(){});
-    }
-
-    function saveSession(){try{localStorage.setItem('gawynt_chat',JSON.stringify({id:chatId,name:lead.name}));}catch(e){}}
-    function loadSession(){
-        try{
-            const s=JSON.parse(localStorage.getItem('gawynt_chat')||'null');
-            return(s&&s.id&&s.name)?s:null;
-        }catch(e){return null;}
-    }
-    function newChatId(){
-        const a=new Uint8Array(12);
-        crypto.getRandomValues(a);
-        return Array.from(a).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
-    }
-    function withFB(fn,tries){
-        tries=tries||0;
-        if(window.chatFB){fn(window.chatFB);return;}
-        if(tries<20)setTimeout(function(){withFB(fn,tries+1);},500);
-    }
-    function attachChat(){
-        withFB(function(fb){
-            fb.listen(chatId,function(m){
-                if(!m||!m.text)return;
-                if(m.from==='admin')addMsg('Gawynt: '+m.text,'bot');
-                else if(m.from==='customer'&&m.sid!==sid)addMsg(m.text,'user');
-            });
+    function matchKey(text){
+        const t=text.toLowerCase();
+        let best=null,bestScore=0;
+        Object.keys(FAQ).forEach(function(k){
+            let score=0;
+            FAQ[k].keys.forEach(function(w){if(t.indexOf(w)!==-1)score++;});
+            if(score>bestScore){best=k;bestScore=score;}
         });
-    }
-    function startLiveChat(){
-        chatId=newChatId();
-        saveSession();
-        withFB(function(fb){fb.start(chatId,lead.name).catch(function(){});});
-        attachChat();
-    }
-    function fallbackEmail(text){
-        fetch('https://formspree.io/f/xjgydwzk',{
-            method:'POST',
-            headers:{'Content-Type':'application/json','Accept':'application/json'},
-            body:JSON.stringify({_subject:'Live Chat message from '+lead.name,Name:lead.name,Message:text,Source:'Website live chat (backup email)'})
-        }).catch(function(){});
-    }
-    function sendLive(text){
-        if(!window.chatFB){
-            addMsg("Live chat isn't available right now, so I emailed your message instead.",'bot');
-            fallbackEmail(text);
-            notifyOwner('Chat message from '+lead.name,text);
-            return;
-        }
-        window.chatFB.send(chatId,lead.name,sid,text).then(function(){
-            notifyOwner('Chat message from '+lead.name,text);
-            if(!liveConfirmed){
-                liveConfirmed=true;
-                addMsg("Message sent! Gawynt will reply right here, so please keep this page open. 💬",'bot');
-            }
-        }).catch(function(){
-            addMsg("Live chat isn't available right now, so I emailed your message instead.",'bot');
-            fallbackEmail(text);
-            notifyOwner('Chat message from '+lead.name,text);
-        });
-    }
-
-    function startConnect(){
-        if(window.chatFB&&chatId){
-            addMsg("You're connected! Type your message below and Gawynt will reply right here in the chat. Please keep this page open.",'bot');
-            input.focus();
-            return;
-        }
-        if(!lead.contact){
-            step='contact';
-            addMsg("Happy to connect you with someone who can help, "+lead.name+"! What's the best email or phone number to reach you?",'bot');
-        }else{
-            step='message';
-            addMsg("What would you like help with?",'bot');
-        }
-        input.focus();
-    }
-
-    function sendLead(){
-        addMsg('Sending your message...','bot');
-        fetch('https://formspree.io/f/xjgydwzk',{
-            method:'POST',
-            headers:{'Content-Type':'application/json','Accept':'application/json'},
-            body:JSON.stringify({_subject:'Live Chat Request from '+lead.name,Name:lead.name,Contact:lead.contact,Message:lead.message,Source:'Website live chat'})
-        })
-        .then(function(res){
-            if(res.ok){
-                step=null;
-                notifyOwner('Chat message from '+lead.name,lead.name+' ('+lead.contact+'): '+lead.message);
-                addMsg("✅ Thanks, "+lead.name+"! Your message was sent. Someone will get back to you as soon as possible.",'bot');
-                backOptions();
-            }else{throw new Error('bad response');}
-        })
-        .catch(function(){
-            step='message';
-            addMsg("Sorry, that didn't send. Please type your message again to retry.",'bot');
-        });
+        return best;
     }
 
     function openChat(){
         panel.classList.add('open');
         if(!started){
             started=true;
-            const saved=loadSession();
-            if(saved){
-                lead.name=saved.name;
-                chatId=saved.id;
-                attachChat();
-                setTimeout(function(){
-                    addMsg("Welcome back, "+saved.name+"! 👋 Type a message any time, or pick an option:",'bot');
-                    mainOptions();
-                },500);
-                return;
-            }
-            setTimeout(function(){addMsg("Welcome! 👋",'bot');},300);
-            setTimeout(function(){
-                step='name';
-                addMsg("What's your name?",'bot');
-                input.focus();
-            },900);
+            setTimeout(function(){addMsg("Hi there! 👋 I'm Gawynt's helper bot. I can answer common questions right away.",'bot');},300);
+            setTimeout(function(){addMsg("What would you like to know?",'bot');mainOptions();},900);
         }
     }
 
@@ -1564,32 +1394,16 @@ window.chatFB={
         const text=input.value.trim();
         if(!text)return;
         input.value='';
+        clearOptions();
         addMsg(text,'user');
-        if(step==='name'){
-            lead.name=text;
-            step=null;
-            startLiveChat();
-            pingChatStarted();
-            setTimeout(function(){
-                addMsg("Nice to meet you, "+text+"! I've let Gawynt know you're here. Do you want me to connect you to someone who can help? Here are your options:",'bot');
+        const key=matchKey(text);
+        setTimeout(function(){
+            if(key){answer(key);}
+            else{
+                addMsg("I'm an automated helper, so I might not know that one. Here are the questions I can answer. For anything else, you can write it in the Comments box when you book. 😊",'bot');
                 mainOptions();
-            },300);
-        }else if(step==='contact'){
-            lead.contact=text;
-            step='message';
-            setTimeout(function(){addMsg("Got it. What would you like help with?",'bot');},300);
-        }else if(step==='message'){
-            lead.message=text;
-            sendLead();
-        }else if(chatId){
-            clearOptions();
-            sendLive(text);
-        }else{
-            setTimeout(function(){
-                addMsg("I'm not sure I understood that, but here's what I can help with:",'bot');
-                mainOptions();
-            },300);
-        }
+            }
+        },400);
     });
 })();
 </script>
