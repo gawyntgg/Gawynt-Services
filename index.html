@@ -1644,6 +1644,131 @@ document.addEventListener('DOMContentLoaded',()=>{
     fixNavSpacing();
 })();
 </script>
+<!-- ===== STEP FLOW ADD-ON: paste this whole block right before </body> ===== -->
+<style>
+header{padding:40px 15px 50px!important}
+#snow-banner,.top-nav,.alert-box,#dynamic-greeting,.service-area{display:none!important}
+body{padding-top:0!important}
+#step-label{text-align:center;font-weight:700;color:#0369a1;padding:14px 10px 0;font-family:'Fredoka',sans-serif}
+#step-label:empty{display:none}
+.salt-note{background:rgba(239,68,68,.12);border:2px solid #ef4444;color:#b91c1c;padding:12px;border-radius:15px;text-align:center;font-weight:700;margin:20px 0 0;line-height:1.5}
+/* Step 1 only: title, goal, plan button, reviews */
+body:not([data-step="1"]) header,body:not([data-step="1"]) #about,body:not([data-step="1"]) #services,body:not([data-step="1"]) .pick-grid,body:not([data-step="1"]) #reviews,body:not([data-step="1"]) .review-section{display:none!important}
+body:not([data-step="3"]) #calendar{display:none!important}
+body:not([data-step="4"]) #payment{display:none!important}
+body:not([data-step="5"]):not([data-step="6"]) #booking-section{display:none!important}
+body:not([data-step="3"]) .sb3,body:not([data-step="4"]) .sb4,body:not([data-step="5"]) .sb5,body:not([data-step="6"]) .sb6{display:none!important}
+/* Step 5 = details, Step 6 = tip */
+body[data-step="5"] #tip,body[data-step="5"] #orderForm button[type="submit"],body[data-step="6"] #next-tip-btn{display:none!important}
+body[data-step="6"] #orderForm>input:not([type="hidden"]),body[data-step="6"] #orderForm>textarea,body[data-step="6"] #orderForm>label,body[data-step="6"] #orderForm>.reset-btn,body[data-step="6"] #form-head{display:none!important}
+/* Mobile-safe calendar */
+#calendar .grid{grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:6px!important;margin-bottom:6px}
+#calendar #calendar-grid{margin-bottom:0}
+@media(max-width:640px){
+.container{padding:12px 12px 110px}
+#calendar .p-6{padding:12px}
+#calendar-title{font-size:1.5rem!important}
+.calendar-day{border-radius:10px!important;font-size:.9rem}
+.payment-btn{min-width:0!important;width:100%;padding:18px!important}
+.estimated-price-box .price-display{font-size:3.2rem}
+input,textarea{padding:15px}
+.submit-btn{font-size:1.2rem;padding:18px}
+.tip-grid{grid-template-columns:repeat(2,1fr)}
+.pick-btn{font-size:1.35rem;padding:22px 18px}
+}
+</style>
+<div id="step-label"></div>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);};
+document.body.setAttribute('data-step','1');
+var BK=$('booking-section'),f=$('orderForm');
+BK.removeAttribute('data-aos');
+document.body.insertBefore($('step-label'),$('page-home'));
+
+// Step 1: one plan button
+var pg=document.querySelector('.pick-grid');
+pg.style.cssText='grid-template-columns:1fr;max-width:520px;margin:30px auto';
+pg.innerHTML='<button type="button" class="pick-btn" onclick="navTo(\'individual\')"><span>Choose Your Plan<small>Pick your shoveling services</small></span><span class="arrow">➜</span></button>';
+
+// Step 2 extras: salt + area notes, back goes home
+var pb=document.querySelector('#page-plans .back-btn');
+pb.setAttribute('onclick',"navTo('')");
+var n=document.createElement('div');n.className='salt-note';
+n.innerHTML='⚠️ NO SALT SERVICE — Shoveling only!<br>📍 Serving Lower and Upper Mount Royal, Scarboro, Bankview and Marda Loop';
+pb.after(n);
+
+// Back buttons for steps 3-6
+function back(cls,target){var b=document.createElement('button');b.type='button';b.className='back-btn '+cls;b.style.margin='20px 0 15px';b.textContent='⬅ Back';b.onclick=function(){navTo(target);};return b;}
+$('calendar').before(back('sb3','individual'));
+$('payment').before(back('sb4','calendar'));
+BK.insertBefore(back('sb6','details'),BK.firstChild);
+BK.insertBefore(back('sb5','payment'),BK.firstChild);
+
+// Step 5 -> 6 button
+var sub=f.querySelector('button[type="submit"]');
+var nx=document.createElement('button');nx.type='button';nx.id='next-tip-btn';nx.className='submit-btn';
+nx.textContent='Next: Leave a Tip ➜';
+nx.onclick=function(){if(f.reportValidity())navTo('tip');};
+sub.parentNode.insertBefore(nx,sub);
+
+// Routing
+var STEPS={'':1,individual:2,bundles:2,calendar:3,payment:4,details:5,tip:6};
+function missing(h){
+ var late=['calendar','payment','details','tip'].indexOf(h)>-1;
+ if(late&&!selectedServices.length)return['individual','Pick a plan first 👆'];
+ if(['payment','details','tip'].indexOf(h)>-1&&!($('requestedDate').value&&$('requestedTime').value))return['calendar','Pick a date and time first 📅'];
+ if(['details','tip'].indexOf(h)>-1&&!$('paymentMethod').value)return['payment','Choose a payment method first 💳'];
+ if(h==='tip'&&!f.checkValidity())return['details','Please fill in your details first ✍️'];
+ return null;
+}
+function route2(){
+ var h=location.hash.replace('#','');
+ if(h==='services')h='individual';
+ var vis=h==='visitors';
+ if(!vis){
+  if(!STEPS.hasOwnProperty(h))h='';
+  var m=missing(h);
+  if(m){showToast(m[1]);location.hash=m[0];return;}
+ }
+ var step=vis?0:STEPS[h];
+ document.body.setAttribute('data-step',step);
+ document.body.classList.toggle('hide-chrome',vis||step===2);
+ $('page-visitors').style.display=vis?'block':'none';
+ $('page-home').style.display=(vis||step===2)?'none':'block';
+ $('page-plans').style.display=step===2?'block':'none';
+ $('plan-bar').style.display=step===2?'flex':'none';
+ if(step===2){
+  $('set-individual').style.display=h==='individual'?'block':'none';
+  $('set-bundles').style.display=h==='bundles'?'block':'none';
+  updatePlanBar();
+ }
+ if(step>1&&window.logEvent)window.logEvent('page',h);
+ $('step-label').textContent=step>1?'Step '+step+' of 6':'';
+ if(window.AOS&&step===1)AOS.refresh();
+ window.scrollTo(0,0);
+}
+window.removeEventListener('hashchange',window.route);
+window.route=route2;
+window.addEventListener('hashchange',route2);
+window.continueToCalendar=function(){
+ if(!selectedServices.length){showToast('Tap a plan first 👆');return;}
+ navTo('calendar');
+};
+
+// Auto-advance after picking a time (step 3) or a payment method (step 4)
+document.addEventListener('click',function(e){
+ var t=e.target;if(!t.closest)return;
+ if(t.closest('#slots-container button')&&/Select Time/.test(t.textContent))setTimeout(function(){navTo('payment');},50);
+ if(t.closest('.payment-btn'))setTimeout(function(){navTo('details');},50);
+});
+// If the chosen time was just taken, send them back to the calendar
+f.addEventListener('submit',function(){setTimeout(function(){if(!$('requestedDate').value)navTo('calendar');},0);});
+
+route2();
+})();
+</script>
+<!-- ===== END ADD-ON ===== -->
 
 </body>
 </html>
