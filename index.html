@@ -1661,14 +1661,8 @@ body:not([data-step="3"]) .sb3,body:not([data-step="4"]) .sb4,body:not([data-ste
 /* Step 5 = details, Step 6 = tip */
 body[data-step="5"] #tip,body[data-step="5"] #orderForm button[type="submit"],body[data-step="6"] #next-tip-btn{display:none!important}
 body[data-step="6"] #orderForm>input:not([type="hidden"]),body[data-step="6"] #orderForm>textarea,body[data-step="6"] #orderForm>label,body[data-step="6"] #orderForm>.reset-btn,body[data-step="6"] #form-head{display:none!important}
-/* Mobile-safe calendar */
-#calendar .grid{grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:6px!important;margin-bottom:6px}
-#calendar #calendar-grid{margin-bottom:0}
 @media(max-width:640px){
 .container{padding:12px 12px 110px}
-#calendar .p-6{padding:12px}
-#calendar-title{font-size:1.5rem!important}
-.calendar-day{border-radius:10px!important;font-size:.9rem}
 .payment-btn{min-width:0!important;width:100%;padding:18px!important}
 .estimated-price-box .price-display{font-size:3.2rem}
 input,textarea{padding:15px}
@@ -1676,6 +1670,19 @@ input,textarea{padding:15px}
 .tip-grid{grid-template-columns:repeat(2,1fr)}
 .pick-btn{font-size:1.35rem;padding:22px 18px}
 }
+/* Page animations */
+@keyframes stepFwd{from{opacity:0;transform:translateX(40px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes stepBack{from{opacity:0;transform:translateX(-40px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes popIn{from{opacity:0;transform:translateY(26px) scale(.94)}to{opacity:1;transform:none}}
+.enter-fwd{animation:stepFwd .5s cubic-bezier(.22,1,.36,1)}
+.enter-back{animation:stepBack .5s cubic-bezier(.22,1,.36,1)}
+.enter-fwd .card,.enter-back .card,.enter-fwd .payment-btn,.enter-fwd .tip-btn,.enter-fwd .pick-btn,.enter-back .payment-btn,.enter-back .tip-btn,.enter-back .pick-btn{animation:popIn .6s cubic-bezier(.22,1,.36,1) backwards}
+.grid .card:nth-child(2),.payment-btn:nth-child(2),.tip-btn:nth-child(2),.pick-btn.alt{animation-delay:.08s!important}
+.grid .card:nth-child(3),.payment-btn:nth-child(3),.tip-btn:nth-child(3){animation-delay:.16s!important}
+.grid .card:nth-child(4),.tip-btn:nth-child(4){animation-delay:.24s!important}
+.grid .card:nth-child(5){animation-delay:.32s!important}
+.grid .card:nth-child(6){animation-delay:.4s!important}
+@media(prefers-reduced-motion:reduce){.enter-fwd,.enter-back,.enter-fwd *,.enter-back *{animation:none!important}}
 </style>
 <div id="step-label"></div>
 <script>
@@ -1685,11 +1692,6 @@ document.body.setAttribute('data-step','1');
 var BK=$('booking-section'),f=$('orderForm');
 BK.removeAttribute('data-aos');
 document.body.insertBefore($('step-label'),$('page-home'));
-
-// Step 1: one plan button
-var pg=document.querySelector('.pick-grid');
-pg.style.cssText='grid-template-columns:1fr;max-width:520px;margin:30px auto';
-pg.innerHTML='<button type="button" class="pick-btn" onclick="navTo(\'individual\')"><span>Choose Your Plan<small>Pick your shoveling services</small></span><span class="arrow">➜</span></button>';
 
 // Step 2 extras: salt + area notes, back goes home
 var pb=document.querySelector('#page-plans .back-btn');
@@ -1722,6 +1724,7 @@ function missing(h){
  if(h==='tip'&&!f.checkValidity())return['details','Please fill in your details first ✍️'];
  return null;
 }
+var lastStep=1;
 function route2(){
  var h=location.hash.replace('#','');
  if(h==='services')h='individual';
@@ -1746,7 +1749,12 @@ function route2(){
  if(step>1&&window.logEvent)window.logEvent('page',h);
  $('step-label').textContent=step>1?'Step '+step+' of 6':'';
  if(window.AOS&&step===1)AOS.refresh();
- window.scrollTo(0,0);
+ var pageEl=step===2?$('page-plans'):(vis?$('page-visitors'):$('page-home'));
+ pageEl.classList.remove('enter-fwd','enter-back');
+ void pageEl.offsetWidth;
+ pageEl.classList.add(step<lastStep?'enter-back':'enter-fwd');
+ lastStep=step;
+ window.scrollTo({top:0,behavior:'instant'});
 }
 window.removeEventListener('hashchange',window.route);
 window.route=route2;
@@ -1769,6 +1777,7 @@ route2();
 })();
 </script>
 <!-- ===== END ADD-ON ===== -->
+
 
 </body>
 </html>
